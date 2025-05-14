@@ -2,26 +2,25 @@
     <div v-if="isClient" ref="mapContainer" class="h-[500px] w-full rounded-md shadow" />
 
     <div v-if="localizacaoSelecionada" class="mt-4 text-sm text-gray-200 space-y-2">
-        <div>
+        <div class="text-gray-900 dark:text-gray-200">
             <strong>Localização selecionada:</strong><br />
             Latitude: {{ localizacaoSelecionada.lat.toFixed(5) }}<br />
             Longitude: {{ localizacaoSelecionada.lng.toFixed(5) }}
         </div>
-        <form action="" class="max-w-sm mx-auto" @submit.prevent="salvarOcorrencia">
+        <form class="max-w-sm mx-auto" @submit.prevent="salvarOcorrencia">
 
             <div class="mb-5">
                 <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Descreva a
                     Ocorrência</label>
                 <input type="text" v-model="descricao"
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-red-500 dark:focus:border-red-500" />
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
             </div>
 
             <div class="mb-5">
-
                 <label for="countries" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Selecione a
                     categoria</label>
                 <select v-model="categoria"
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-red-500 dark:focus:border-red-500">
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                     <option value="">Selecione uma categoria</option>
                     <option value="Iluminação">Iluminação</option>
                     <option value="Buraco">Buraco</option>
@@ -29,7 +28,6 @@
                     <option value="Lixo">Lixo</option>
                     <option value="Outros">Outros</option>
                 </select>
-
             </div>
 
             <UButton type="submit" :disabled="descricao.length === 0 || categoria.length === 0" color="info"> Salvar
@@ -37,7 +35,9 @@
             </UButton>
         </form>
 
-        {{ endereco?.display_name }}
+        <div class="text-gray-900 dark:text-gray-200">
+            {{ endereco?.display_name }}
+        </div>
     </div>
 </template>
 
@@ -61,6 +61,8 @@ const store = useOcorrenciasStore()
 let marcador: L.Marker | null = null
 let map: L.Map
 
+const toast = useToast()
+
 function adicionarLegenda() {
     const legenda = new L.Control({ position: 'bottomright' })
 
@@ -81,7 +83,10 @@ function adicionarLegenda() {
 
     legenda.addTo(map)
 }
+function showToast(title: string) {
 
+    toast.add({ title })
+}
 function adicionarMarcadoresSalvos() {
     store.lista.forEach(ocorrencia => {
         const { id, descricao, localizacao, categoria } = ocorrencia
@@ -93,12 +98,17 @@ function adicionarMarcadoresSalvos() {
         }).addTo(map)
 
         marker.bindPopup(`
-      <div>
-       <p class="mb-0.5">  <strong>Ocorrência: ${categoria}</strong><br/></p>
-        
-        ${descricao}<br/>
-        <button data-id="${id}" style="cursor: pointer;" class=" px-3 py-2 text-xs font-medium text-center text-white bg-red-700 rounded-lg hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-80 btn-remover">Remover</button>
-      </div>
+       <div>
+            <p > <strong>Ocorrência: ${categoria}</strong><br /></p>
+
+            <p > ${descricao}</p>
+            <div class="text-right mt-4">
+            <button data-id="${id}" style="cursor: pointer;"
+                class=" px-2 py-1 text-xs font-medium text-center text-white bg-red-700 rounded-lg hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-80 btn-remover">
+                Remover
+            </button>
+            </div>
+        </div>
     `)
 
         marcadoresAtivos.set(id, marker)
@@ -143,7 +153,7 @@ function salvarOcorrencia() {
         categoria: categoria.value
     })
 
-    alert('Ocorrência salva com sucesso!')
+    showToast('Ocorrência salva com sucesso!')
     descricao.value = ''
     adicionarMarcadoresSalvos()
 }
@@ -161,7 +171,7 @@ onMounted(async () => {
         attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map)
 
-    adicionarLegenda() // 👈 aqui
+    adicionarLegenda()
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
