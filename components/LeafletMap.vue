@@ -58,6 +58,17 @@ const categoria = ref('')
 const { endereco, buscarEndereco } = useReverseGeocoding()
 const store = useOcorrenciasStore()
 
+const iconSelecionado = new L.Icon({
+    iconUrl: "/images/marking-icons/marker-icon-blue.png",
+    shadowUrl: "/images/marking-icons/marker-shadow.png",
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+})
+
+
+
 let marcador: L.Marker | null = null
 let map: L.Map
 
@@ -129,7 +140,7 @@ async function atualizarMarcador(lat: number, lng: number) {
     await buscarEndereco(lat, lng)
 
     if (!marcador) {
-        marcador = L.marker([lat, lng], { draggable: true }).addTo(map)
+        marcador = L.marker([lat, lng], { draggable: true, icon: markerIcons['Padrao'] }).addTo(map)
     }
 
     marcador.setLatLng([lat, lng]).openPopup()
