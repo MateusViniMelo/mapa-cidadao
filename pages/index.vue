@@ -8,6 +8,7 @@
           <UIcon name="hugeicons:maps-search" class="size-5" /> Mapa Cidadão
           <ColorModeButtonVue />
         </h1>
+        <p class="text-gray-900 dark:text-gray-200 mb-1">Clique no mapa para selecionar uma marcação</p>
         <LeafletMap />
       </div>
     </ClientOnly>
