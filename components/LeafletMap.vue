@@ -82,12 +82,20 @@ function adicionarLegenda() {
 
         const categorias = Object.keys(markerIcons)
 
-        div.innerHTML = categorias.map(categoria => `
-      <div class="flex items-center gap-2">
-        <img src="${markerIcons[categoria].options.iconUrl}" width="20" height="32" />
-        <span class="text-gray-900">${categoria}</span>
-      </div>
-    `).join('')
+        div.innerHTML = categorias.map(categoria => {
+
+            if (categoria !== 'Padrao') {
+
+              return  `
+<div class="flex items-center gap-2">
+<img src="${markerIcons[categoria].options.iconUrl}" width="20" height="32" />
+<span class="text-gray-900">${categoria}</span>
+</div>
+`
+            }
+        }
+
+        ).join('')
 
         return div
     }
