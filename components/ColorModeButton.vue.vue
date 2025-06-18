@@ -1,10 +1,10 @@
 <template>
   <ClientOnly v-if="!colorMode?.forced">
     <UButton :icon="isDark ? 'i-lucide-moon' : 'i-lucide-sun'" color="neutral" variant="ghost"
-      @click="isDark = !isDark" />
+      @click="isDark = !isDark" class="pointer"/>
 
     <template #fallback>
-      <div class="size-8" />
+      <div class="size-12" />
     </template>
   </ClientOnly>
 </template>
@@ -21,3 +21,9 @@ const isDark = computed({
   }
 })
 </script>
+
+<style scoped>
+.pointer{
+cursor: pointer;
+}
+</style>

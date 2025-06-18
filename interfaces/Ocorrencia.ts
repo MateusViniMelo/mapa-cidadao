@@ -6,4 +6,6 @@ export interface Ocorrencia {
     lat: number;
     lng: number;
   };
+  nome_local: string;
+  data: Date;
 }
