@@ -1,13 +1,22 @@
 <template>
     <div>
-asdasdas
+      teste
     </div>
-</template>
+  </template>
+  
+  <script lang="ts" setup>
 
-<script setup lang="ts">
-
-</script>
-
-<style scoped>
-
-</style>
+  
+  
+  import { useFlowbite } from "~/composables/useFlowbite";
+  import { initFlowbite } from "flowbite";
+  
+  onMounted(() => {
+    useFlowbite(() => {
+      initFlowbite();
+    });
+  });
+  </script>
+  
+  <style></style>
+  

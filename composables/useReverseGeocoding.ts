@@ -10,14 +10,7 @@ export const useReverseGeocoding = () => {
     erro.value = null;
 
     try {
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`,
-        {
-          headers: {
-            "Accept-Language": "pt-BR",
-          },
-        }
-      );
+      const res = await fetch(`/api/reverse-geocoding?lat=${lat}&lng=${lng}`);
 
       if (!res.ok) throw new Error("Erro ao buscar endereço");
 

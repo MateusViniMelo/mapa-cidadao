@@ -13,10 +13,8 @@
     >
       <div class="relative w-full h-full max-w-md md:h-auto">
         <div class="relative bg-white rounded-lg shadow dark:bg-gray-800">
-          <div
-            class="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-700"
-          >
-            <h3 class="text- font-semibold text-gray-900 dark:text-white">
+          <div class="flex items-start justify-between p-4 rounded-t">
+            <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
               Informar Ocorrência
             </h3>
             <button
@@ -31,13 +29,21 @@
           <div class="p-4 md:p-5">
             <!-- Formulário aqui -->
             <form @submit.prevent="salvarOcorrencia" class="space-y-4">
+              <UFormField label="Endereço" size="lg" readonly>
+                <UInput
+                  size="lg"
+                  :value="endereco?.display_name"
+                  readonly
+                  class="w-full"
+                  color="secondary"
+                />
+              </UFormField>
               <UFormField label="Ocorrência" required size="lg">
                 <UInput
                   placeholder="Descreva a Ocorrência"
                   v-model="descricao"
                   color="secondary"
                   class="w-full"
-                  
                 />
               </UFormField>
 
@@ -48,7 +54,6 @@
                   class="w-full"
                   placeholder="Selecione uma categoria"
                   color="secondary"
-                
                 />
               </UFormField>
               <UButton
@@ -111,7 +116,7 @@ function adicionarLegenda() {
   legenda.onAdd = function () {
     const div = L.DomUtil.create(
       "div",
-      "leaflet-legend bg-white p-2 rounded shadow text-sm space-y-1"
+      "leaflet-legend bg-gray-100 p-2 rounded-2xl shadow text-sm space-y-1 shadow-xl"
     );
 
     const categorias = Object.keys(markerIcons);
@@ -120,7 +125,7 @@ function adicionarLegenda() {
       .map((categoria) => {
         if (categoria !== "Padrao") {
           return `
-<div class="flex items-center gap-2">
+<div class="flex items-center gap-2 ">
 <img src="${markerIcons[categoria].options.iconUrl}" width="50" />
 <span class="text-gray-900">${categoria}</span>
 </div>
@@ -139,6 +144,7 @@ function showToast(title: string) {
 }
 function adicionarMarcadoresSalvos() {
   store.lista.forEach((ocorrencia) => {
+    
     const { id, descricao, localizacao, categoria, nome_local, data } =
       ocorrencia;
 
@@ -154,7 +160,7 @@ function adicionarMarcadoresSalvos() {
 
             <ul>
               <li>${nome_local} </li>
-              <li class="text-xs text-gray-500">${tempoAtras(data)} </li>
+              <li class="text-xs text-gray-500">${tempoAtras(data)}</li>
             
             </ul>
             <div class="text-right mt-4">
@@ -229,8 +235,7 @@ function salvarOcorrencia() {
     alert("Preencha a descrição e marque a localização.");
     return;
   }
-
-  store.adicionar({
+  const novaOcorrencia = {
     descricao: descricao.value,
     localizacao: localizacaoSelecionada.value,
     categoria: categoria.value,
@@ -240,7 +245,8 @@ function salvarOcorrencia() {
         }`
       : "",
     data: new Date(),
-  });
+  }
+  store.adicionar(novaOcorrencia);
 
   showToast("Ocorrência salva com sucesso!");
   descricao.value = "";
