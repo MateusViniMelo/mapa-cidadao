@@ -38,14 +38,6 @@
                   color="secondary"
                 />
               </UFormField>
-              <UFormField label="Ocorrência" required size="lg">
-                <UInput
-                  placeholder="Descreva a Ocorrência"
-                  v-model="descricao"
-                  color="secondary"
-                  class="w-full"
-                />
-              </UFormField>
 
               <UFormField label="Categoria" required size="lg">
                 <USelect
@@ -54,6 +46,14 @@
                   class="w-full"
                   placeholder="Selecione uma categoria"
                   color="secondary"
+                />
+              </UFormField>
+              <UFormField label="Descrição do problema" required size="lg">
+                <UInput
+                  placeholder="Descreva a Ocorrência"
+                  v-model="descricao"
+                  color="secondary"
+                  class="w-full"
                 />
               </UFormField>
               <UButton
@@ -116,7 +116,7 @@ function adicionarLegenda() {
   legenda.onAdd = function () {
     const div = L.DomUtil.create(
       "div",
-      "leaflet-legend bg-gray-100 p-2 rounded-2xl shadow text-sm space-y-1 shadow-xl"
+      "leaflet-legend bg-gray-100 p-2 rounded-2xl text-sm space-y-1 shadow-2xl"
     );
 
     const categorias = Object.keys(markerIcons);
@@ -126,7 +126,7 @@ function adicionarLegenda() {
         if (categoria !== "Padrao") {
           return `
 <div class="flex items-center gap-2 ">
-<img src="${markerIcons[categoria].options.iconUrl}" width="50" />
+<img src="${markerIcons[categoria].options.iconUrl}" width="45" />
 <span class="text-gray-900">${categoria}</span>
 </div>
 `;
@@ -144,7 +144,6 @@ function showToast(title: string) {
 }
 function adicionarMarcadoresSalvos() {
   store.lista.forEach((ocorrencia) => {
-    
     const { id, descricao, localizacao, categoria, nome_local, data } =
       ocorrencia;
 
@@ -245,7 +244,7 @@ function salvarOcorrencia() {
         }`
       : "",
     data: new Date(),
-  }
+  };
   store.adicionar(novaOcorrencia);
 
   showToast("Ocorrência salva com sucesso!");
