@@ -10,22 +10,34 @@ export function tempoAtras(data: Date | string): string {
       end: new Date(),
     });
 
-    const onlySeconds =
-      duration.years === 0 &&
-      duration.months === 0 &&
-      duration.days === 0 &&
-      duration.hours === 0 &&
-      duration.minutes === 0;
+    let unidades: (
+      | "years"
+      | "months"
+      | "days"
+      | "hours"
+      | "minutes"
+      | "seconds"
+    )[] = [];
+
+    if (duration.years || duration.months) {
+      unidades = ["years", "months"];
+    } else if (duration.days || duration.hours) {
+      unidades = ["days", "hours"];
+    } else if (duration.hours || duration.minutes) {
+      unidades = ["hours", "minutes"];
+    } else if (duration.minutes) {
+      unidades = ["minutes"];
+    } else {
+      unidades = ["seconds"];
+    }
 
     const formatted = formatDuration(duration, {
       locale: ptBR,
-      format: onlySeconds
-        ? ["seconds"]
-        : ["years", "months", "days", "hours", "minutes"],
+      format: unidades,
       delimiter: " e ",
     });
 
-    return formatted ? `há ${formatted}` : "agora";
+    return formatted ? `${formatted} atrás` : "agora";
   } catch (e) {
     return "";
   }
