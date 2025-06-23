@@ -4,7 +4,7 @@
       class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4"
     >
       <NuxtLink to="/" class="flex items-center space-x-3 rtl:space-x-reverse">
-        <UIcon name="hugeicons:maps-search" class="text-3xl text-blue-500" />
+        <UIcon name="hugeicons:maps-search" class="text-3xl text-indigo-500" />
         <span
           class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white"
           >Mapa Cidadão</span
@@ -13,7 +13,7 @@
       <div class="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
         <button
           type="button"
-          class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+          class="text-white bg-indigo-700 hover:bg-indigo-800 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800"
         >
           Entrar
         </button>
@@ -55,8 +55,8 @@
               :class="[
                 'block py-2 px-3 rounded-sm md:p-0',
                 route.path === '/'
-                  ? 'text-white bg-blue-700 md:bg-transparent md:text-blue-700 md:dark:text-blue-500'
-                  : 'text-gray-900 hover:bg-white md:hover:bg-transparent md:hover:text-blue-700 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700',
+                  ? 'text-white bg-indigo-700 md:bg-transparent md:text-indigo-700 md:dark:text-indigo-500'
+                  : 'text-gray-900 hover:bg-white md:hover:bg-transparent md:hover:text-indigo-700 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700',
               ]"
             >
               Início
@@ -68,8 +68,8 @@
               :class="[
                 'block py-2 px-3 rounded-sm md:p-0',
                 route.path === '/about'
-                  ? 'text-white bg-blue-700 md:bg-transparent md:text-blue-700 md:dark:text-blue-500'
-                  : 'text-gray-900 hover:bg-white md:hover:bg-transparent md:hover:text-blue-700 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700',
+                  ? 'text-white bg-indigo-700 md:bg-transparent md:text-indigo-700 md:dark:text-indigo-500'
+                  : 'text-gray-900 hover:bg-white md:hover:bg-transparent md:hover:text-indigo-700 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700',
               ]"
             >
               Sobre

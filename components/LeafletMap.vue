@@ -5,67 +5,67 @@
       ref="mapContainer"
       class="h-[800px] w-full rounded-md shadow"
     />
+  </div>
+  <div
+    id="modalInformar"
+    ref="modalRef"
+    class="fixed top-0 left-0 right-0 z-[9999] hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-modal md:h-full bg-transparent"
+  >
+    <div class="relative w-full h-full max-w-md md:h-auto">
+      <div class="relative bg-white rounded-lg shadow dark:bg-gray-800">
+        <div class="flex items-start justify-between p-4 rounded-t">
+          <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+            Informar Ocorrência
+          </h3>
+          <button
+            type="button"
+            @click="modalInstance?.hide()"
+            class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
+          >
+            ✕
+          </button>
+        </div>
 
-    <div
-      id="modalInformar"
-      ref="modalRef"
-      class="fixed top-0 left-0 right-0 z-[9999] hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-modal md:h-full bg-transparent"
-    >
-      <div class="relative w-full h-full max-w-md md:h-auto">
-        <div class="relative bg-white rounded-lg shadow dark:bg-gray-800">
-          <div class="flex items-start justify-between p-4 rounded-t">
-            <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
-              Informar Ocorrência
-            </h3>
-            <button
-              type="button"
-              @click="modalInstance?.hide()"
-              class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
+        <div class="p-4 md:p-5">
+          <!-- Formulário aqui -->
+          <form @submit.prevent="salvarOcorrencia" class="space-y-4">
+            <UFormField label="Endereço" size="lg" readonly>
+              <UInput
+                size="lg"
+                :value="endereco?.display_name"
+                readonly
+                class="w-full"
+                color="tertiary"
+              />
+            </UFormField>
+
+            <UFormField label="Categoria" required size="lg">
+              <USelect
+                v-model="categoria"
+                :items="tiposOcorrencias"
+                class="w-full"
+                placeholder="Selecione uma categoria"
+                color="tertiary"
+              />
+            </UFormField>
+            <UFormField label="Descrição do problema" required size="lg">
+              <UInput
+                placeholder="Descreva a Ocorrência"
+                v-model="descricao"
+                color="tertiary"
+                class="w-full"
+              />
+            </UFormField>
+            <UButton
+              type="submit"
+              :disabled="descricao.length === 0 || categoria.length === 0"
+              color="tertiary"
+              :ui="{ base: 'text-white ' }"
+              block
             >
-              ✕
-            </button>
-          </div>
-
-          <div class="p-4 md:p-5">
-            <!-- Formulário aqui -->
-            <form @submit.prevent="salvarOcorrencia" class="space-y-4">
-              <UFormField label="Endereço" size="lg" readonly>
-                <UInput
-                  size="lg"
-                  :value="endereco?.display_name"
-                  readonly
-                  class="w-full"
-                  color="secondary"
-                />
-              </UFormField>
-
-              <UFormField label="Categoria" required size="lg">
-                <USelect
-                  v-model="categoria"
-                  :items="tiposOcorrencias"
-                  class="w-full"
-                  placeholder="Selecione uma categoria"
-                  color="secondary"
-                />
-              </UFormField>
-              <UFormField label="Descrição do problema" required size="lg">
-                <UInput
-                  placeholder="Descreva a Ocorrência"
-                  v-model="descricao"
-                  color="secondary"
-                  class="w-full"
-                />
-              </UFormField>
-              <UButton
-                type="submit"
-                :disabled="descricao.length === 0 || categoria.length === 0"
-                color="info"
-                block
-              >
-                Salvar
-              </UButton>
-            </form>
-          </div>
+              Salvar
+            </UButton>
+          </form>
         </div>
       </div>
     </div>
@@ -199,7 +199,7 @@ async function atualizarMarcador(lat: number, lng: number) {
       .bindPopup(
         `
      <button id="abrir-modal"
-    class="bg-blue-600 text-white text-sm px-3 py-1 rounded shadow hover:bg-blue-700">
+    class="bg-indigo-700 hover:bg-indigo-800 text-white text-sm px-3 py-1 rounded shadow hover:bg-indigo-600">
     Informar Problema
   </button>
   `
@@ -221,7 +221,7 @@ async function atualizarMarcador(lat: number, lng: number) {
     .bindPopup(
       `
      <button id="abrir-modal"
-    class="bg-blue-600 text-white text-sm px-3 py-1 rounded shadow hover:bg-blue-700">
+    class="bg-indigo-700 hover:bg-indigo-800 text-white text-sm px-3 py-1 rounded shadow hover:bg-indigo-600">
     Informar Problema
   </button>
 `
