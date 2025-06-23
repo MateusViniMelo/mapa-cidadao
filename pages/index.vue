@@ -1,23 +1,15 @@
 <template>
-  <div>
-
-
-    <ClientOnly>
-      <div class="w-full md:w-2/3 xl:w-1/2 mx-auto px-4 py-4">
-        <h1 class="text-3xl mb-5 mt-10 text-blue-600 dark:text-blue-500 font-bold">
-          <UIcon name="hugeicons:maps-search" class="size-5" /> Mapa Cidadão
-          <ColorModeButtonVue />
-        </h1>
-        <p class="text-gray-900 dark:text-gray-200 mb-1">Clique no mapa para selecionar uma marcação</p>
-        <LeafletMap />
-      </div>
-    </ClientOnly>
-  </div>
+  <ClientOnly>
+    <div class="w-full">
+      <LeafletMap />
+    </div>
+  </ClientOnly>
 </template>
 
 <script lang="ts" setup>
-import LeafletMap from '~/components/LeafletMap.vue';
-import ColorModeButtonVue from '~/components/ColorModeButton.vue.vue';
+import LeafletMap from "~/components/LeafletMap.vue";
+
+
 </script>
 
 <style></style>
