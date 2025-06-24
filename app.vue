@@ -1,7 +1,7 @@
 <template>
   <div>
     <NuxtLayout>
-      <UApp>
+      <UApp :toaster="{position: 'top-center'}">
         <NuxtPage />
       </UApp>
     </NuxtLayout>
