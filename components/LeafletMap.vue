@@ -94,14 +94,6 @@ const { endereco, buscarEndereco } = useReverseGeocoding();
 const store = useOcorrenciasStore();
 
 const modalAberto = ref(false);
-const iconSelecionado = new L.Icon({
-  iconUrl: "/images/marking-icons/marker-icon-blue.png",
-  shadowUrl: "/images/marking-icons/marker-shadow.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41],
-});
 
 let marcador: L.Marker | null = null;
 let map: L.Map;
@@ -122,15 +114,15 @@ function adicionarLegenda() {
     const categorias = Object.keys(markerIcons);
 
     div.innerHTML = categorias
+      .filter((categoria) => categoria !== "Padrao")
       .map((categoria) => {
-        if (categoria !== "Padrao") {
-          return `
-<div class="flex items-center gap-2 ">
-<img src="${markerIcons[categoria].options.iconUrl}" width="45" />
-<span class="text-gray-900">${categoria}</span>
+        const { icon, nome } = markerIcons[categoria];
+        return `
+<div class="flex items-center gap-2">
+  <img src="${icon.options.iconUrl}" width="45" />
+  <span class="text-gray-900">${nome}</span>
 </div>
 `;
-        }
       })
       .join("");
 
@@ -139,41 +131,50 @@ function adicionarLegenda() {
 
   legenda.addTo(map);
 }
+
 function showToast(title: string) {
-  toast.add({ title, class: "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700", icon: 'i-clarity-success-standard-line' });
+  toast.add({
+    title,
+    class:
+      "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700",
+    icon: "i-clarity-success-standard-line",
+  });
 }
 function adicionarMarcadoresSalvos() {
   store.lista.forEach((ocorrencia) => {
-    const { id, descricao, localizacao, categoria, nome_local, data } =
-      ocorrencia;
+    const { id, descricao, localizacao, categoria, nome_local, data } = ocorrencia;
 
-    const icon = markerIcons[categoria] || markerIcons["Outros"];
+    const marcadorData = markerIcons[categoria] || markerIcons["Padrao"];
+    const icon = marcadorData.icon;
+    const nomeOcorrencia = marcadorData.nome;
 
     const marker = L.marker([localizacao.lat, localizacao.lng], {
       icon,
     }).addTo(map);
 
     marker.bindPopup(`
-       <div>
-            <p class="text-base"> <strong>${categoria}</strong><br /></p>
+      <div>
+        <p class="text-base"><strong>${nomeOcorrencia}</strong><br /></p>
 
-            <ul>
-              <li>${nome_local} </li>
-              <li class="text-xs text-gray-500">${tempoAtras(data)}</li>
-            
-            </ul>
-            <div class="text-right mt-4">
-            <button data-id="${id}" style="cursor: pointer;"
-                class=" px-2 py-1 text-xs font-medium text-center text-white bg-red-700 rounded-lg hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-80 btn-remover">
-                Remover
-            </button>
-            </div>
+        <ul>
+          <li>${nome_local}</li>
+          <li class="text-xs text-gray-500">${tempoAtras(data)}</li>
+        </ul>
+
+        <div class="text-right mt-4">
+          <button data-id="${id}" style="cursor: pointer;"
+            class="px-2 py-1 text-xs font-medium text-center text-white bg-red-700 rounded-lg hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800 btn-remover">
+            Remover
+          </button>
         </div>
+      </div>
     `);
 
     marcadoresAtivos.set(id, marker);
   });
 }
+
+
 function removerOcorrencia(id: number) {
   const marcador = marcadoresAtivos.get(id);
   if (marcador) {
@@ -189,21 +190,22 @@ async function atualizarMarcador(lat: number, lng: number) {
 
   await buscarEndereco(lat, lng);
 
+  const iconePadrao = markerIcons["Padrao"].icon;
+
   if (!marcador) {
     marcador = L.marker([lat, lng], {
       draggable: true,
-      icon: markerIcons["Padrao"],
+      icon: iconePadrao,
     }).addTo(map);
+
     marcador
       .setLatLng([lat, lng])
-      .bindPopup(
-        `
-     <button id="abrir-modal"
-    class="bg-indigo-700 hover:bg-indigo-800 text-white text-sm px-3 py-1 rounded shadow hover:bg-indigo-600">
-    Informar Problema
-  </button>
-  `
-      )
+      .bindPopup(`
+        <button id="abrir-modal"
+          class="bg-indigo-700 hover:bg-indigo-800 text-white text-sm px-3 py-1 rounded shadow">
+          Informar Problema
+        </button>
+      `)
       .openPopup();
   }
 
@@ -218,16 +220,15 @@ async function atualizarMarcador(lat: number, lng: number) {
       };
       await buscarEndereco(novaPosicao.lat, novaPosicao.lng);
     })
-    .bindPopup(
-      `
-     <button id="abrir-modal"
-    class="bg-indigo-700 hover:bg-indigo-800 text-white text-sm px-3 py-1 rounded shadow hover:bg-indigo-600">
-    Informar Problema
-  </button>
-`
-    )
+    .bindPopup(`
+      <button id="abrir-modal"
+        class="bg-indigo-700 hover:bg-indigo-800 text-white text-sm px-3 py-1 rounded shadow">
+        Informar Problema
+      </button>
+    `)
     .openPopup();
 }
+
 
 function salvarOcorrencia() {
   if (!localizacaoSelecionada.value || !descricao.value) {
