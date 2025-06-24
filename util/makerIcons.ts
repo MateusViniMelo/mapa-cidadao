@@ -21,7 +21,7 @@ export const markerIcons: Record<string, { icon: L.Icon; nome: string }> = {
       popupAnchor: [1, -34],
       shadowSize: [50, 25],
     }),
-    nome: "Problema com Buraco",
+    nome: "Problema de Pavimentação",
   },
   Alagamento: {
     icon: new L.Icon({
@@ -32,7 +32,7 @@ export const markerIcons: Record<string, { icon: L.Icon; nome: string }> = {
       popupAnchor: [1, -34],
       shadowSize: [50, 25],
     }),
-    nome: "Problema de Alagamento",
+    nome: "Alagamento",
   },
   Lixo: {
     icon: new L.Icon({
@@ -43,7 +43,7 @@ export const markerIcons: Record<string, { icon: L.Icon; nome: string }> = {
       popupAnchor: [1, -34],
       shadowSize: [50, 25],
     }),
-    nome: "Problema com Lixo",
+    nome: "Lixo",
   },
   Padrao: {
     icon: new L.Icon({
