@@ -60,7 +60,7 @@
               type="submit"
               :disabled="descricao.length === 0 || categoria.length === 0"
               color="tertiary"
-              :ui="{ base: 'text-white ' }"
+              :ui="{ base: 'text-white cursor-pointer ' }"
               block
             >
               Salvar
@@ -202,7 +202,7 @@ async function atualizarMarcador(lat: number, lng: number) {
       .setLatLng([lat, lng])
       .bindPopup(`
         <button id="abrir-modal"
-          class="bg-indigo-700 hover:bg-indigo-800 text-white text-sm px-3 py-1 rounded shadow">
+          class="bg-indigo-700 hover:bg-indigo-800 text-white text-sm px-3 py-1 rounded shadow cursor-pointer">
           Informar Problema
         </button>
       `)
@@ -222,7 +222,7 @@ async function atualizarMarcador(lat: number, lng: number) {
     })
     .bindPopup(`
       <button id="abrir-modal"
-        class="bg-indigo-700 hover:bg-indigo-800 text-white text-sm px-3 py-1 rounded shadow">
+        class="bg-indigo-700 hover:bg-indigo-800 text-white text-sm px-3 py-1 rounded shadow cursor-pointer">
         Informar Problema
       </button>
     `)

@@ -11,12 +11,8 @@
         >
       </NuxtLink>
       <div class="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
-        <button
-          type="button"
-          class="text-white bg-indigo-700 hover:bg-indigo-800 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800"
-        >
-          Entrar
-        </button>
+       
+        <LoginModal/>
         <button
           data-collapse-toggle="navbar-sticky"
           type="button"
@@ -83,6 +79,7 @@
       </div>
     </div>
   </nav>
+ 
 </template>
 
 <script setup lang="ts">
