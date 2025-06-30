@@ -47,7 +47,7 @@ export const markerIcons: Record<string, { icon: L.Icon; nome: string }> = {
   },
   Padrao: {
     icon: new L.Icon({
-      iconUrl: "/images/marking-icons/marker-icon-green.png",
+      iconUrl: "/images/marking-icons/marker-icon-padrao_2.png",
       shadowUrl: "/images/marking-icons/marker-shadow.png",
       iconSize: [25, 41],
       iconAnchor: [12, 41],
@@ -55,6 +55,17 @@ export const markerIcons: Record<string, { icon: L.Icon; nome: string }> = {
       shadowSize: [35, 25],
     }),
     nome: "Problema Desconhecido",
+  },
+  SemPavimentacao: {
+    icon: new L.Icon({
+      iconUrl: "/images/marking-icons/marker-icon-sem-pavimentacao.png",
+      shadowUrl: "/images/marking-icons/marker-shadow.png",
+      iconSize: [40, 40],
+      iconAnchor: [19.2, 40],
+      popupAnchor: [1, -34],
+      shadowSize: [50, 25],
+    }),
+    nome: "Sem Pavimentação",
   },
 };
 

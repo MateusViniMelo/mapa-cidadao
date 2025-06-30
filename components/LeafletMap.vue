@@ -100,7 +100,7 @@ let map: L.Map;
 
 const toast = useToast();
 
-const tiposOcorrencias = ref(["Iluminação", "Buraco", "Alagamento", "Lixo"]);
+const tiposOcorrencias = ref([{label: "Problema de Iluminação", value: "Iluminação"}, {label: "Problema de Pavimentação", value: "Buraco"}, {label: "Alagamento", value: "Alagamento"}, {label: "Lixo", value: "Lixo"}, {label: "Sem Pavimentação", value: "SemPavimentacao"}]);
 
 function adicionarLegenda() {
   const legenda = new L.Control({ position: "bottomright" });
