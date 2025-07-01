@@ -72,7 +72,7 @@
             </NuxtLink>
           </li>
 
-          <li>
+          <li class="text-center" >
             <ColorModeButtonVue />
           </li>
         </ul>
