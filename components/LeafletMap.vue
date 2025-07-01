@@ -119,8 +119,8 @@ function adicionarLegenda() {
         const { icon, nome } = markerIcons[categoria];
         return `
 <div class="flex items-center gap-2">
-  <img src="${icon.options.iconUrl}" width="45" />
-  <span class="text-gray-900">${nome}</span>
+  <img src="${icon.options.iconUrl}" class="w-[24px] md:w-[32px] xl:w-[45px]" />
+  <span class="text-gray-900 text-xs lg:text-sm">${nome}</span>
 </div>
 `;
       })
