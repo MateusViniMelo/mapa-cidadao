@@ -60,10 +60,10 @@
           </li>
           <li>
             <NuxtLink
-              to="/about"
+              to="/sobre"
               :class="[
                 'block py-2 px-3 rounded-sm md:p-0',
-                route.path === '/about'
+                route.path === '/sobre'
                   ? 'text-white bg-indigo-700 md:bg-transparent md:text-indigo-700 md:dark:text-indigo-500'
                   : 'text-gray-900 hover:bg-white md:hover:bg-transparent md:hover:text-indigo-700 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700',
               ]"
