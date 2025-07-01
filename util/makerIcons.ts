@@ -44,11 +44,9 @@ export const markerIcons: Record<string, { icon: L.Icon; nome: string }> = {
   Padrao: {
     icon: new L.Icon({
       iconUrl: "/images/marking-icons/marker-icon-padrao_2.png",
-
-      iconSize: [30, 50],
-      iconAnchor: [19.2, 40],
+      iconSize: [33.6, 48],
+      iconAnchor: [23.04, 48],
       popupAnchor: [1, -34],
-      shadowSize: [35, 25],
     }),
     nome: "Problema Desconhecido",
   },
