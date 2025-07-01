@@ -161,11 +161,16 @@ function adicionarMarcadoresSalvos() {
           <li class="text-xs text-gray-500">${tempoAtras(data)}</li>
         </ul>
 
-        <div class="text-right mt-4">
+        <div class="mt-4 flex justify-between ">
+        <div> 
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-[18px] hover:text-indigo-500 cursor-pointer" viewBox="0 0 24 24"><path fill="currentColor" d="M23 10a2 2 0 0 0-2-2h-6.32l.96-4.57c.02-.1.03-.21.03-.32c0-.41-.17-.79-.44-1.06L14.17 1L7.59 7.58C7.22 7.95 7 8.45 7 9v10a2 2 0 0 0 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73zM1 21h4V9H1z"/></svg>
+        </div>
+        <div class="">
           <button data-id="${id}" style="cursor: pointer;"
             class="px-2 py-1 text-xs font-medium text-center text-white bg-red-700 rounded-lg hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800 btn-remover">
             Remover
           </button>
+        </div>
         </div>
       </div>
     `);
