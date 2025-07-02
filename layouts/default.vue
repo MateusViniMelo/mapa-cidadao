@@ -1,13 +1,11 @@
 <template>
   <div>
     <Navbar />
-    <div class="bg-gray-100 dark:bg-gray-900 min-h-screen p-4 lg:p-0">
+    <div class="bg-white dark:bg-gray-900 min-h-screen lg:p-0">
       <slot />
     </div>
   </div>
 </template>
 <script>
-
+import Footer from "~/components/Footer.vue";
 </script>
-
-

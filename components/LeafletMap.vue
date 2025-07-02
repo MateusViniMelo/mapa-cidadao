@@ -3,7 +3,7 @@
     <div
       v-if="isClient"
       ref="mapContainer"
-      class="h-[700px] lg:h-[800px] w-full rounded-md shadow"
+      class="h-[790px] lg:h-[780px] xl:h-[880px] w-full rounded-md shadow"
     />
   </div>
   <div
@@ -100,7 +100,13 @@ let map: L.Map;
 
 const toast = useToast();
 
-const tiposOcorrencias = ref([{label: "Problema de Iluminação", value: "Iluminação"}, {label: "Problema de Pavimentação", value: "Buraco"}, {label: "Alagamento", value: "Alagamento"}, {label: "Lixo", value: "Lixo"}, {label: "Sem Pavimentação", value: "SemPavimentacao"}]);
+const tiposOcorrencias = ref([
+  { label: "Problema de Iluminação", value: "Iluminação" },
+  { label: "Problema de Pavimentação", value: "Buraco" },
+  { label: "Alagamento", value: "Alagamento" },
+  { label: "Lixo", value: "Lixo" },
+  { label: "Sem Pavimentação", value: "SemPavimentacao" },
+]);
 
 function adicionarLegenda() {
   const legenda = new L.Control({ position: "bottomright" });
@@ -108,7 +114,7 @@ function adicionarLegenda() {
   legenda.onAdd = function () {
     const div = L.DomUtil.create(
       "div",
-      "leaflet-legend bg-gray-100 p-2 rounded-2xl text-sm space-y-1 shadow-2xl"
+      "leaflet-legend  p-2 rounded-2xl text-sm space-y-1 shadow-2xl bg-white border border-gray-200  "
     );
 
     const categorias = Object.keys(markerIcons);
@@ -120,7 +126,7 @@ function adicionarLegenda() {
         return `
 <div class="flex items-center gap-2">
   <img src="${icon.options.iconUrl}" class="w-[24px] md:w-[32px]" />
-  <span class="text-gray-900 text-xs lg:text-sm">${nome}</span>
+  <span class="text-gray-700  text-xs lg:text-sm">${nome}</span>
 </div>
 `;
       })
@@ -142,7 +148,8 @@ function showToast(title: string) {
 }
 function adicionarMarcadoresSalvos() {
   store.lista.forEach((ocorrencia) => {
-    const { id, descricao, localizacao, categoria, nome_local, data } = ocorrencia;
+    const { id, descricao, localizacao, categoria, nome_local, data } =
+      ocorrencia;
 
     const marcadorData = markerIcons[categoria] || markerIcons["Padrao"];
     const icon = marcadorData.icon;
@@ -179,7 +186,6 @@ function adicionarMarcadoresSalvos() {
   });
 }
 
-
 function removerOcorrencia(id: number) {
   const marcador = marcadoresAtivos.get(id);
   if (marcador) {
@@ -205,12 +211,14 @@ async function atualizarMarcador(lat: number, lng: number) {
 
     marcador
       .setLatLng([lat, lng])
-      .bindPopup(`
+      .bindPopup(
+        `
         <button id="abrir-modal"
           class="bg-indigo-700 hover:bg-indigo-800 text-white text-sm px-3 py-1 rounded shadow cursor-pointer">
           Informar Problema
         </button>
-      `)
+      `
+      )
       .openPopup();
   }
 
@@ -225,15 +233,16 @@ async function atualizarMarcador(lat: number, lng: number) {
       };
       await buscarEndereco(novaPosicao.lat, novaPosicao.lng);
     })
-    .bindPopup(`
+    .bindPopup(
+      `
       <button id="abrir-modal"
         class="bg-indigo-700 hover:bg-indigo-800 text-white text-sm px-3 py-1 rounded shadow cursor-pointer">
         Informar Problema
       </button>
-    `)
+    `
+    )
     .openPopup();
 }
-
 
 function salvarOcorrencia() {
   if (!localizacaoSelecionada.value || !descricao.value) {
@@ -271,15 +280,16 @@ onMounted(async () => {
     [-1.45, -48.49],
     13
   );
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: "&copy; OpenStreetMap contributors",
-  }).addTo(map);
+  L.tileLayer(
+    "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+    {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      subdomains: "abcd",
+      maxZoom: 20,
+    }
+  ).addTo(map);
 
   adicionarLegenda();
-
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: "&copy; OpenStreetMap contributors",
-  }).addTo(map);
 
   // marcador atual
   if ("geolocation" in navigator) {
