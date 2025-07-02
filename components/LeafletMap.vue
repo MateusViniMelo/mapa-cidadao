@@ -3,7 +3,7 @@
     <div
       v-if="isClient"
       ref="mapContainer"
-      class="h-[790px] lg:h-[780px] xl:h-[880px] w-full rounded-md shadow"
+      class="h-[700px] lg:h-[800px] w-full rounded-md shadow"
     />
   </div>
   <div
