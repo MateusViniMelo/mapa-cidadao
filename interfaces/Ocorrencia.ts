@@ -1,6 +1,6 @@
 export interface Ocorrencia {
   id: number;
-  descricao: string;
+  descricao?: string;
   categoria: string;
   localizacao: {
     lat: number;

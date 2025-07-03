@@ -84,7 +84,7 @@
 
 <script setup lang="ts">
 import ColorModeButtonVue from "~/components/ColorModeButton.vue.vue";
-
+import LoginModal from "@/components/LoginModal.vue";
 import { useRoute } from "vue-router";
 
 const route = useRoute();

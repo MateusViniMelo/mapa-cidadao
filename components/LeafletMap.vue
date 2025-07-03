@@ -58,7 +58,7 @@
             </UFormField>
             <UButton
               type="submit"
-              :disabled="descricao.length === 0 || categoria.length === 0"
+              :disabled="categoria.length === 0"
               color="tertiary"
               :ui="{ base: 'text-white cursor-pointer ' }"
               block
@@ -92,6 +92,7 @@ const descricao = ref("");
 const categoria = ref("");
 const { endereco, buscarEndereco } = useReverseGeocoding();
 const store = useOcorrenciasStore();
+const carregandoLocalizacao = ref(false);
 
 const modalAberto = ref(false);
 
@@ -245,7 +246,7 @@ async function atualizarMarcador(lat: number, lng: number) {
 }
 
 function salvarOcorrencia() {
-  if (!localizacaoSelecionada.value || !descricao.value) {
+  if (!localizacaoSelecionada.value) {
     alert("Preencha a descrição e marque a localização.");
     return;
   }
@@ -268,6 +269,38 @@ function salvarOcorrencia() {
   modalInstance?.value?.hide();
 }
 
+function adicionarBotaoRecentrar() {
+  const botao = new L.Control({ position: "bottomright" });
+
+  botao.onAdd = function () {
+    const div = L.DomUtil.create("div");
+
+    div.innerHTML = `
+      <button id="btn-recentralizar"
+        class="mb-1 block w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-2 rounded-lg shadow-md cursor-pointer flex items-center justify-center ">
+        <svg xmlns="http://www.w3.org/2000/svg" id="btn-recentralizar-texto" class=" w-4 h-4 me-1 text-white " viewBox="0 0 24 24"><path fill="currentColor" d="M12 6.5A2.5 2.5 0 0 1 14.5 9a2.5 2.5 0 0 1-2.5 2.5A2.5 2.5 0 0 1 9.5 9A2.5 2.5 0 0 1 12 6.5M12 2a7 7 0 0 1 7 7c0 5.25-7 13-7 13S5 14.25 5 9a7 7 0 0 1 7-7m0 2a5 5 0 0 0-5 5c0 1 0 3 5 9.71C17 12 17 10 17 9a5 5 0 0 0-5-5"/></svg>
+
+      
+
+              <svg aria-hidden="true" role="status" class="w-4 h-4 me-1 text-white animate-spin hidden" id="btn-recentralizar-loading" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="#E5E7EB"/>
+<path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentColor"/>
+</svg>
+        Localização Atual
+
+      </button>
+    `;
+
+    // Impede que o clique no botão afete o mapa abaixo
+    L.DomEvent.disableClickPropagation(div);
+    L.DomEvent.disableScrollPropagation(div);
+
+    return div;
+  };
+
+  botao.addTo(map);
+}
+
 onMounted(async () => {
   isClient.value = true;
   await nextTick();
@@ -283,26 +316,16 @@ onMounted(async () => {
   L.tileLayer(
     "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
     {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
       subdomains: "abcd",
       maxZoom: 20,
     }
   ).addTo(map);
 
   adicionarLegenda();
+  adicionarBotaoRecentrar();
 
-  // marcador atual
-  if ("geolocation" in navigator) {
-    navigator.geolocation.getCurrentPosition(
-      async ({ coords }) => {
-        await atualizarMarcador(coords.latitude, coords.longitude);
-        map.setView([coords.latitude, coords.longitude], 16);
-      },
-      (err) => console.error("Erro ao obter localização:", err)
-    );
-  }
-
-  // clique no mapa
   map.on("click", async (e) => {
     const { lat, lng } = e.latlng;
     await atualizarMarcador(lat, lng);
@@ -328,6 +351,49 @@ onMounted(async () => {
           backdropClasses: "hidden",
         });
         modalInstance.value.show();
+      }
+    }
+    if (target.id === "btn-recentralizar") {
+      const botao = target as HTMLButtonElement;
+      const texto = document.getElementById("btn-recentralizar-texto");
+      const spinner = document.getElementById("btn-recentralizar-loading");
+
+      botao.disabled = true;
+      carregandoLocalizacao.value = true;
+      texto?.classList.add("hidden");
+      spinner?.classList.remove("hidden");
+
+      const finalizar = () => {
+        carregandoLocalizacao.value = false;
+        botao.disabled = false;
+        texto?.classList.remove("hidden");
+        spinner?.classList.add("hidden");
+      };
+
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          async ({ coords }) => {
+            await atualizarMarcador(coords.latitude, coords.longitude);
+            map.setView([coords.latitude, coords.longitude], 16);
+            finalizar();
+          },
+          (err) => {
+            toast.add({
+              title: "Erro ao obter sua localização.",
+              icon: "i-heroicons-x-circle",
+              color: "error",
+            });
+            console.error("Erro ao obter localização:", err);
+            finalizar();
+          }
+        );
+      } else {
+        toast.add({
+          title: "Geolocalização não disponível no seu navegador.",
+          icon: "i-heroicons-map-pin",
+          color: "error",
+        });
+        finalizar();
       }
     }
   });
