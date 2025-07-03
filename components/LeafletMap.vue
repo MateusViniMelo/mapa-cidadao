@@ -379,9 +379,11 @@ onMounted(async () => {
           },
           (err) => {
             toast.add({
-              title: "Erro ao obter sua localização.",
+              title: "Não foi possível obter sua localização.",
+              description: "Verifique se você concedeu permissão de acesso à sua localização para este site nas configurações do navegador e tente novamente.",
               icon: "i-heroicons-x-circle",
               color: "error",
+              duration: 10000
             });
             console.error("Erro ao obter localização:", err);
             finalizar();
