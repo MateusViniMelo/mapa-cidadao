@@ -1,6 +1,7 @@
 <template>
   <UModal
     :dismissible="false"
+    v-model:open="first"
     title="Entrar no Mapa Cidadão"
     :close="{
       color: 'tertiary',
@@ -28,7 +29,6 @@
             name="email"
             id="email"
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-          
             required
           />
         </div>
@@ -50,7 +50,6 @@
         <div class="flex justify-between">
           <div class="flex items-start"></div>
           <a
-            
             class="text-sm text-indigo-700 hover:underline dark:text-indigo-500 cursor-pointer"
             >Esqueceu sua senha?</a
           >
@@ -63,15 +62,28 @@
         </button>
         <div class="text-sm font-medium text-gray-500 dark:text-gray-300">
           Sem Registro?
-          <a  class="text-indigo-700 hover:underline dark:text-indigo-500 cursor-pointer"
-            >Criar conta</a
-          >
+        
+          <RegisterModal/>
         </div>
       </form>
     </template>
   </UModal>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { ref } from "vue";
+const first = ref(false);
+const second = ref(false);
+const email = ref("");
+const password = ref("");
+const authStore = useAuthStore();
+
+async function handleLogin() {
+  await authStore.login({ email: email.value, password: password.value });
+  console.log(authStore.user);
+}
+
+
+</script>
 
 <style scoped></style>
