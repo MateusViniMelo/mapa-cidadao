@@ -2,12 +2,13 @@
 import type { LoginForm } from "~/interfaces/LoginForm";
 import type { RegisterForm } from "~/interfaces/RegisterForm";
 import type { IUserResponse } from "~/interfaces/responses/IUserResponse";
+import type { RegisterUserSchema } from "~/validators/registerUserSchema";
 
 export const useAuthService = () => {
   const config = useRuntimeConfig();
   const baseURL = config.public.apiBase;
 
-  async function register(form: RegisterForm) {
+  async function register(form: RegisterUserSchema) {
     return await $fetch<IUserResponse>("/register", {
       method: "POST",
       body: form,

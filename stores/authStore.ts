@@ -4,30 +4,50 @@ import type { RegisterForm } from "~/interfaces/RegisterForm";
 import { useAuthService } from "~/composables/authService";
 import type { IUser } from "~/interfaces/IUser";
 import type { IUserResponse } from "~/interfaces/responses/IUserResponse";
+import type { RegisterUserSchema } from "~/validators/registerUserSchema";
 
 export const useAuthStore = defineStore("auth", () => {
   // useCookie já lê/salva automaticamente no cookie
   const token = useCookie<string | null>("auth_token", {
     path: "/", // cookie válido para todo o site
-    maxAge: 60 * 60 * 24 * 7, // expira em 7 dias
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
   });
 
   const user = useCookie<IUser | null>("auth_user", {
     path: "/",
-    maxAge: 60 * 60 * 24 * 7,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
   });
 
   const isAuthenticated = computed(() => !!token.value);
 
-  const authService = useAuthService()
-  async function register(form: RegisterForm) {
-    const res: IUserResponse = await authService.register(form);
-    user.value = res.user;
-    token.value = res.token;
+  const loading = ref(false);
+
+  const authService = useAuthService();
+  const toast = useToast();
+
+  async function register(form: RegisterUserSchema) {
+    loading.value = true;
+
+    try {
+      const res: IUserResponse = await authService.register(form);
+      user.value = res.user;
+      token.value = res.token;
+      toast.add({
+        title: "Sucesso",
+        description: "Cadastro Realizado com sucesso.",
+        color: "success",
+      });
+    } catch (err: any) {
+      toast.add({
+        title: "Ocorreu um erro",
+        description: err?.data?.message || "Erro ao registrar",
+        color: "error",
+      });
+    } finally {
+      loading.value = false;
+    }
   }
 
   async function login(form: LoginForm) {
@@ -63,6 +83,7 @@ export const useAuthStore = defineStore("auth", () => {
   return {
     user,
     token,
+    loading,
     isAuthenticated,
     register,
     login,

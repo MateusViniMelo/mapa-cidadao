@@ -11,8 +11,7 @@
         >
       </NuxtLink>
       <div class="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
-       
-        <LoginModal/>
+        <LoginModal />
         <button
           data-collapse-toggle="navbar-sticky"
           type="button"
@@ -72,18 +71,17 @@
             </NuxtLink>
           </li>
 
-          <li class="text-center" >
+          <li class="text-center">
             <ColorModeButtonVue />
           </li>
         </ul>
       </div>
     </div>
   </nav>
- 
 </template>
 
 <script setup lang="ts">
-import ColorModeButtonVue from "~/components/ColorModeButton.vue.vue";
+import ColorModeButtonVue from "~/components/ColorModeButton.vue";
 import LoginModal from "@/components/LoginModal.vue";
 import { useRoute } from "vue-router";
 
