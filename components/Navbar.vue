@@ -20,14 +20,13 @@
           v-if="authStore.user != undefined && authStore.user != null"
         >
           <UAvatar
-          class="cursor-pointer"
+            class="cursor-pointer"
             size="lg"
             :alt="authStore.user?.name"
             src="https://www.shutterstock.com/image-vector/default-avatar-profile-icon-social-600nw-1906669723.jpg"
           />
           <template #logout>
             <UButton
-            
               color="error"
               variant="ghost"
               icon="i-heroicons-arrow-left-on-rectangle"
@@ -137,29 +136,33 @@ function getSiglaPrimeiroEUltimo(nomeCompleto: string): string {
   return `${primeiraLetra}.${ultimaLetra}`;
 }
 
-const items = [
-  [
-    {
-      label: getPrimeiroEUltimoNome(authStore.user?.name ?? ""),
-      type: "label",
-    },
-  ],
-  [
-    {
-      label: "Meu perfil",
-      icon: "i-heroicons-user",
-      to: "/profile",
-    },
-    {
-      label: "Configurações",
-      icon: "i-heroicons-cog-6-tooth",
-      to: "/settings",
-    },
-    {
-      label: "Sair",
-      icon: "i-heroicons-arrow-left-on-rectangle",
-      slot: "logout", // vamos criar um slot customizado pro botão
-    },
-  ],
-];
+const items = computed(() => {
+  if (!authStore.user) return [];
+
+  return [
+    [
+      {
+        label: authStore.user.name,
+        type: "label",
+      },
+    ],
+    [
+      {
+        label: "Meu perfil",
+        icon: "i-heroicons-user",
+        to: "/profile",
+      },
+      {
+        label: "Configurações",
+        icon: "i-heroicons-cog-6-tooth",
+        to: "/settings",
+      },
+      {
+        label: "Sair",
+        icon: "i-heroicons-arrow-left-on-rectangle",
+        slot: "logout",
+      },
+    ],
+  ];
+});
 </script>

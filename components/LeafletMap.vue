@@ -81,7 +81,7 @@ import { useOcorrenciasStore } from "@/stores/ocorrencias";
 import { markerIcons } from "@/util/makerIcons";
 import { Modal } from "flowbite";
 import { tempoAtras } from "@/util/date";
-
+import { useAuthStore } from "#imports";
 const modalInstance = ref<Modal | null>(null);
 const modalRef = ref<HTMLElement | null>(null);
 const mapContainer = ref<HTMLElement | null>(null);
@@ -94,6 +94,7 @@ const { endereco, buscarEndereco } = useReverseGeocoding();
 const store = useOcorrenciasStore();
 const carregandoLocalizacao = ref(false);
 
+const authStore = useAuthStore();
 const modalAberto = ref(false);
 
 let marcador: L.Marker | null = null;
@@ -344,13 +345,15 @@ onMounted(async () => {
     }
     if (target.id === "abrir-modal") {
       modalAberto.value = true;
-
-      // flowbite: mostrar modal
-      if (modalRef.value) {
-        modalInstance.value = new Modal(modalRef.value, {
-          backdropClasses: "hidden",
-        });
-        modalInstance.value.show();
+      if (authStore.user === null || authStore.user === undefined) {
+        alert("Usuário Não autenticado");
+      } else {
+        if (modalRef.value) {
+          modalInstance.value = new Modal(modalRef.value, {
+            backdropClasses: "hidden",
+          });
+          modalInstance.value.show();
+        }
       }
     }
     if (target.id === "btn-recentralizar") {
@@ -380,10 +383,11 @@ onMounted(async () => {
           (err) => {
             toast.add({
               title: "Não foi possível obter sua localização.",
-              description: "Verifique se você concedeu permissão de acesso à sua localização para este site nas configurações do navegador e tente novamente.",
+              description:
+                "Verifique se você concedeu permissão de acesso à sua localização para este site nas configurações do navegador e tente novamente.",
               icon: "i-heroicons-x-circle",
               color: "error",
-              duration: 10000
+              duration: 10000,
             });
             console.error("Erro ao obter localização:", err);
             finalizar();
