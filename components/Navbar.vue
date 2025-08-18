@@ -11,7 +11,35 @@
         >
       </NuxtLink>
       <div class="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
-        <LoginModal />
+        <LoginModal
+          v-if="authStore.user === undefined || authStore.user === null"
+        />
+        <UDropdownMenu
+          :items="items"
+          :popper="{ placement: 'bottom-end' }"
+          v-if="authStore.user != undefined && authStore.user != null"
+        >
+          <UAvatar
+          class="cursor-pointer"
+            size="lg"
+            :alt="authStore.user?.name"
+            src="https://www.shutterstock.com/image-vector/default-avatar-profile-icon-social-600nw-1906669723.jpg"
+          />
+          <template #logout>
+            <UButton
+            
+              color="error"
+              variant="ghost"
+              icon="i-heroicons-arrow-left-on-rectangle"
+              :loading="authStore.loading"
+              class="w-full cursor-pointer"
+              @click="authStore.logout()"
+            >
+              Sair
+            </UButton>
+          </template>
+        </UDropdownMenu>
+
         <button
           data-collapse-toggle="navbar-sticky"
           type="button"
@@ -84,6 +112,54 @@
 import ColorModeButtonVue from "~/components/ColorModeButton.vue";
 import LoginModal from "@/components/LoginModal.vue";
 import { useRoute } from "vue-router";
+import { useAuthStore } from "@/stores/authStore";
 
+const authStore = useAuthStore();
 const route = useRoute();
+
+function getPrimeiroEUltimoNome(nomeCompleto: string): string {
+  const partes: string[] = nomeCompleto.trim().split(/\s+/);
+
+  return `${partes[0] || ""} ${
+    partes.length > 1 ? partes[partes.length - 1] : ""
+  }`;
+}
+
+function getSiglaPrimeiroEUltimo(nomeCompleto: string): string {
+  const partes: string[] = nomeCompleto.trim().split(/\s+/);
+
+  if (partes.length === 0) return "";
+
+  const primeiraLetra = partes[0]?.charAt(0).toUpperCase() || "";
+  const ultimaLetra =
+    partes.length > 1 ? partes[partes.length - 1]?.charAt(0).toUpperCase() : "";
+
+  return `${primeiraLetra}.${ultimaLetra}`;
+}
+
+const items = [
+  [
+    {
+      label: getPrimeiroEUltimoNome(authStore.user?.name ?? ""),
+      type: "label",
+    },
+  ],
+  [
+    {
+      label: "Meu perfil",
+      icon: "i-heroicons-user",
+      to: "/profile",
+    },
+    {
+      label: "Configurações",
+      icon: "i-heroicons-cog-6-tooth",
+      to: "/settings",
+    },
+    {
+      label: "Sair",
+      icon: "i-heroicons-arrow-left-on-rectangle",
+      slot: "logout", // vamos criar um slot customizado pro botão
+    },
+  ],
+];
 </script>

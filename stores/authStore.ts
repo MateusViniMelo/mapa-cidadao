@@ -1,10 +1,10 @@
 import { defineStore } from "pinia";
 import type { LoginForm } from "~/interfaces/LoginForm";
-import type { RegisterForm } from "~/interfaces/RegisterForm";
 import { useAuthService } from "~/composables/authService";
 import type { IUser } from "~/interfaces/IUser";
 import type { IUserResponse } from "~/interfaces/responses/IUserResponse";
 import type { RegisterUserSchema } from "~/validators/registerUserSchema";
+import type { LoginUserSchema } from "~/validators/loginUserSchema";
 
 export const useAuthStore = defineStore("auth", () => {
   // useCookie já lê/salva automaticamente no cookie
@@ -50,10 +50,27 @@ export const useAuthStore = defineStore("auth", () => {
     }
   }
 
-  async function login(form: LoginForm) {
-    const res: IUserResponse = await authService.login(form);
-    user.value = res.user;
-    token.value = res.token;
+  async function login(form: LoginUserSchema) {
+    loading.value = true;
+
+    try {
+      const res: IUserResponse = await authService.login(form);
+      user.value = res.user;
+      token.value = res.token;
+       toast.add({
+         title: "Sucesso",
+         description: "Login realizado com sucesso.",
+         color: "success",
+       });
+    } catch (err: any) {
+      toast.add({
+        title: "Ocorreu um erro",
+        description: err?.data?.message || "Erro ao registrar",
+        color: "error",
+      });
+    } finally {
+      loading.value = false;
+    }
   }
 
   async function getUser() {
@@ -70,13 +87,16 @@ export const useAuthStore = defineStore("auth", () => {
 
   async function logout() {
     if (!token.value) return;
+    loading.value = true;
     try {
       await authService.logout(token.value);
     } catch (e) {
       console.error("Erro ao sair", e);
     } finally {
+      
       user.value = null;
       token.value = null;
+      loading.value = false;
     }
   }
 

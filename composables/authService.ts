@@ -2,6 +2,7 @@
 import type { LoginForm } from "~/interfaces/LoginForm";
 import type { RegisterForm } from "~/interfaces/RegisterForm";
 import type { IUserResponse } from "~/interfaces/responses/IUserResponse";
+import type { LoginUserSchema } from "~/validators/loginUserSchema";
 import type { RegisterUserSchema } from "~/validators/registerUserSchema";
 
 export const useAuthService = () => {
@@ -16,7 +17,7 @@ export const useAuthService = () => {
     });
   }
 
-  async function login(form: LoginForm) {
+  async function login(form: LoginUserSchema) {
     return await $fetch<IUserResponse>("/user/login", {
       method: "POST",
       body: form,

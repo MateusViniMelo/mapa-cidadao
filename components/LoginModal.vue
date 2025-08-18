@@ -17,73 +17,65 @@
     />
 
     <template #body>
-      <form class="space-y-4">
-        <div>
-          <label
-            for="email"
-            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >Email</label
-          >
-          <input
-            type="email"
-            name="email"
-            id="email"
-            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-            required
-          />
-        </div>
-        <div>
-          <label
-            for="password"
-            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >Senha</label
-          >
-          <input
+      <UForm
+        :schema="loginUserSchema"
+        :state="state"
+        class="space-y-4"
+        @submit="onSubmit"
+      >
+        <UFormField label="Email" name="email">
+          <UInput v-model="state.email" class="w-full" color="tertiary" />
+        </UFormField>
+
+        <UFormField label="Senha" name="password">
+          <UInput
+            v-model="state.password"
             type="password"
-            name="password"
-            id="password"
-            placeholder="••••••••"
-            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-            required
+            class="w-full"
+            color="tertiary"
           />
-        </div>
-        <div class="flex justify-between">
-          <div class="flex items-start"></div>
-          <a
-            class="text-sm text-indigo-700 hover:underline dark:text-indigo-500 cursor-pointer"
-            >Esqueceu sua senha?</a
-          >
-        </div>
-        <button
+        </UFormField>
+
+        <UButton
           type="submit"
-          class="w-full text-white bg-indigo-700 hover:bg-indigo-800 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800"
+          class="w-full flex justify-center"
+          :loading="authStore.loading"
+          :ui="{
+            base: 'text-white bg-indigo-700  hover:bg-indigo-800 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800 cursor-pointer',
+          }"
         >
           Entrar
-        </button>
-        <div class="text-sm font-medium text-gray-500 dark:text-gray-300">
-          Sem Registro?
-        
-          <RegisterModal/>
-        </div>
-      </form>
+        </UButton>
+      </UForm>
+      <div class="text-sm font-medium text-gray-500 dark:text-gray-300 mt-5">
+        Sem Registro?
+
+        <RegisterModal />
+      </div>
     </template>
   </UModal>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import type { FormSubmitEvent } from "@nuxt/ui";
+import { useAuthStore } from "@/stores/authStore";
+import {
+  loginUserSchema,
+  type LoginUserSchema,
+} from "~/validators/loginUserSchema";
+
+const state = reactive<Partial<LoginUserSchema>>({
+  email: undefined,
+  password: undefined,
+});
 const first = ref(false);
-const second = ref(false);
-const email = ref("");
-const password = ref("");
 const authStore = useAuthStore();
 
-async function handleLogin() {
-  await authStore.login({ email: email.value, password: password.value });
-  console.log(authStore.user);
+async function onSubmit(event: FormSubmitEvent<LoginUserSchema>) {
+  await authStore.login(event.data).then(() => {
+    first.value = false;
+  });
 }
-
-
 </script>
 
 <style scoped></style>
