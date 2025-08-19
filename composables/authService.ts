@@ -1,6 +1,5 @@
 // composables/useAuthService.ts
-import type { LoginForm } from "~/interfaces/LoginForm";
-import type { RegisterForm } from "~/interfaces/RegisterForm";
+
 import type { IUserResponse } from "~/interfaces/responses/IUserResponse";
 import type { LoginUserSchema } from "~/validators/loginUserSchema";
 import type { RegisterUserSchema } from "~/validators/registerUserSchema";

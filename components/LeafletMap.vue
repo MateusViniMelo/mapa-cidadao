@@ -6,70 +6,61 @@
       class="h-[700px] lg:h-[800px] w-full rounded-md shadow"
     />
   </div>
-  <div
-    id="modalInformar"
-    ref="modalRef"
-    class="fixed top-0 left-0 right-0 z-[9999] hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-modal md:h-full bg-transparent"
+  <UModal
+    v-model:open="modalAberto"
+    title="Criar Ocorrência"
+    :close="{
+      color: 'tertiary',
+      variant: 'outline',
+      class: 'rounded-full',
+    }"
   >
-    <div class="relative w-full h-full max-w-md md:h-auto">
-      <div class="relative bg-white rounded-lg shadow dark:bg-gray-800">
-        <div class="flex items-start justify-between p-4 rounded-t">
-          <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
-            Informar Ocorrência
-          </h3>
-          <button
-            type="button"
-            @click="modalInstance?.hide()"
-            class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
-          >
-            ✕
-          </button>
-        </div>
+    <UButton label="Open" color="neutral" variant="subtle" />
 
-        <div class="p-4 md:p-5">
-          <!-- Formulário aqui -->
-          <form @submit.prevent="salvarOcorrencia" class="space-y-4">
-            <UFormField label="Endereço" size="lg" readonly>
-              <UInput
-                size="lg"
-                :value="endereco?.display_name"
-                readonly
-                class="w-full"
-                color="tertiary"
-              />
-            </UFormField>
-
-            <UFormField label="Categoria" required size="lg">
-              <USelect
-                v-model="categoria"
-                :items="tiposOcorrencias"
-                class="w-full"
-                placeholder="Selecione uma categoria"
-                color="tertiary"
-              />
-            </UFormField>
-            <UFormField label="Descrição do problema" required size="lg">
-              <UInput
-                placeholder="Descreva a Ocorrência"
-                v-model="descricao"
-                color="tertiary"
-                class="w-full"
-              />
-            </UFormField>
-            <UButton
-              type="submit"
-              :disabled="categoria.length === 0"
+    <template #body>
+      <div >
+        <!-- Formulário aqui -->
+        <form @submit.prevent="salvarOcorrencia" class="space-y-4">
+          <UFormField label="Endereço" size="lg" readonly>
+            <UInput
+              size="lg"
+              :value="endereco?.display_name"
+              readonly
+              class="w-full"
               color="tertiary"
-              :ui="{ base: 'text-white cursor-pointer ' }"
-              block
-            >
-              Salvar
-            </UButton>
-          </form>
-        </div>
+            />
+          </UFormField>
+
+          <UFormField label="Categoria" required size="lg">
+            <USelect
+              v-model="selectedType"
+              :items="options"
+              class="w-full"
+              placeholder="Selecione uma categoria"
+              color="tertiary"
+            />
+          </UFormField>
+          <UFormField label="Descrição do problema" required size="lg">
+            <UInput
+              placeholder="Descreva a Ocorrência"
+              v-model="descricao"
+              color="tertiary"
+              class="w-full"
+            />
+          </UFormField>
+          <UButton
+            type="submit"
+            :disabled="categoria.length === 0"
+            color="tertiary"
+            :ui="{ base: 'text-white cursor-pointer ' }"
+            block
+          >
+            Salvar
+          </UButton>
+        </form>
       </div>
-    </div>
-  </div>
+    </template>
+  </UModal>
 </template>
 
 <script setup lang="ts">
@@ -79,11 +70,12 @@ import "leaflet/dist/leaflet.css";
 import { useReverseGeocoding } from "@/composables/useReverseGeocoding";
 import { useOcorrenciasStore } from "@/stores/ocorrencias";
 import { markerIcons } from "@/util/makerIcons";
-import { Modal } from "flowbite";
+
 import { tempoAtras } from "@/util/date";
 import { useAuthStore } from "#imports";
-const modalInstance = ref<Modal | null>(null);
-const modalRef = ref<HTMLElement | null>(null);
+import { useTypesOcurrencesService } from "#imports";
+import type { ITypeOcurrence } from "~/interfaces/ITypeOcurrence";
+
 const mapContainer = ref<HTMLElement | null>(null);
 const marcadoresAtivos = new Map<number, L.Marker>();
 const isClient = ref(false);
@@ -95,6 +87,8 @@ const store = useOcorrenciasStore();
 const carregandoLocalizacao = ref(false);
 
 const authStore = useAuthStore();
+const typesOcurrenceService = useTypesOcurrencesService();
+const { fetchTypesOcurrence } = typesOcurrenceService;
 const modalAberto = ref(false);
 
 let marcador: L.Marker | null = null;
@@ -102,13 +96,9 @@ let map: L.Map;
 
 const toast = useToast();
 
-const tiposOcorrencias = ref([
-  { label: "Problema de Iluminação", value: "Iluminação" },
-  { label: "Problema de Pavimentação", value: "Buraco" },
-  { label: "Alagamento", value: "Alagamento" },
-  { label: "Lixo", value: "Lixo" },
-  { label: "Sem Pavimentação", value: "SemPavimentacao" },
-]);
+const types = ref<ITypeOcurrence[]>([]);
+const loading = ref(true);
+const selectedType = ref<number | undefined>(undefined); // guarda o id selecionado
 
 function adicionarLegenda() {
   const legenda = new L.Control({ position: "bottomright" });
@@ -267,7 +257,6 @@ function salvarOcorrencia() {
   showToast("Ocorrência salva com sucesso!");
   descricao.value = "";
   adicionarMarcadoresSalvos();
-  modalInstance?.value?.hide();
 }
 
 function adicionarBotaoRecentrar() {
@@ -302,6 +291,12 @@ function adicionarBotaoRecentrar() {
   botao.addTo(map);
 }
 
+const options = computed(() =>
+  types.value.map((t) => ({
+    label: t.name,
+    value: t.id,
+  }))
+);
 onMounted(async () => {
   isClient.value = true;
   await nextTick();
@@ -344,16 +339,10 @@ onMounted(async () => {
       el?.scrollIntoView({ behavior: "smooth" });
     }
     if (target.id === "abrir-modal") {
-      modalAberto.value = true;
       if (authStore.user === null || authStore.user === undefined) {
         alert("Usuário Não autenticado");
       } else {
-        if (modalRef.value) {
-          modalInstance.value = new Modal(modalRef.value, {
-            backdropClasses: "hidden",
-          });
-          modalInstance.value.show();
-        }
+        modalAberto.value = true;
       }
     }
     if (target.id === "btn-recentralizar") {
@@ -405,5 +394,10 @@ onMounted(async () => {
   });
   // adicionar marcadores anteriores
   adicionarMarcadoresSalvos();
+  try {
+    types.value = await fetchTypesOcurrence();
+  } finally {
+    loading.value = false;
+  }
 });
 </script>
