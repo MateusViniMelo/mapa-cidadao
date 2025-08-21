@@ -311,7 +311,7 @@ async function salvarOcorrencia() {
   await ocurrenceStore
     .addOcurrence(ocurrencePayload)
     .then(() => {
-      adicionarMarcadoresSalvos();
+      recarregarMarcadores();
       toast.add({
         title: "Ocorrência criada",
         description: "Ocorrência salva com sucesso.",
@@ -324,7 +324,7 @@ async function salvarOcorrencia() {
         description: "Não foi possível salvar ocorrência.",
         color: "error",
       });
-      adicionarMarcadoresSalvos();
+      recarregarMarcadores();
     })
     .finally(() => {
       descricao.value = "";
@@ -370,6 +370,17 @@ const options = computed(() =>
     value: t.id,
   }))
 );
+
+watch(
+  () => authStore.user?.id,
+  () => recarregarMarcadores()
+);
+
+function recarregarMarcadores() {
+  marcadoresAtivos.forEach((m) => m.remove());
+  marcadoresAtivos.clear();
+  adicionarMarcadoresSalvos();
+}
 onMounted(async () => {
   isClient.value = true;
   await nextTick();
