@@ -28,11 +28,15 @@ export const registerUserSchema = z
       .refine(
         (val) => dayjs(val).isBefore(dayjs(), "day"),
         "A data de nascimento deve ser anterior a hoje"
+      )
+      .refine(
+        (val) => dayjs(val).isBefore(dayjs().subtract(18, "year"), "day"),
+        "Você deve ter pelo menos 18 anos"
       ),
   })
   .refine((data) => data.password === data.password_confirmation, {
     message: "As senha não são iguais",
-    path: ["password_confirmation"], // Aponta para o campo com erro
+    path: ["password_confirmation"],
   });
 
 export type RegisterUserSchema = z.infer<typeof registerUserSchema>;
