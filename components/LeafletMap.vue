@@ -173,7 +173,7 @@ function adicionarMarcadoresSalvos() {
         icon,
       }
     ).addTo(map);
-    console.log(`Olha o id do usuário ${authStore.user?.id}`);
+   
     if (authStore.user?.id === user_id) {
       marker.bindPopup(`
         <div>
@@ -317,7 +317,7 @@ async function salvarOcorrencia() {
     country: enderecoAchado.value?.address.country,
   };
 
-  console.log(ocurrencePayload);
+
 
   await ocurrenceStore
     .addOcurrence(ocurrencePayload)
@@ -396,7 +396,7 @@ onMounted(async () => {
   isClient.value = true;
   await nextTick();
   await ocurrenceStore.loadOcurrences();
-  console.log(ocurrenceStore.ocurrences);
+ 
 
   if (!mapContainer.value) return;
 
@@ -442,7 +442,7 @@ onMounted(async () => {
         });
       } else {
         modalAberto.value = true;
-        console.log(`OLha a lat ${localizacaoSelecionada.value?.lat}`);
+
         if (
           localizacaoSelecionada.value?.lat &&
           localizacaoSelecionada.value?.lng
