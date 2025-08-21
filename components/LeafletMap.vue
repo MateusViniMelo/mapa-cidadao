@@ -7,12 +7,16 @@
     />
   </div>
   <UModal
+    @close=""
     v-model:open="modalAberto"
     title="Criar Ocorrência"
     :close="{
       color: 'tertiary',
       variant: 'outline',
       class: 'rounded-full',
+      onClick(event) {
+        enderecoAchado = null;
+      },
     }"
   >
     <UButton label="Open" color="neutral" variant="subtle" />
@@ -23,12 +27,20 @@
         <form @submit.prevent="salvarOcorrencia" class="space-y-4">
           <UFormField label="Endereço" size="lg" readonly>
             <UInput
+              :loading="carregando"
               size="lg"
-              :value="endereco?.display_name"
+              :value="enderecoAchado?.display_name ?? null"
               readonly
               class="w-full"
               color="tertiary"
             />
+            <p
+              class="mt-2 text-sm text-yellow-600 dark:text-yellow-500"
+              v-if="erroEndereco"
+            >
+              Não foi possível obter o endereço, mas ainda é possível salvar a
+              ocorrência.
+            </p>
           </UFormField>
 
           <UFormField label="Categoria" required size="lg">
@@ -50,7 +62,7 @@
           </UFormField>
           <UButton
             type="submit"
-            :loading="ocurrenceStore.loading"
+            :loading="ocurrenceStore.loading || carregando"
             :disabled="selectedType === null || selectedType === undefined"
             color="tertiary"
             :ui="{ base: 'text-white cursor-pointer ' }"
@@ -78,6 +90,7 @@ import { useTypesOcurrencesService } from "#imports";
 import type { ITypeOcurrence } from "~/interfaces/ITypeOcurrence";
 import type { ILocationPoint } from "~/interfaces/ILocationPoint";
 import type { IOcurrencePayload } from "~/interfaces/IOcurrencePayload";
+import type { EnderecoNominatim } from "~/interfaces/EnderecoNominatim";
 
 const mapContainer = ref<HTMLElement | null>(null);
 const marcadoresAtivos = new Map<number, L.Marker>();
@@ -85,7 +98,8 @@ const isClient = ref(false);
 const localizacaoSelecionada = ref<{ lat: number; lng: number } | null>(null);
 const descricao = ref("");
 const categoria = ref("");
-const { endereco, buscarEndereco } = useReverseGeocoding();
+const enderecoAchado = ref<EnderecoNominatim | null>(null);
+const { buscarEndereco, carregando, erroEndereco } = useReverseGeocoding();
 
 const carregandoLocalizacao = ref(false);
 
@@ -239,8 +253,6 @@ async function removerOcorrencia(id: number) {
 async function atualizarMarcador(lat: number, lng: number) {
   localizacaoSelecionada.value = { lat, lng };
 
-  await buscarEndereco(lat, lng);
-
   const iconePadrao = markerIcons["Padrao"].icon;
 
   if (!marcador) {
@@ -271,7 +283,6 @@ async function atualizarMarcador(lat: number, lng: number) {
         lat: novaPosicao.lat,
         lng: novaPosicao.lng,
       };
-      await buscarEndereco(novaPosicao.lat, novaPosicao.lng);
     })
     .bindPopup(
       `
@@ -300,10 +311,10 @@ async function salvarOcorrencia() {
     location: location,
     type_id: selectedType.value ?? 1,
     description: descricao.value,
-    address_name: endereco.value?.display_name,
-    city: endereco.value?.address.city,
-    state: endereco.value?.address.state,
-    country: endereco.value?.address.country,
+    address_name: enderecoAchado.value?.display_name,
+    city: enderecoAchado.value?.address.city,
+    state: enderecoAchado.value?.address.state,
+    country: enderecoAchado.value?.address.country,
   };
 
   console.log(ocurrencePayload);
@@ -410,7 +421,7 @@ onMounted(async () => {
     const { lat, lng } = e.latlng;
     await atualizarMarcador(lat, lng);
   });
-  document.addEventListener("click", (e) => {
+  document.addEventListener("click", async (e) => {
     const target = e.target as HTMLElement;
 
     if (target.classList.contains("btn-remover")) {
@@ -424,9 +435,24 @@ onMounted(async () => {
     }
     if (target.id === "abrir-modal") {
       if (authStore.user === null || authStore.user === undefined) {
-        alert("Usuário Não autenticado");
+        toast.add({
+          title: "Erro",
+          description: "Faça o login pra informar uma ocorrência",
+          color: "error",
+        });
       } else {
         modalAberto.value = true;
+        console.log(`OLha a lat ${localizacaoSelecionada.value?.lat}`);
+        if (
+          localizacaoSelecionada.value?.lat &&
+          localizacaoSelecionada.value?.lng
+        ) {
+          enderecoAchado.value =
+            (await buscarEndereco(
+              localizacaoSelecionada.value?.lat,
+              localizacaoSelecionada.value?.lng
+            )) ?? null;
+        }
       }
     }
     if (target.id === "btn-recentralizar") {

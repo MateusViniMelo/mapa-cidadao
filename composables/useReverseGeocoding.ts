@@ -1,13 +1,15 @@
 import type { EnderecoNominatim } from "@/interfaces/EnderecoNominatim";
 
 export const useReverseGeocoding = () => {
-  const endereco = ref<EnderecoNominatim | null>(null);
   const carregando = ref(false);
-  const erro = ref<string | null>(null);
+  const erroEndereco = ref<string | null>(null);
 
-  const buscarEndereco = async (lat: number, lng: number) => {
+  const buscarEndereco = async (
+    lat: number,
+    lng: number
+  ): Promise<EnderecoNominatim | undefined> => {
     carregando.value = true;
-    erro.value = null;
+    erroEndereco.value = null;
 
     try {
       const res = await fetch(`/api/reverse-geocoding?lat=${lat}&lng=${lng}`);
@@ -15,18 +17,17 @@ export const useReverseGeocoding = () => {
       if (!res.ok) throw new Error("Erro ao buscar endereço");
 
       const data: EnderecoNominatim = await res.json();
-      endereco.value = data;
+      return data;
     } catch (e: any) {
-      erro.value = e.message || "Erro desconhecido";
+      erroEndereco.value = e.message || "Erro desconhecido";
     } finally {
       carregando.value = false;
     }
   };
 
   return {
-    endereco,
     carregando,
-    erro,
+    erroEndereco,
     buscarEndereco,
   };
 };

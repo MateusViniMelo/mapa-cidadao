@@ -147,7 +147,7 @@ const items = computed(() => {
       },
     ],
     [
-      {
+     /* {
         label: "Meu perfil",
         icon: "i-heroicons-user",
         to: "/profile",
@@ -156,7 +156,7 @@ const items = computed(() => {
         label: "Configurações",
         icon: "i-heroicons-cog-6-tooth",
         to: "/settings",
-      },
+      }, */
       {
         label: "Sair",
         icon: "i-heroicons-arrow-left-on-rectangle",
