@@ -19,7 +19,7 @@
       },
     }"
   >
-    <UButton label="Open" color="neutral" variant="subtle" />
+   
 
     <template #body>
       <div>

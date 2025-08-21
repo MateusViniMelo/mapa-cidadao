@@ -6,6 +6,9 @@
       color: 'tertiary',
       variant: 'outline',
       class: 'rounded-full cursor-pointer',
+      onClick() {
+        resetForm();
+      },
     }"
     :dismissible="false"
   >
@@ -221,6 +224,17 @@ const authStore = useAuthStore();
 
 async function onSubmit(formEvent: FormSubmitEvent<RegisterUserSchema>) {
   await authStore.register(formEvent.data);
+}
+
+function resetForm() {
+  state.name = undefined;
+  state.email = undefined;
+  state.password = undefined;
+  state.password_confirmation = undefined;
+  state.date_birth = undefined;
+
+  showPassword.value = false;
+  showPasswordConfirmation.value = false;
 }
 
 defineShortcuts({

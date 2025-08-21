@@ -7,6 +7,9 @@
       color: 'tertiary',
       variant: 'outline',
       class: 'rounded-full cursor-pointer',
+      onClick() {
+        resetForm();
+      },
     }"
   >
     <UButton
@@ -75,6 +78,12 @@ async function onSubmit(event: FormSubmitEvent<LoginUserSchema>) {
   await authStore.login(event.data).then(() => {
     first.value = false;
   });
+}
+function resetForm() {
+  state.email = undefined;
+  state.password = undefined;
+
+  first.value = false;
 }
 </script>
 

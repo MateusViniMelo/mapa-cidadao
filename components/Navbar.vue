@@ -116,26 +116,6 @@ import { useAuthStore } from "@/stores/authStore";
 const authStore = useAuthStore();
 const route = useRoute();
 
-function getPrimeiroEUltimoNome(nomeCompleto: string): string {
-  const partes: string[] = nomeCompleto.trim().split(/\s+/);
-
-  return `${partes[0] || ""} ${
-    partes.length > 1 ? partes[partes.length - 1] : ""
-  }`;
-}
-
-function getSiglaPrimeiroEUltimo(nomeCompleto: string): string {
-  const partes: string[] = nomeCompleto.trim().split(/\s+/);
-
-  if (partes.length === 0) return "";
-
-  const primeiraLetra = partes[0]?.charAt(0).toUpperCase() || "";
-  const ultimaLetra =
-    partes.length > 1 ? partes[partes.length - 1]?.charAt(0).toUpperCase() : "";
-
-  return `${primeiraLetra}.${ultimaLetra}`;
-}
-
 const items = computed(() => {
   if (!authStore.user) return [];
 
@@ -147,7 +127,7 @@ const items = computed(() => {
       },
     ],
     [
-     /* {
+      /* {
         label: "Meu perfil",
         icon: "i-heroicons-user",
         to: "/profile",
