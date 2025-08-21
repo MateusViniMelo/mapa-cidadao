@@ -18,7 +18,7 @@
     <UButton label="Open" color="neutral" variant="subtle" />
 
     <template #body>
-      <div >
+      <div>
         <!-- Formulário aqui -->
         <form @submit.prevent="salvarOcorrencia" class="space-y-4">
           <UFormField label="Endereço" size="lg" readonly>
@@ -40,7 +40,7 @@
               color="tertiary"
             />
           </UFormField>
-          <UFormField label="Descrição do problema" required size="lg">
+          <UFormField label="Descrição do problema" size="lg">
             <UInput
               placeholder="Descreva a Ocorrência"
               v-model="descricao"
@@ -50,7 +50,8 @@
           </UFormField>
           <UButton
             type="submit"
-            :disabled="categoria.length === 0"
+            :loading="ocurrenceStore.loading"
+            :disabled="selectedType === null || selectedType === undefined"
             color="tertiary"
             :ui="{ base: 'text-white cursor-pointer ' }"
             block
@@ -70,11 +71,13 @@ import "leaflet/dist/leaflet.css";
 import { useReverseGeocoding } from "@/composables/useReverseGeocoding";
 import { useOcorrenciasStore } from "@/stores/ocorrencias";
 import { markerIcons } from "@/util/makerIcons";
-
+import { useOcurrenceStore } from "#imports";
 import { tempoAtras } from "@/util/date";
 import { useAuthStore } from "#imports";
 import { useTypesOcurrencesService } from "#imports";
 import type { ITypeOcurrence } from "~/interfaces/ITypeOcurrence";
+import type { ILocationPoint } from "~/interfaces/ILocationPoint";
+import type { IOcurrencePayload } from "~/interfaces/IOcurrencePayload";
 
 const mapContainer = ref<HTMLElement | null>(null);
 const marcadoresAtivos = new Map<number, L.Marker>();
@@ -87,6 +90,7 @@ const store = useOcorrenciasStore();
 const carregandoLocalizacao = ref(false);
 
 const authStore = useAuthStore();
+const ocurrenceStore = useOcurrenceStore();
 const typesOcurrenceService = useTypesOcurrencesService();
 const { fetchTypesOcurrence } = typesOcurrenceService;
 const modalAberto = ref(false);
@@ -130,34 +134,41 @@ function adicionarLegenda() {
   legenda.addTo(map);
 }
 
-function showToast(title: string) {
-  toast.add({
-    title,
-    class:
-      "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700",
-    icon: "i-clarity-success-standard-line",
-  });
-}
 function adicionarMarcadoresSalvos() {
-  store.lista.forEach((ocorrencia) => {
-    const { id, descricao, localizacao, categoria, nome_local, data } =
-      ocorrencia;
+  ocurrenceStore.ocurrences.forEach((ocorrencia) => {
+    const {
+      id,
+      description,
+      location,
+      type_id,
+      address_name,
+      city,
+      country,
+      created_at,
+      state,
+      user_id,
+    } = ocorrencia;
 
-    const marcadorData = markerIcons[categoria] || markerIcons["Padrao"];
+    const marcadorData = markerIcons[type_id] || markerIcons["Padrao"];
     const icon = marcadorData.icon;
     const nomeOcorrencia = marcadorData.nome;
 
-    const marker = L.marker([localizacao.lat, localizacao.lng], {
-      icon,
-    }).addTo(map);
+    const marker = L.marker(
+      [location.coordinates[1], location.coordinates[0]],
+      {
+        icon,
+      }
+    ).addTo(map);
 
     marker.bindPopup(`
       <div>
         <p class="text-base"><strong>${nomeOcorrencia}</strong><br /></p>
 
         <ul>
-          <li>${nome_local}</li>
-          <li class="text-xs text-gray-500">${tempoAtras(data)}</li>
+          <li>${`${address_name.split(",")[0]}, ${
+            address_name?.split(",")[1]
+          }`}</li>
+          <li class="text-xs text-gray-500">${tempoAtras(created_at)}</li>
         </ul>
 
         <div class="mt-4 flex justify-between ">
@@ -236,27 +247,51 @@ async function atualizarMarcador(lat: number, lng: number) {
     .openPopup();
 }
 
-function salvarOcorrencia() {
+async function salvarOcorrencia() {
   if (!localizacaoSelecionada.value) {
     alert("Preencha a descrição e marque a localização.");
     return;
   }
-  const novaOcorrencia = {
-    descricao: descricao.value,
-    localizacao: localizacaoSelecionada.value,
-    categoria: categoria.value,
-    nome_local: endereco.value?.display_name
-      ? `${endereco.value?.display_name.split(",")[0]}, ${
-          endereco.value?.display_name.split(",")[1]
-        }`
-      : "",
-    data: new Date(),
+  const location: ILocationPoint = {
+    type: "Point",
+    coordinates: [
+      localizacaoSelecionada.value.lat,
+      localizacaoSelecionada.value.lng,
+    ],
   };
-  store.adicionar(novaOcorrencia);
+  const ocurrencePayload: IOcurrencePayload = {
+    location: location,
+    type_id: selectedType.value ?? 1,
+    description: descricao.value,
+    address_name: endereco.value?.display_name,
+    city: endereco.value?.address.city,
+    state: endereco.value?.address.state,
+    country: endereco.value?.address.country,
+  };
 
-  showToast("Ocorrência salva com sucesso!");
-  descricao.value = "";
-  adicionarMarcadoresSalvos();
+  console.log(ocurrencePayload);
+
+  await ocurrenceStore
+    .addOcurrence(ocurrencePayload)
+    .then(() => {
+      toast.add({
+        title: "Ocorrência criada",
+        description: "Ocorrência salva com sucesso.",
+        color: "success",
+      });
+    })
+    .catch(() => {
+      toast.add({
+        title: "Erro",
+        description: "Não foi possível salvar ocorrência.",
+        color: "error",
+      });
+      adicionarMarcadoresSalvos();
+    })
+    .finally(() => {
+      descricao.value = "";
+      modalAberto.value = false;
+    });
 }
 
 function adicionarBotaoRecentrar() {
@@ -300,7 +335,8 @@ const options = computed(() =>
 onMounted(async () => {
   isClient.value = true;
   await nextTick();
-
+  await ocurrenceStore.loadOcurrences();
+  console.log(ocurrenceStore.ocurrences);
   store.carregar();
 
   if (!mapContainer.value) return;

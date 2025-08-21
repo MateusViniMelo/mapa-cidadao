@@ -5,14 +5,17 @@ import { useAuthStore } from "@/stores/authStore";
 
 export function useOcurrencesService() {
   const authStore = useAuthStore();
+  const config = useRuntimeConfig();
+  const baseURL = config.public.apiBase;
 
   const fetchOcurrences = async (): Promise<IOcurrence[]> => {
     const { ocurrences } = await $fetch<{ ocurrences: IOcurrence[] }>(
-      "/api/ocurrences",
+      "ocurrences",
       {
         headers: {
-          Authorization: authStore.token ?? "",
+          Authorization: authStore.token ? `bearer ${authStore.token}` : "",
         },
+        baseURL,
       }
     );
     return ocurrences;
@@ -21,25 +24,28 @@ export function useOcurrencesService() {
   const createOcurrence = async (
     payload: IOcurrencePayload
   ): Promise<IOcurrence> => {
+   
     const { ocurrence } = await $fetch<{ ocurrence: IOcurrence }>(
-      "/api/ocurrences",
+      "ocurrences",
       {
         method: "POST",
         body: payload,
         headers: {
-          Authorization: authStore.token ?? "",
+          Authorization: authStore.token ? `bearer ${authStore.token}` : "",
         },
+        baseURL,
       }
     );
     return ocurrence;
   };
 
   const deleteOcurrence = async (id: number): Promise<void> => {
-    await $fetch(`/api/ocurrences/${id}`, {
+    await $fetch(`ocurrences/${id}`, {
       method: "DELETE",
       headers: {
-        Authorization: authStore.token ?? "",
+        Authorization: authStore.token ? `bearer ${authStore.token}` : "",
       },
+      baseURL,
     });
   };
 

@@ -7,6 +7,7 @@ export default defineNuxtConfig({
       apiBase: process.env.NUXT_PUBLIC_API_BASE ,
     },
   },
+  
   modules: [
     "@nuxt/fonts",
     "@nuxt/icon",

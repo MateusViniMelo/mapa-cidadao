@@ -1,7 +1,7 @@
 import L from "leaflet";
 
 export const markerIcons: Record<string, { icon: L.Icon; nome: string }> = {
-  Iluminação: {
+  1: {
     icon: new L.Icon({
       iconUrl: "/images/marking-icons/marker-icon-iluminacao_2.png",
 
@@ -11,7 +11,7 @@ export const markerIcons: Record<string, { icon: L.Icon; nome: string }> = {
     }),
     nome: "Problema de Iluminação",
   },
-  Buraco: {
+ 2: {
     icon: new L.Icon({
       iconUrl: "/images/marking-icons/marker-icon-buraco_2.png",
 
@@ -21,7 +21,7 @@ export const markerIcons: Record<string, { icon: L.Icon; nome: string }> = {
     }),
     nome: "Problema de Pavimentação",
   },
-  Alagamento: {
+  3: {
     icon: new L.Icon({
       iconUrl: "/images/marking-icons/marker-icon-alagamento_2.png",
 
@@ -31,7 +31,7 @@ export const markerIcons: Record<string, { icon: L.Icon; nome: string }> = {
     }),
     nome: "Alagamento",
   },
-  Lixo: {
+  4: {
     icon: new L.Icon({
       iconUrl: "/images/marking-icons/marker-icon-lixo_2.png",
 
@@ -50,7 +50,7 @@ export const markerIcons: Record<string, { icon: L.Icon; nome: string }> = {
     }),
     nome: "Problema Desconhecido",
   },
-  SemPavimentacao: {
+  5: {
     icon: new L.Icon({
       iconUrl: "/images/marking-icons/marker-icon-sem-pavimentacao_2.png",
 
