@@ -9,6 +9,7 @@
       class: 'rounded-full cursor-pointer',
       onClick() {
         resetForm();
+        showPassword = false;
       },
     }"
   >
@@ -33,10 +34,24 @@
         <UFormField label="Senha" name="password">
           <UInput
             v-model="state.password"
-            type="password"
             class="w-full"
             color="tertiary"
-          />
+            :type="showPassword ? 'text' : 'password'"
+            :ui="{ trailing: 'pe-1' }"
+          >
+            <template #trailing>
+              <UButton
+                color="tertiary"
+                variant="link"
+                size="md"
+                :icon="showPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+                :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                :aria-pressed="showPassword"
+                aria-controls="password"
+                @click="showPassword = !showPassword"
+              />
+            </template>
+          </UInput>
         </UFormField>
 
         <UButton
@@ -71,6 +86,8 @@ const state = reactive<Partial<LoginUserSchema>>({
   email: undefined,
   password: undefined,
 });
+
+const showPassword = ref(false);
 const first = ref(false);
 const authStore = useAuthStore();
 

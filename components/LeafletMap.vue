@@ -19,8 +19,6 @@
       },
     }"
   >
-   
-
     <template #body>
       <div>
         <!-- Formulário aqui -->
@@ -173,7 +171,7 @@ function adicionarMarcadoresSalvos() {
         icon,
       }
     ).addTo(map);
-   
+
     if (authStore.user?.id === user_id) {
       marker.bindPopup(`
         <div>
@@ -317,8 +315,6 @@ async function salvarOcorrencia() {
     country: enderecoAchado.value?.address.country,
   };
 
-
-
   await ocurrenceStore
     .addOcurrence(ocurrencePayload)
     .then(() => {
@@ -396,7 +392,6 @@ onMounted(async () => {
   isClient.value = true;
   await nextTick();
   await ocurrenceStore.loadOcurrences();
- 
 
   if (!mapContainer.value) return;
 
