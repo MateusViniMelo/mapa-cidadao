@@ -7,15 +7,16 @@
     />
   </div>
   <UModal
-    @close=""
+
     v-model:open="modalAberto"
     title="Criar Ocorrência"
     :close="{
       color: 'tertiary',
       variant: 'outline',
       class: 'rounded-full',
-      onClick(event) {
+      onClick() {
         enderecoAchado = null;
+        descricao = ''
       },
     }"
   >
@@ -51,12 +52,26 @@
             />
           </UFormField>
           <UFormField label="Descrição do problema" size="lg">
-            <UInput
+            <UTextarea
               placeholder="Descreva a Ocorrência"
               v-model="descricao"
               color="tertiary"
               class="w-full"
-            />
+              :maxlength="maxLength"
+              aria-describedby="character-count"
+              :ui="{ trailing: 'pointer-events-none' }"
+            >
+              <template #trailing>
+                <div
+                  id="character-count"
+                 class="absolute bottom-1 right-2 text-xs text-muted tabular-nums"
+                  aria-live="polite"
+                  role="status"
+                >
+                  {{ descricao?.length }}/{{ maxLength }}
+                </div>
+              </template>
+            </UTextarea>
           </UFormField>
           <UButton
             type="submit"
@@ -100,7 +115,7 @@ const enderecoAchado = ref<EnderecoNominatim | null>(null);
 const { buscarEndereco, carregando, erroEndereco } = useReverseGeocoding();
 
 const carregandoLocalizacao = ref(false);
-
+const maxLength = 250;
 const authStore = useAuthStore();
 const ocurrenceStore = useOcurrenceStore();
 const typesOcurrenceService = useTypesOcurrencesService();
