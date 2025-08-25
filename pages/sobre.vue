@@ -51,7 +51,9 @@
 <script lang="ts" setup>
 import { useFlowbite } from "~/composables/useFlowbite";
 import { initFlowbite } from "flowbite";
-
+definePageMeta({
+  title: 'Sobre'
+})
 onMounted(() => {
   useFlowbite(() => {
     initFlowbite();

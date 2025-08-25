@@ -10,6 +10,10 @@
 import LeafletMap from "~/components/LeafletMap.vue";
 import { useFlowbite } from '~/composables/useFlowbite';
 import { initFlowbite } from 'flowbite';
+
+definePageMeta({
+  title: 'Ocorrências'
+})
 onMounted(() => {
     useFlowbite(() => {
         initFlowbite();

@@ -9,6 +9,7 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
+      titleTemplate: '%s - Mapa Cidadão',
       link: [
         {
           rel: "apple-touch-icon",
