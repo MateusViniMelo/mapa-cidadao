@@ -92,9 +92,15 @@ const first = ref(false);
 const authStore = useAuthStore();
 
 async function onSubmit(event: FormSubmitEvent<LoginUserSchema>) {
-  await authStore.login(event.data).then(() => {
-    first.value = false;
-  });
+  await authStore
+    .login(event.data)
+    .then(() => {
+      first.value = false;
+    })
+    .finally(() => {
+      resetForm();
+      showPassword.value = false;
+    });
 }
 function resetForm() {
   state.email = undefined;

@@ -7,7 +7,6 @@
     />
   </div>
   <UModal
-
     v-model:open="modalAberto"
     title="Criar Ocorrência"
     :close="{
@@ -16,7 +15,7 @@
       class: 'rounded-full',
       onClick() {
         enderecoAchado = null;
-        descricao = ''
+        descricao = '';
       },
     }"
   >
@@ -64,7 +63,7 @@
               <template #trailing>
                 <div
                   id="character-count"
-                 class="absolute bottom-1 right-2 text-xs text-muted tabular-nums"
+                  class="absolute bottom-1 right-2 text-xs text-muted tabular-nums"
                   aria-live="polite"
                   role="status"
                 >
@@ -87,6 +86,76 @@
       </div>
     </template>
   </UModal>
+  <UModal v-model:open="modalFinalizarOcorrencia" title="Encerrar Ocorrência" :close="{
+    onClick() {
+        resetFormFinalizarOcorrencia()
+    },
+  }">
+    <template #body>
+      <UForm
+        :schema="inactiveOccurrenceSchema"
+        :state="inactiveOcurrenceState"
+        @submit="onSubmitInactivateOcurrence"
+        class="space-y-4"
+      >
+   
+        <UFormField
+          label="Qual o motivo do encerramento?"
+          required
+          size="lg"
+          name="type_closure"
+        >
+          <USelect
+            placeholder="Escolha o tipo"
+            v-model="inactiveOcurrenceState.type_closure"
+            :items="tiposEncerramentoOcorrencia"
+            class="w-full"
+          />
+        </UFormField>
+        <UFormField
+          label="Descreva o motivo?"
+          size="lg"
+          name="solution_description"
+          required
+          v-if="
+            inactiveOcurrenceState.type_closure === 'other' ||
+            inactiveOcurrenceState.type_closure === 'resolved'
+          "
+        >
+          <UTextarea
+            v-model="inactiveOcurrenceState.solution_description"
+            color="tertiary"
+            class="w-full"
+            :maxlength="500"
+            aria-describedby="character-count"
+            :ui="{ trailing: 'pointer-events-none' }"
+          >
+            <template #trailing>
+              <div
+                id="character-count"
+                class="absolute bottom-1 right-2 text-xs text-muted tabular-nums"
+                aria-live="polite"
+                role="status"
+              >
+                {{ inactiveOcurrenceState.solution_description?.length }}/{{
+                  500
+                }}
+              </div>
+            </template>
+          </UTextarea>
+        </UFormField>
+        <UButton
+          type="submit"
+          color="error"
+          :ui="{ base: 'text-white cursor-pointer ' }"
+          :loading="ocurrenceStore.loading"
+          block
+        >
+          Encerrar
+        </UButton>
+      </UForm>
+    </template>
+  </UModal>
 </template>
 
 <script setup lang="ts">
@@ -94,7 +163,7 @@ import { ref, onMounted, nextTick } from "vue";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useReverseGeocoding } from "@/composables/useReverseGeocoding";
-
+import type { FormSubmitEvent } from "@nuxt/ui";
 import { markerIcons } from "@/util/makerIcons";
 import { useOcurrenceStore } from "#imports";
 import { tempoAtras } from "@/util/date";
@@ -104,7 +173,11 @@ import type { ITypeOcurrence } from "~/interfaces/ITypeOcurrence";
 import type { ILocationPoint } from "~/interfaces/ILocationPoint";
 import type { IOcurrencePayload } from "~/interfaces/IOcurrencePayload";
 import type { EnderecoNominatim } from "~/interfaces/EnderecoNominatim";
-
+import {
+  inactiveOccurrenceSchema,
+  type InactivateOcurrenceSchema,
+} from "@/validators/inactivateOcurrenceSchema";
+import { TypeOccurrenceClosure } from "~/enums/TypeOcurrenceClosure";
 const mapContainer = ref<HTMLElement | null>(null);
 const marcadoresAtivos = new Map<number, L.Marker>();
 const isClient = ref(false);
@@ -122,6 +195,36 @@ const typesOcurrenceService = useTypesOcurrencesService();
 const { fetchTypesOcurrence } = typesOcurrenceService;
 const modalAberto = ref(false);
 
+const ocorrenciaRemover = ref<null | number>(null);
+
+const modalFinalizarOcorrencia = ref(false);
+
+const tiposEncerramentoOcorrencia = ref([
+  {
+    label: "Problema Resolvido",
+    value: "resolved",
+  },
+  {
+    label: "Criei Errado",
+    value: "mistake",
+  },
+  {
+    label: "Outro motivo",
+    value: "other",
+  },
+]);
+const inactiveOcurrenceState = reactive<Partial<InactivateOcurrenceSchema>>({
+  type_closure: TypeOccurrenceClosure.RESOLVED,
+  solution_description: undefined,
+});
+async function onSubmitInactivateOcurrence(
+  event: FormSubmitEvent<InactivateOcurrenceSchema>
+) {
+  if (ocorrenciaRemover.value != null) {
+    await removerOcorrencia(event.data, ocorrenciaRemover.value);
+  }
+}
+
 let marcador: L.Marker | null = null;
 let map: L.Map;
 
@@ -129,7 +232,7 @@ const toast = useToast();
 
 const types = ref<ITypeOcurrence[]>([]);
 const loading = ref(true);
-const selectedType = ref<number | undefined>(undefined); // guarda o id selecionado
+const selectedType = ref<number | undefined>(undefined);
 
 function adicionarLegenda() {
   const legenda = new L.Control({ position: "bottomright" });
@@ -206,7 +309,7 @@ function adicionarMarcadoresSalvos() {
           <div class="">
             <button data-id="${id}" style="cursor: pointer;"
               class="px-2 py-1 text-xs font-medium text-center text-white bg-red-700 rounded-lg hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800 btn-remover">
-              Remover
+              Encerrar
             </button>
           </div>
           </div>
@@ -238,29 +341,38 @@ function adicionarMarcadoresSalvos() {
   });
 }
 
-async function removerOcorrencia(id: number) {
+async function removerOcorrencia(form: InactivateOcurrenceSchema, id: number) {
   await ocurrenceStore
-    .removeOcurrence(id)
+    .inactive(form, id)
     .then(() => {
       const marcador = marcadoresAtivos.get(id);
       if (marcador) {
         marcador.closeTooltip();
         marcador.remove();
         marcadoresAtivos.delete(id);
+
+        resetFormFinalizarOcorrencia();
       }
       toast.add({
-        title: "Ocorrência removida",
-        description: "Ocorrência removida com sucesso",
+        title: "Ocorrência inativada",
+        description: "Ocorrência inativada com sucesso",
         color: "success",
       });
     })
     .catch(() => {
       toast.add({
         title: "Erro",
-        description: "Não foi possível remover a ocorrência",
+        description: "Não foi possível inativar a ocorrência",
         color: "error",
       });
     });
+}
+
+function resetFormFinalizarOcorrencia() {
+  ocorrenciaRemover.value = null
+  inactiveOcurrenceState.type_closure = TypeOccurrenceClosure.RESOLVED;
+  inactiveOcurrenceState.solution_description = undefined;
+  modalFinalizarOcorrencia.value = false;
 }
 
 async function atualizarMarcador(lat: number, lng: number) {
@@ -436,7 +548,11 @@ onMounted(async () => {
 
     if (target.classList.contains("btn-remover")) {
       const id = Number(target.dataset.id);
-      removerOcorrencia(id);
+
+      ocorrenciaRemover.value = id;
+      modalFinalizarOcorrencia.value = true;
+
+      //removerOcorrencia(id);
     }
 
     if (target.id === "btnInformarProblema") {

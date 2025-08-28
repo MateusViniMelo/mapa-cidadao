@@ -4,14 +4,23 @@ import { ref } from "vue";
 import type { IOcurrence } from "~/interfaces/IOcurrence";
 import type { IOcurrencePayload } from "~/interfaces/IOcurrencePayload";
 import { useOcurrencesService } from "@/composables/ocurrencesService";
+import {
+  inactiveOccurrenceSchema,
+  type InactivateOcurrenceSchema,
+} from "~/validators/inactivateOcurrenceSchema";
 
 export const useOcurrenceStore = defineStore("ocurrences", () => {
   const ocurrences = ref<IOcurrence[]>([]);
   const loading = ref(false);
   const error = ref<any>(null);
 
-  const { fetchOcurrences, createOcurrence, deleteOcurrence } =
-    useOcurrencesService();
+  const {
+    fetchOcurrences,
+    createOcurrence,
+    deleteOcurrence,
+
+    inactivateOcurrence,
+  } = useOcurrencesService();
 
   const loadOcurrences = async () => {
     loading.value = true;
@@ -54,6 +63,24 @@ export const useOcurrenceStore = defineStore("ocurrences", () => {
     }
   };
 
+  const inactive = async (
+    inactiveOcurrence: InactivateOcurrenceSchema,
+    id: number
+  ) => {
+    console.log(inactiveOcurrence);
+    loading.value = true;
+    error.value = null;
+    try {
+      await inactivateOcurrence(inactiveOcurrence, id);
+      ocurrences.value = ocurrences.value.filter((o) => o.id !== id);
+    } catch (err: any) {
+      error.value = err?.data || err;
+      throw err;
+    } finally {
+      loading.value = false;
+    }
+  };
+
   return {
     ocurrences,
     loading,
@@ -61,5 +88,6 @@ export const useOcurrenceStore = defineStore("ocurrences", () => {
     loadOcurrences,
     addOcurrence,
     removeOcurrence,
+    inactive,
   };
 });

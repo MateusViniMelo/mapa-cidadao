@@ -2,6 +2,7 @@
 import type { IOcurrence } from "~/interfaces/IOcurrence";
 import type { IOcurrencePayload } from "~/interfaces/IOcurrencePayload";
 import { useAuthStore } from "@/stores/authStore";
+import type { InactivateOcurrenceSchema } from "~/validators/inactivateOcurrenceSchema";
 
 export function useOcurrencesService() {
   const authStore = useAuthStore();
@@ -24,7 +25,6 @@ export function useOcurrencesService() {
   const createOcurrence = async (
     payload: IOcurrencePayload
   ): Promise<IOcurrence> => {
-   
     const { ocurrence } = await $fetch<{ ocurrence: IOcurrence }>(
       "ocurrences",
       {
@@ -49,9 +49,25 @@ export function useOcurrencesService() {
     });
   };
 
+  const inactivateOcurrence = async (
+    inactiveOcurrence: InactivateOcurrenceSchema,
+    id: number
+  ) => {
+    await $fetch(`ocurrences/inactivate/${id}`, {
+      method: "POST",
+      body: inactiveOcurrence,
+      headers: {
+        Authorization: authStore.token ? `bearer ${authStore.token}` : "",
+      },
+      baseURL,
+    });
+  };
+
   return {
     fetchOcurrences,
     createOcurrence,
     deleteOcurrence,
+
+    inactivateOcurrence,
   };
 }
