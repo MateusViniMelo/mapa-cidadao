@@ -86,11 +86,15 @@
       </div>
     </template>
   </UModal>
-  <UModal v-model:open="modalFinalizarOcorrencia" title="Encerrar Ocorrência" :close="{
-    onClick() {
-        resetFormFinalizarOcorrencia()
-    },
-  }">
+  <UModal
+    v-model:open="modalFinalizarOcorrencia"
+    title="Encerrar Ocorrência"
+    :close="{
+      onClick() {
+        resetFormFinalizarOcorrencia();
+      },
+    }"
+  >
     <template #body>
       <UForm
         :schema="inactiveOccurrenceSchema"
@@ -98,7 +102,6 @@
         @submit="onSubmitInactivateOcurrence"
         class="space-y-4"
       >
-   
         <UFormField
           label="Qual o motivo do encerramento?"
           required
@@ -159,7 +162,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, nextTick } from "vue";
+import { ref, onMounted, nextTick, onUnmounted } from "vue";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useReverseGeocoding } from "@/composables/useReverseGeocoding";
@@ -369,7 +372,7 @@ async function removerOcorrencia(form: InactivateOcurrenceSchema, id: number) {
 }
 
 function resetFormFinalizarOcorrencia() {
-  ocorrenciaRemover.value = null
+  ocorrenciaRemover.value = null;
   inactiveOcurrenceState.type_closure = TypeOccurrenceClosure.RESOLVED;
   inactiveOcurrenceState.solution_description = undefined;
   modalFinalizarOcorrencia.value = false;
@@ -515,6 +518,10 @@ function recarregarMarcadores() {
   marcadoresAtivos.clear();
   adicionarMarcadoresSalvos();
 }
+
+let handleDocumentClick: (e: Event) => void;
+let handleMapClick: (e: L.LeafletMouseEvent) => void;
+
 onMounted(async () => {
   isClient.value = true;
   await nextTick();
@@ -539,11 +546,13 @@ onMounted(async () => {
   adicionarLegenda();
   adicionarBotaoRecentrar();
 
-  map.on("click", async (e) => {
+  handleMapClick = async (e: L.LeafletMouseEvent) => {
     const { lat, lng } = e.latlng;
     await atualizarMarcador(lat, lng);
-  });
-  document.addEventListener("click", async (e) => {
+  };
+  map.on("click", handleMapClick);
+
+  handleDocumentClick = async (e: Event) => {
     const target = e.target as HTMLElement;
 
     if (target.classList.contains("btn-remover")) {
@@ -627,13 +636,26 @@ onMounted(async () => {
         finalizar();
       }
     }
-  });
+  };
+  document.addEventListener("click", handleDocumentClick);
   // adicionar marcadores anteriores
   adicionarMarcadoresSalvos();
   try {
     types.value = await fetchTypesOcurrence();
   } finally {
     loading.value = false;
+  }
+});
+
+onUnmounted(() => {
+  if (map && handleMapClick) {
+    map.off("click", handleMapClick);
+  }
+  if (handleDocumentClick) {
+    document.removeEventListener("click", handleDocumentClick);
+  }
+  if (map) {
+    map.remove(); // limpa o mapa do Leaflet (importante em SPA)
   }
 });
 </script>
