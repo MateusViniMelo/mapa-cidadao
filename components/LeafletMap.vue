@@ -102,19 +102,39 @@
         @submit="onSubmitInactivateOcurrence"
         class="space-y-4"
       >
-        <UFormField
-          label="Qual o motivo do encerramento?"
-          required
-          size="lg"
-          name="type_closure"
-        >
-          <USelect
-            placeholder="Escolha o tipo"
-            v-model="inactiveOcurrenceState.type_closure"
-            :items="tiposEncerramentoOcorrencia"
+        <div class="flex justify-between space-x-4">
+          <UFormField
+            label="Qual o motivo do encerramento?"
+            required
+            size="lg"
+            name="type_closure" class="w-full"
+          >
+            <USelect
+              placeholder="Escolha o tipo"
+              v-model="inactiveOcurrenceState.type_closure"
+              :items="tiposEncerramentoOcorrencia"
+              class="w-full"
+            />
+          </UFormField>
+          <UFormField
+            :label="inactiveOcurrenceState.type_closure === 'resolved' ? 'Data de solução do problema?' : 'Data de quando aconteceu?'  "
+            name="resolution_date"
             class="w-full"
-          />
-        </UFormField>
+            size="lg"
+            v-if="
+              inactiveOcurrenceState.type_closure === 'other' ||
+              inactiveOcurrenceState.type_closure === 'resolved'
+            "
+          >
+            <UInput
+              v-model="inactiveOcurrenceState.resolution_date"
+              color="tertiary"
+              class="w-full"
+              type="date"
+            />
+          </UFormField>
+        </div>
+
         <UFormField
           label="Descreva o motivo?"
           size="lg"
@@ -147,6 +167,7 @@
             </template>
           </UTextarea>
         </UFormField>
+
         <UButton
           type="submit"
           color="error"
@@ -219,6 +240,7 @@ const tiposEncerramentoOcorrencia = ref([
 const inactiveOcurrenceState = reactive<Partial<InactivateOcurrenceSchema>>({
   type_closure: TypeOccurrenceClosure.RESOLVED,
   solution_description: undefined,
+  resolution_date: undefined,
 });
 async function onSubmitInactivateOcurrence(
   event: FormSubmitEvent<InactivateOcurrenceSchema>
@@ -375,6 +397,7 @@ function resetFormFinalizarOcorrencia() {
   ocorrenciaRemover.value = null;
   inactiveOcurrenceState.type_closure = TypeOccurrenceClosure.RESOLVED;
   inactiveOcurrenceState.solution_description = undefined;
+   inactiveOcurrenceState.resolution_date = undefined;
   modalFinalizarOcorrencia.value = false;
 }
 

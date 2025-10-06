@@ -8,17 +8,20 @@ import {
   inactiveOccurrenceSchema,
   type InactivateOcurrenceSchema,
 } from "~/validators/inactivateOcurrenceSchema";
+import type { MyOcurrencesResponse } from "~/interfaces/responses/MyOcurrencesResponse";
+import type { NuxtDebugModuleMutationRecord } from "nuxt/schema";
 
 export const useOcurrenceStore = defineStore("ocurrences", () => {
   const ocurrences = ref<IOcurrence[]>([]);
   const loading = ref(false);
   const error = ref<any>(null);
+  const myOcurrences = ref<MyOcurrencesResponse>();
 
   const {
     fetchOcurrences,
     createOcurrence,
     deleteOcurrence,
-
+    getOcurrencesByUserAuth,
     inactivateOcurrence,
   } = useOcurrencesService();
 
@@ -81,6 +84,19 @@ export const useOcurrenceStore = defineStore("ocurrences", () => {
     }
   };
 
+  const loadMyOcurrences = async (page = 1) => {
+    loading.value = true;
+    error.value = null;
+    try {
+      myOcurrences.value = await getOcurrencesByUserAuth(page);
+    } catch (err: any) {
+      error.value = err?.data || err;
+      throw err
+    } finally {
+      loading.value = false;
+    }
+  };
+
   return {
     ocurrences,
     loading,
@@ -89,5 +105,7 @@ export const useOcurrenceStore = defineStore("ocurrences", () => {
     addOcurrence,
     removeOcurrence,
     inactive,
+    loadMyOcurrences,
+    myOcurrences,
   };
 });

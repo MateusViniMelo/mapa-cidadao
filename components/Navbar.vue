@@ -127,16 +127,12 @@ const items = computed(() => {
       },
     ],
     [
-      /* {
-        label: "Meu perfil",
-        icon: "i-heroicons-user",
-        to: "/profile",
+       {
+        label: "Minhas Ocorrências",
+        icon: "material-symbols:list",
+        to: "/my-ocurrences",
       },
-      {
-        label: "Configurações",
-        icon: "i-heroicons-cog-6-tooth",
-        to: "/settings",
-      }, */
+       
       {
         label: "Sair",
         icon: "i-heroicons-arrow-left-on-rectangle",

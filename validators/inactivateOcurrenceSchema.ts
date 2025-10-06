@@ -14,6 +14,21 @@ export const inactiveOccurrenceSchema = z
       .string()
       .max(500, "A descrição da solução deve ter no máximo 500 caracteres.")
       .optional(),
+    resolution_date: z
+      .string()
+      .optional()
+      .refine(
+        (val) => {
+          if (!val) return true; 
+          const date = new Date(val);
+          const today = new Date();
+          today.setHours(0, 0, 0, 0); 
+          return date <= today;
+        },
+        {
+          message: "A data de resolução não pode ser maior que hoje.",
+        }
+      ),
   })
   .superRefine((val, ctx) => {
     const mustHaveDescription =

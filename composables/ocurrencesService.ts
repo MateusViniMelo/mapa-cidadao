@@ -3,6 +3,8 @@ import type { IOcurrence } from "~/interfaces/IOcurrence";
 import type { IOcurrencePayload } from "~/interfaces/IOcurrencePayload";
 import { useAuthStore } from "@/stores/authStore";
 import type { InactivateOcurrenceSchema } from "~/validators/inactivateOcurrenceSchema";
+import type { MyOcurrencesResponse } from "~/interfaces/responses/MyOcurrencesResponse";
+import MyOcurrences from "~/pages/my-ocurrences.vue";
 
 export function useOcurrencesService() {
   const authStore = useAuthStore();
@@ -62,12 +64,24 @@ export function useOcurrencesService() {
       baseURL,
     });
   };
+  const getOcurrencesByUserAuth = async (page: number) => {
+    return await $fetch<MyOcurrencesResponse>(
+      `ocurrences/my-ocurrences?page=${page}`,
+      {
+        headers: {
+          Authorization: authStore.token ? `bearer ${authStore.token}` : "",
+        },
+        baseURL,
+      }
+    );
+    
+  };
 
   return {
     fetchOcurrences,
     createOcurrence,
     deleteOcurrence,
-
     inactivateOcurrence,
+    getOcurrencesByUserAuth,
   };
 }

@@ -45,6 +45,7 @@ export const useAuthStore = defineStore("auth", () => {
         description: err?.data?.message || "Erro ao registrar",
         color: "error",
       });
+      throw err;
     } finally {
       loading.value = false;
     }
@@ -57,17 +58,18 @@ export const useAuthStore = defineStore("auth", () => {
       const res: IUserResponse = await authService.login(form);
       user.value = res.user;
       token.value = res.token;
-       toast.add({
-         title: "Sucesso",
-         description: "Login realizado com sucesso.",
-         color: "success",
-       });
+      toast.add({
+        title: "Sucesso",
+        description: "Login realizado com sucesso.",
+        color: "success",
+      });
     } catch (err: any) {
       toast.add({
         title: "Ocorreu um erro",
         description: err?.data?.message || "Erro ao registrar",
         color: "error",
       });
+      throw err;
     } finally {
       loading.value = false;
     }
@@ -93,7 +95,6 @@ export const useAuthStore = defineStore("auth", () => {
     } catch (e) {
       console.error("Erro ao sair", e);
     } finally {
-      
       user.value = null;
       token.value = null;
       loading.value = false;
