@@ -71,7 +71,6 @@ export const useOcurrenceStore = defineStore("ocurrences", () => {
     inactiveOcurrence: InactivateOcurrenceSchema,
     id: number
   ) => {
-    console.log(inactiveOcurrence);
     loading.value = true;
     error.value = null;
     try {
@@ -114,7 +113,7 @@ export const useOcurrenceStore = defineStore("ocurrences", () => {
         // se não existir na lista, adiciona
         ocurrences.value.push(updatedOcurrence);
       }
-      console.log(updatedOcurrence);
+
       return updatedOcurrence;
     } catch (err: any) {
       error.value = err?.data || err;
@@ -134,6 +133,6 @@ export const useOcurrenceStore = defineStore("ocurrences", () => {
     inactive,
     loadMyOcurrences,
     myOcurrences,
-    toggleLikeOcurrence
+    toggleLikeOcurrence,
   };
 });

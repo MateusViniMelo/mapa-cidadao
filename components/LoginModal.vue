@@ -100,7 +100,7 @@ async function onSubmit(event: FormSubmitEvent<LoginUserSchema>) {
   }
 }
 function resetForm() {
-  console.log('fechou')
+
   state.email = undefined;
   state.password = undefined;
 
