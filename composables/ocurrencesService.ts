@@ -4,7 +4,6 @@ import type { IOcurrencePayload } from "~/interfaces/IOcurrencePayload";
 import { useAuthStore } from "@/stores/authStore";
 import type { InactivateOcurrenceSchema } from "~/validators/inactivateOcurrenceSchema";
 import type { MyOcurrencesResponse } from "~/interfaces/responses/MyOcurrencesResponse";
-import MyOcurrences from "~/pages/my-ocurrences.vue";
 
 export function useOcurrencesService() {
   const authStore = useAuthStore();
@@ -12,69 +11,113 @@ export function useOcurrencesService() {
   const baseURL = config.public.apiBase;
 
   const fetchOcurrences = async (): Promise<IOcurrence[]> => {
-    const { ocurrences } = await $fetch<{ ocurrences: IOcurrence[] }>(
-      "ocurrences",
-      {
+    try {
+      const uri = authStore.token ? "ocurrences" : "ocurrences";
+      const { ocurrences } = await $fetch<{ ocurrences: IOcurrence[] }>(uri, {
         headers: {
           Authorization: authStore.token ? `bearer ${authStore.token}` : "",
         },
         baseURL,
-      }
-    );
-    return ocurrences;
+      });
+      return ocurrences;
+    } catch (error) {
+      console.error("Erro ao buscar ocorrências:", error);
+      throw new Error("Não foi possível buscar as ocorrências.");
+    }
   };
 
   const createOcurrence = async (
     payload: IOcurrencePayload
   ): Promise<IOcurrence> => {
-    const { ocurrence } = await $fetch<{ ocurrence: IOcurrence }>(
-      "ocurrences",
-      {
-        method: "POST",
-        body: payload,
+    try {
+      const { ocurrence } = await $fetch<{ ocurrence: IOcurrence }>(
+        "ocurrences",
+        {
+          method: "POST",
+          body: payload,
+          headers: {
+            Authorization: authStore.token ? `bearer ${authStore.token}` : "",
+          },
+          baseURL,
+        }
+      );
+      return ocurrence;
+    } catch (error) {
+      console.error("Erro ao criar ocorrência:", error);
+      throw new Error("Não foi possível criar a ocorrência.");
+    }
+  };
+
+  const deleteOcurrence = async (id: number): Promise<void> => {
+    try {
+      await $fetch(`ocurrences/${id}`, {
+        method: "DELETE",
         headers: {
           Authorization: authStore.token ? `bearer ${authStore.token}` : "",
         },
         baseURL,
-      }
-    );
-    return ocurrence;
-  };
-
-  const deleteOcurrence = async (id: number): Promise<void> => {
-    await $fetch(`ocurrences/${id}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: authStore.token ? `bearer ${authStore.token}` : "",
-      },
-      baseURL,
-    });
+      });
+    } catch (error) {
+      console.error(`Erro ao deletar ocorrência ${id}:`, error);
+      throw new Error("Não foi possível deletar a ocorrência.");
+    }
   };
 
   const inactivateOcurrence = async (
     inactiveOcurrence: InactivateOcurrenceSchema,
     id: number
-  ) => {
-    await $fetch(`ocurrences/inactivate/${id}`, {
-      method: "POST",
-      body: inactiveOcurrence,
-      headers: {
-        Authorization: authStore.token ? `bearer ${authStore.token}` : "",
-      },
-      baseURL,
-    });
-  };
-  const getOcurrencesByUserAuth = async (page: number) => {
-    return await $fetch<MyOcurrencesResponse>(
-      `ocurrences/my-ocurrences?page=${page}`,
-      {
+  ): Promise<void> => {
+    try {
+      await $fetch(`ocurrences/inactivate/${id}`, {
+        method: "POST",
+        body: inactiveOcurrence,
         headers: {
           Authorization: authStore.token ? `bearer ${authStore.token}` : "",
         },
         baseURL,
-      }
-    );
-    
+      });
+    } catch (error) {
+      console.error(`Erro ao inativar ocorrência ${id}:`, error);
+      throw new Error("Não foi possível inativar a ocorrência.");
+    }
+  };
+
+  const getOcurrencesByUserAuth = async (
+    page: number
+  ): Promise<MyOcurrencesResponse> => {
+    try {
+      return await $fetch<MyOcurrencesResponse>(
+        `ocurrences/my-ocurrences?page=${page}`,
+        {
+          headers: {
+            Authorization: authStore.token ? `bearer ${authStore.token}` : "",
+          },
+          baseURL,
+        }
+      );
+    } catch (error) {
+      console.error("Erro ao buscar ocorrências do usuário:", error);
+      throw new Error("Não foi possível buscar suas ocorrências.");
+    }
+  };
+
+  const likeOrDislike = async (id: number): Promise<IOcurrence | null> => {
+    try {
+      const { ocurrence } = await $fetch<{ ocurrence: IOcurrence }>(
+        `ocurrences/like/${id}`,
+        {
+          headers: {
+            Authorization: authStore.token ? `bearer ${authStore.token}` : "",
+          },
+          baseURL,
+        }
+      );
+
+      return ocurrence;
+    } catch (error) {
+      console.error(`Erro ao dar like/dislike na ocorrência ${id}:`, error);
+      throw new Error("Não foi possível atualizar o like da ocorrência.");
+    }
   };
 
   return {
@@ -83,5 +126,6 @@ export function useOcurrencesService() {
     deleteOcurrence,
     inactivateOcurrence,
     getOcurrencesByUserAuth,
+    likeOrDislike,
   };
 }

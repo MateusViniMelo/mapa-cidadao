@@ -5,7 +5,7 @@ export interface IOcurrence {
   id: number;
   location: ILocationPoint;
   type_id: number;
-  type: ITypeOcurrence
+  type: ITypeOcurrence;
   user_id: number;
   description: string;
   address_name: string;
@@ -13,10 +13,11 @@ export interface IOcurrence {
   country: string;
   state: string;
   is_active: boolean;
-  created_at: string; 
-  updated_at: string; 
+  created_at: string;
+  updated_at: string;
   type_closure: string | null;
   solution_description: string | null;
   resolution_date: string | null;
-
+  liked_by_auth_user: boolean;
+  likes_count: number;
 }

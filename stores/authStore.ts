@@ -58,11 +58,13 @@ export const useAuthStore = defineStore("auth", () => {
       const res: IUserResponse = await authService.login(form);
       user.value = res.user;
       token.value = res.token;
-      toast.add({
+      window.location.reload();
+     /* toast.add({
         title: "Sucesso",
         description: "Login realizado com sucesso.",
         color: "success",
-      });
+      }); */
+       
     } catch (err: any) {
       toast.add({
         title: "Ocorreu um erro",

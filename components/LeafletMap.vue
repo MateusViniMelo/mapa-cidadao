@@ -107,7 +107,8 @@
             label="Qual o motivo do encerramento?"
             required
             size="lg"
-            name="type_closure" class="w-full"
+            name="type_closure"
+            class="w-full"
           >
             <USelect
               placeholder="Escolha o tipo"
@@ -117,7 +118,11 @@
             />
           </UFormField>
           <UFormField
-            :label="inactiveOcurrenceState.type_closure === 'resolved' ? 'Data de solução do problema?' : 'Data de quando aconteceu?'  "
+            :label="
+              inactiveOcurrenceState.type_closure === 'resolved'
+                ? 'Data de solução do problema?'
+                : 'Data de quando aconteceu?'
+            "
             name="resolution_date"
             class="w-full"
             size="lg"
@@ -215,6 +220,7 @@ const carregandoLocalizacao = ref(false);
 const maxLength = 250;
 const authStore = useAuthStore();
 const ocurrenceStore = useOcurrenceStore();
+const { ocurrences } = storeToRefs(ocurrenceStore);
 const typesOcurrenceService = useTypesOcurrencesService();
 const { fetchTypesOcurrence } = typesOcurrenceService;
 const modalAberto = ref(false);
@@ -290,7 +296,7 @@ function adicionarLegenda() {
 }
 
 function adicionarMarcadoresSalvos() {
-  ocurrenceStore.ocurrences.forEach((ocorrencia) => {
+  ocurrences.value.forEach((ocorrencia) => {
     const {
       id,
       description,
@@ -302,6 +308,8 @@ function adicionarMarcadoresSalvos() {
       created_at,
       state,
       user_id,
+      likes_count,
+      liked_by_auth_user,
     } = ocorrencia;
 
     const marcadorData = markerIcons[type_id] || markerIcons["Padrao"];
@@ -316,6 +324,9 @@ function adicionarMarcadoresSalvos() {
     ).addTo(map);
 
     if (authStore.user?.id === user_id) {
+      const likedClass = liked_by_auth_user
+        ? "text-indigo-500"
+        : "hover:text-indigo-500";
       marker.bindPopup(`
         <div>
           <p class="text-base"><strong>${nomeOcorrencia}</strong><br /></p>
@@ -328,8 +339,13 @@ function adicionarMarcadoresSalvos() {
           </ul>
 
           <div class="mt-4 flex justify-between ">
-          <div> 
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-[18px] hover:text-indigo-500 cursor-pointer" viewBox="0 0 24 24"><path fill="currentColor" d="M23 10a2 2 0 0 0-2-2h-6.32l.96-4.57c.02-.1.03-.21.03-.32c0-.41-.17-.79-.44-1.06L14.17 1L7.59 7.58C7.22 7.95 7 8.45 7 9v10a2 2 0 0 0 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73zM1 21h4V9H1z"/></svg>
+          <div class="flex items-center space-x-1">
+          <button data-id="${id}" class="btn-like cursor-pointer ">
+      
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-[18px] ${likedClass}" cursor-pointer" viewBox="0 0 24 24"><path fill="currentColor" d="M23 10a2 2 0 0 0-2-2h-6.32l.96-4.57c.02-.1.03-.21.03-.32c0-.41-.17-.79-.44-1.06L14.17 1L7.59 7.58C7.22 7.95 7 8.45 7 9v10a2 2 0 0 0 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73zM1 21h4V9H1z"/></svg>
+          </button>
+           <div class="text-xs contador"> ${likes_count} </div>
+
           </div>
           <div class="">
             <button data-id="${id}" style="cursor: pointer;"
@@ -352,11 +368,18 @@ function adicionarMarcadoresSalvos() {
             <li class="text-xs text-gray-500">${tempoAtras(created_at)}</li>
           </ul>
 
-          <div class="mt-4 flex justify-between ">
-          <div> 
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-[18px] hover:text-indigo-500 cursor-pointer" viewBox="0 0 24 24"><path fill="currentColor" d="M23 10a2 2 0 0 0-2-2h-6.32l.96-4.57c.02-.1.03-.21.03-.32c0-.41-.17-.79-.44-1.06L14.17 1L7.59 7.58C7.22 7.95 7 8.45 7 9v10a2 2 0 0 0 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73zM1 21h4V9H1z"/></svg>
+          <div class="mt-4 flex justify-between">
+          <div class="flex items-center space-x-1">
+          <button ">
+      
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-[18px] " viewBox="0 0 24 24"><path fill="currentColor" d="M23 10a2 2 0 0 0-2-2h-6.32l.96-4.57c.02-.1.03-.21.03-.32c0-.41-.17-.79-.44-1.06L14.17 1L7.59 7.58C7.22 7.95 7 8.45 7 9v10a2 2 0 0 0 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73zM1 21h4V9H1z"/></svg>
+          </button>
+           <div class="text-xs contador"> ${likes_count} </div>
+
           </div>
-         
+
+          </div>
+
           </div>
         </div>
       `);
@@ -397,7 +420,7 @@ function resetFormFinalizarOcorrencia() {
   ocorrenciaRemover.value = null;
   inactiveOcurrenceState.type_closure = TypeOccurrenceClosure.RESOLVED;
   inactiveOcurrenceState.solution_description = undefined;
-   inactiveOcurrenceState.resolution_date = undefined;
+  inactiveOcurrenceState.resolution_date = undefined;
   modalFinalizarOcorrencia.value = false;
 }
 
@@ -503,7 +526,7 @@ function adicionarBotaoRecentrar() {
           class="mb-1 block w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-2 rounded-lg shadow-md cursor-pointer flex items-center justify-center ">
           <svg xmlns="http://www.w3.org/2000/svg" id="btn-recentralizar-texto" class=" w-4 h-4 me-1 text-white " viewBox="0 0 24 24"><path fill="currentColor" d="M12 6.5A2.5 2.5 0 0 1 14.5 9a2.5 2.5 0 0 1-2.5 2.5A2.5 2.5 0 0 1 9.5 9A2.5 2.5 0 0 1 12 6.5M12 2a7 7 0 0 1 7 7c0 5.25-7 13-7 13S5 14.25 5 9a7 7 0 0 1 7-7m0 2a5 5 0 0 0-5 5c0 1 0 3 5 9.71C17 12 17 10 17 9a5 5 0 0 0-5-5"/></svg>
 
-        
+
 
                 <svg aria-hidden="true" role="status" class="w-4 h-4 me-1 text-white animate-spin hidden" id="btn-recentralizar-loading" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
   <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="#E5E7EB"/>
@@ -585,6 +608,54 @@ onMounted(async () => {
       modalFinalizarOcorrencia.value = true;
 
       //removerOcorrencia(id);
+    }
+    // Substitua seu if por isso:
+    const btnLike = (target as HTMLElement).closest(".btn-like") as HTMLElement;
+
+    if (btnLike) {
+      const id = btnLike.getAttribute("data-id");
+      if (!id) return;
+
+      ocurrenceStore
+        .toggleLikeOcurrence(Number(id))
+        .then((updatedOcurrence) => {
+          if (!updatedOcurrence) return;
+
+          // busca o popup
+          const popupEl = btnLike.closest(".leaflet-popup-content");
+          const contadorEl = popupEl?.querySelector(".contador") as HTMLElement;
+          const svgEl = btnLike.querySelector("svg");
+
+          if (svgEl) {
+            // converte de forma segura
+            const svgElement = svgEl as unknown as HTMLElement;
+
+            if (updatedOcurrence.liked_by_auth_user) {
+              svgElement.classList.add("text-indigo-500");
+            } else {
+              svgElement.classList.remove("text-indigo-500");
+            }
+          }
+
+          if (contadorEl) {
+            contadorEl.textContent = String(updatedOcurrence.likes_count);
+          }
+
+          if (svgEl) {
+            if (updatedOcurrence.liked_by_auth_user) {
+              svgEl.classList.add("text-indigo-500");
+            } else {
+              svgEl.classList.remove("text-indigo-500");
+            }
+          }
+        })
+        .catch(() => {
+          toast.add({
+            title: "Erro",
+            description: "Não foi possível dar like na ocorrência",
+            color: "error",
+          });
+        });
     }
 
     if (target.id === "btnInformarProblema") {

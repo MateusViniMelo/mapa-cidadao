@@ -23,6 +23,7 @@ export const useOcurrenceStore = defineStore("ocurrences", () => {
     deleteOcurrence,
     getOcurrencesByUserAuth,
     inactivateOcurrence,
+    likeOrDislike,
   } = useOcurrencesService();
 
   const loadOcurrences = async () => {
@@ -91,7 +92,33 @@ export const useOcurrenceStore = defineStore("ocurrences", () => {
       myOcurrences.value = await getOcurrencesByUserAuth(page);
     } catch (err: any) {
       error.value = err?.data || err;
-      throw err
+      throw err;
+    } finally {
+      loading.value = false;
+    }
+  };
+  const toggleLikeOcurrence = async (id: number) => {
+    loading.value = true;
+    error.value = null;
+    try {
+      const updatedOcurrence = await likeOrDislike(id);
+      if (!updatedOcurrence) return;
+
+      // substitui a ocorrência na lista
+      const index = ocurrences.value.findIndex(
+        (o) => o.id === updatedOcurrence.id
+      );
+      if (index !== -1) {
+        ocurrences.value[index] = updatedOcurrence;
+      } else {
+        // se não existir na lista, adiciona
+        ocurrences.value.push(updatedOcurrence);
+      }
+      console.log(updatedOcurrence);
+      return updatedOcurrence;
+    } catch (err: any) {
+      error.value = err?.data || err;
+      throw err;
     } finally {
       loading.value = false;
     }
@@ -107,5 +134,6 @@ export const useOcurrenceStore = defineStore("ocurrences", () => {
     inactive,
     loadMyOcurrences,
     myOcurrences,
+    toggleLikeOcurrence
   };
 });
