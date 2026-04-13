@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
   const response = await $fetch(url, {
     headers: {
       "Accept-Language": "pt-BR",
-      "User-Agent": "mapa-cidadao/1.0 (mateusmelo04@gmail.com)",
+      "User-Agent": "mapa-cidadao/1.0 (email.com@gmail.com)",
     },
   });
 
