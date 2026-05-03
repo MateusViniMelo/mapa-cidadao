@@ -2,9 +2,25 @@
   <div>
     <div
       v-if="isClient"
-      ref="mapContainer"
-      class="h-[700px] lg:h-[800px] w-full rounded-md shadow"
-    />
+      class="relative h-[700px] lg:h-[800px] w-full overflow-hidden rounded-md shadow"
+    >
+      <div ref="mapContainer" class="h-full w-full" />
+      <div
+        v-if="loadingOcurrences"
+        class="absolute inset-0 z-[1000] flex flex-col items-center justify-center gap-3 rounded-md bg-white/80 backdrop-blur-sm dark:bg-gray-950/80"
+        role="status"
+        aria-live="polite"
+        aria-busy="true"
+      >
+        <UIcon
+          name="i-heroicons-arrow-path"
+          class="size-10 animate-spin text-indigo-600 dark:text-indigo-400"
+        />
+        <p class="text-sm font-medium text-gray-700 dark:text-gray-200">
+          Carregando ocorrências…
+        </p>
+      </div>
+    </div>
   </div>
   <UModal
     v-model:open="modalAberto"
@@ -220,7 +236,7 @@ const carregandoLocalizacao = ref(false);
 const maxLength = 250;
 const authStore = useAuthStore();
 const ocurrenceStore = useOcurrenceStore();
-const { ocurrences } = storeToRefs(ocurrenceStore);
+const { ocurrences, loadingOcurrences } = storeToRefs(ocurrenceStore);
 const typesOcurrenceService = useTypesOcurrencesService();
 const { fetchTypesOcurrence } = typesOcurrenceService;
 const modalAberto = ref(false);

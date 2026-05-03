@@ -14,6 +14,8 @@ import type { NuxtDebugModuleMutationRecord } from "nuxt/schema";
 export const useOcurrenceStore = defineStore("ocurrences", () => {
   const ocurrences = ref<IOcurrence[]>([]);
   const loading = ref(false);
+  /** Somente para listagem no mapa (evita misturar com loading de criar/like/inativar). */
+  const loadingOcurrences = ref(false);
   const error = ref<any>(null);
   const myOcurrences = ref<MyOcurrencesResponse>();
 
@@ -27,14 +29,14 @@ export const useOcurrenceStore = defineStore("ocurrences", () => {
   } = useOcurrencesService();
 
   const loadOcurrences = async () => {
-    loading.value = true;
+    loadingOcurrences.value = true;
     error.value = null;
     try {
       ocurrences.value = await fetchOcurrences();
     } catch (err: any) {
       error.value = err?.data || err;
     } finally {
-      loading.value = false;
+      loadingOcurrences.value = false;
     }
   };
 
@@ -126,6 +128,7 @@ export const useOcurrenceStore = defineStore("ocurrences", () => {
   return {
     ocurrences,
     loading,
+    loadingOcurrences,
     error,
     loadOcurrences,
     addOcurrence,
