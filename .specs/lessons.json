@@ -3,6 +3,97 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 1,
-  "lessons": []
+  "next_id": 6,
+  "lessons": [
+    {
+      "id": "L-001",
+      "key": "surviving_mutant::afirme o valor aceito na fronteira e o valor um passo fora dela para um limite deslocado em um falhar o teste",
+      "text": "Afirme o valor aceito na fronteira e o valor um passo fora dela, para um limite deslocado em um falhar o teste.",
+      "signal": "surviving_mutant",
+      "scope": "auth",
+      "status": "candidate",
+      "features": [
+        "migrar-backend"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "C6 (auth)"
+      ],
+      "created": "2026-11-09T22:55:16Z",
+      "last_seen": "2026-11-09T22:55:16Z"
+    },
+    {
+      "id": "L-002",
+      "key": "surviving_mutant::afirme a funcao de producao quando a dependencia lanca e quando devolve vazio em vez de um stub que ja retorna falso",
+      "text": "Afirme a função de produção quando a dependência lança e quando devolve vazio, em vez de um stub que já retorna falso.",
+      "signal": "surviving_mutant",
+      "scope": "auth",
+      "status": "candidate",
+      "features": [
+        "migrar-backend"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "C5 (auth)"
+      ],
+      "created": "2026-11-09T22:55:16Z",
+      "last_seen": "2026-11-09T22:55:16Z"
+    },
+    {
+      "id": "L-003",
+      "key": "surviving_mutant::afirme o status http que a rota define para um corpo invalido e que a escrita nao aconteceu",
+      "text": "Afirme o status HTTP que a rota define para um corpo inválido e que a escrita não aconteceu.",
+      "signal": "surviving_mutant",
+      "scope": "routes",
+      "status": "candidate",
+      "features": [
+        "migrar-backend"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "C3 (routes)"
+      ],
+      "created": "2026-11-09T22:55:16Z",
+      "last_seen": "2026-11-09T22:55:16Z"
+    },
+    {
+      "id": "L-004",
+      "key": "spec_precision_gap::afirme as chaves publicas do json e a ausencia dos campos secretos em todo payload de usuario que o criterio cobre",
+      "text": "Afirme as chaves públicas do JSON e a ausência dos campos secretos em todo payload de usuário que o critério cobre.",
+      "signal": "spec_precision_gap",
+      "scope": "auth",
+      "status": "candidate",
+      "features": [
+        "migrar-backend"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "C15 (auth)"
+      ],
+      "created": "2026-11-09T22:55:16Z",
+      "last_seen": "2026-11-09T22:55:16Z"
+    },
+    {
+      "id": "L-005",
+      "key": "spec_precision_gap::peca cada caminho que o criterio lista e afirme cada resposta em vez de so contar os handlers",
+      "text": "Peça cada caminho que o critério lista e afirme cada resposta, em vez de só contar os handlers.",
+      "signal": "spec_precision_gap",
+      "scope": "routes",
+      "status": "candidate",
+      "features": [
+        "migrar-backend"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "C51 (routes)"
+      ],
+      "created": "2026-11-09T22:55:16Z",
+      "last_seen": "2026-11-09T22:55:16Z"
+    }
+  ]
 }

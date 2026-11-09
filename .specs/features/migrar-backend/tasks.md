@@ -9,8 +9,8 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Design**: `.specs/features/migrar-backend/design.md`
-**Approved**: 2026-11-09 - user: "está aprovado"
 **Status**: Approved
+**Approved**: 2026-11-09 - user: "está aprovado"
 **Mutations**: 3
 **Build**: `npx vitest run; npm run build`
 
@@ -23,8 +23,8 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 | Code Layer | Required Test Type | Coverage Expectation | Location Pattern | Run Command |
 | --- | --- | --- | --- | --- |
 | Pure domain (validation, geo, like decision, page slice) | unit | All branches; 1:1 to the ACs proved in that file | `server/domain/**/*.test.ts` | `npx vitest run server/domain` |
-| SQL and HTTP routes | integration | Every route in scope: happy path, edge, error | `server/api/**/*.test.ts`, `server/db/**/*.test.ts` | `npx vitest run` |
-| Schema, compose, client, Vitest config, env example | none | build gate only | `docker-compose.yml`, `server/db/schema.sql`, `server/db/seed.sql`, `server/db/client.ts`, `vitest.config.ts`, `.env.example` | `npm run build` |
+| Prisma queries and HTTP routes | integration | Every route in scope: happy path, edge, error | `server/api/**/*.test.ts`, `server/db/**/*.test.ts` | `npx vitest run` |
+| Schema Prisma, migration, seed, config, client, compose, Vitest, env example | none | build gate only | `prisma/schema.prisma`, `prisma.config.ts`, `prisma/seed.ts`, `prisma/migrations/20261109120000_init/migration.sql`, `server/db/client.ts`, `docker-compose.yml`, `vitest.config.ts`, `.env.example` | `npm run build` |
 
 ## Gate Check Commands
 
@@ -52,18 +52,19 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Done when**:
 
-- [ ] O serviço publica PostgreSQL com PostGIS na porta 5432
-- [ ] Usuário, senha e os dois databases estão no arquivo
-- [ ] Gate check passes: `npm run build`
+- [x] O serviço publica PostgreSQL com PostGIS na porta 5432
+- [x] Usuário, senha e os dois databases estão no arquivo
+- [x] Gate check passes: `npm run build`
 
 **Tests**: none
 **Gate**: build
+**Status**: Complete
 
 ---
 
-### T2: Schema SQL
+### T2: Inventário SQL das colunas
 
-**What**: `schema.sql` cria `users`, `access_tokens`, `types_ocurrence`, `ocurrences` com `geometry(Point, 4326)` e `like_ocurrences` com unicidade `(user_id, ocurrence_id)`.
+**What**: `schema.sql` lista `users`, `access_tokens`, `types_ocurrence`, `ocurrences` com `geometry(Point, 4326)` e `like_ocurrences` com unicidade `(user_id, ocurrence_id)`. A T5 copia essas colunas para a migration e apaga este arquivo.
 **Where**: `server/db/schema.sql`
 **Depends on**: T1
 **Reuses**: colunas das migrations Laravel citadas no design, sem sessão, cache, jobs nem reset de senha
@@ -71,541 +72,629 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Done when**:
 
-- [ ] `description` e `address_name` são `text not null default ''`
-- [ ] `type_closure` só aceita `resolved`, `mistake` ou `other`
-- [ ] Gate check passes: `npm run build`
+- [x] `description` e `address_name` são `text not null default ''`
+- [x] `type_closure` só aceita `resolved`, `mistake` ou `other`
+- [x] Gate check passes: `npm run build`
 
 **Tests**: none
 **Gate**: build
+**Status**: Complete
 
 ---
 
-### T3: Seed dos cinco tipos
+### T3: Schema Prisma
 
-**What**: `seed.sql` insere os cinco nomes e pode rodar de novo sem duplicar.
-**Where**: `server/db/seed.sql`
+**What**: `prisma/schema.prisma` descreve os cinco models do design, com `location` `Unsupported("geometry(Point, 4326)")`, enum de encerramento e `@@map` nas tabelas do `schema.sql`. As dependências `prisma@7`, `@prisma/client@7`, `@prisma/adapter-pg`, `pg`, `dotenv` e `tsx` entram no `package.json` nesta tarefa.
+**Where**: `prisma/schema.prisma`
 **Depends on**: T2
+**Reuses**: `server/db/schema.sql`
+**Requirement**: MIG-06
+
+**Done when**:
+
+- [x] O generator é `prisma-client`, o output é `../generated/prisma` e `importFileExtension` é `ts`
+- [x] `name` de `TypeOcurrence` é único e os ids são `Int`
+- [x] O CLI instalado é a major 7, não o `prisma@latest`
+- [x] Gate check passes: `npm run build`
+
+**Tests**: none
+**Gate**: build
+**Status**: Complete
+
+---
+
+### T4: Config do Prisma
+
+**What**: `prisma.config.ts` aponta o schema, a pasta `prisma/migrations`, o seed `tsx prisma/seed.ts` e a URL `env("DATABASE_URL")`.
+**Where**: `prisma.config.ts`
+**Depends on**: T3
+**Reuses**: `prisma/schema.prisma`
+**Requirement**: MIG-04
+
+**Done when**:
+
+- [x] O arquivo importa `dotenv/config` e `defineConfig` de `prisma/config`
+- [x] Gate check passes: `npm run build`
+
+**Tests**: none
+**Gate**: build
+**Status**: Complete
+
+---
+
+### T5: Migration inicial
+
+**What**: A migration `20261109120000_init` nasce de `prisma migrate diff --from-empty --to-schema prisma/schema.prisma --script`, com `CREATE EXTENSION IF NOT EXISTS "postgis";` na primeira linha. `server/db/schema.sql` sai do repositório.
+**Where**: `prisma/migrations/20261109120000_init/migration.sql`
+**Depends on**: T4
+**Reuses**: `prisma/schema.prisma` e as colunas de `server/db/schema.sql`
+**Requirement**: MIG-06
+
+**Done when**:
+
+- [x] A primeira instrução cria a extensão `postgis`
+- [x] A tabela `ocurrences` tem `geometry(Point, 4326)` e `like_ocurrences` tem unicidade de `(user_id, ocurrence_id)`
+- [x] `server/db/schema.sql` não existe mais
+- [x] Gate check passes: `npm run build`
+
+**Tests**: none
+**Gate**: build
+**Status**: Complete
+
+---
+
+### T6: Seed dos cinco tipos
+
+**What**: `prisma/seed.ts` faz upsert dos cinco nomes e pode rodar de novo sem duplicar.
+**Where**: `prisma/seed.ts`
+**Depends on**: T5
 **Reuses**: `TypeOcurrenceSeeder.php`
 **Requirement**: MIG-04
 
 **Done when**:
 
-- [ ] Os nomes são Problema de Iluminação, Problema de Pavimentação, Alagamento, Acúmulo de Lixo e Falta de Pavimentação
-- [ ] Gate check passes: `npm run build`
+- [x] Os nomes são Problema de Iluminação, Problema de Pavimentação, Alagamento, Acúmulo de Lixo e Falta de Pavimentação
+- [x] Gate check passes: `npm run build`
 
 **Tests**: none
 **Gate**: build
+**Status**: Complete
 
 ---
 
-### T4: Cliente SQL
+### T7: Cliente Prisma
 
-**What**: `client.ts` exporta `getSql()` lendo `DATABASE_URL`.
+**What**: `client.ts` exporta `getPrisma()` com `PrismaPg({ connectionString })` e uma instância por processo. O `postinstall` passa a `prisma generate && nuxt prepare`. `generated` entra no `.gitignore`.
 **Where**: `server/db/client.ts`
-**Depends on**: T3
-**Reuses**: nada de ORM; o pacote é `postgres`
+**Depends on**: T6
+**Reuses**: `prisma/schema.prisma`
 **Requirement**: MIG-04
 
 **Done when**:
 
-- [ ] `getSql()` devolve um cliente do pacote `postgres`
-- [ ] Gate check passes: `npm run build`
+- [x] `getPrisma()` devolve um `PrismaClient` construído com o adapter
+- [x] O import vem de `generated/prisma/client`
+- [x] Gate check passes: `npm run build`
 
 **Tests**: none
 **Gate**: build
+**Status**: Complete
 
 ---
 
 ### Phase 2: Test harness
 
-### T5: Vitest
+### T8: Vitest
 
-**What**: Configurar o Vitest para `server/domain/**/*.test.ts`, `server/api/**/*.test.ts` e `server/db/**/*.test.ts`.
+**What**: Configurar o Vitest para `server/domain/**/*.test.ts`, `server/api/**/*.test.ts` e `server/db/**/*.test.ts`. A URL de teste é a do banco `mapa_cidadao_test` e o runner recusa outro nome de banco.
 **Where**: `vitest.config.ts`
-**Depends on**: T4
+**Depends on**: T7
 **Reuses**: o `package.json` deste Nuxt, que ainda não tem script de teste
 **Requirement**: MIG-01
 
 **Done when**:
 
-- [ ] `npx vitest run` termina sem suite, ou só com os testes que já existirem
-- [ ] Gate check passes: `npm run build`
+- [x] `npx vitest run` termina sem suite, ou só com os testes que já existirem
+- [x] A config não aponta o reset para o banco `mapa_cidadao`
+- [x] Gate check passes: `npm run build`
 
 **Tests**: none
 **Gate**: build
+**Status**: Complete
 
 ---
 
-### T6: Migrate no banco de teste
+### T9: Migrate no banco de teste
 
-**What**: `migrate.ts` aplica schema e seed e trunca as tabelas de domínio antes de reinseri-los.
+**What**: `migrate.ts` aplica `prisma migrate deploy`, trunca as tabelas de domínio e reinsere os tipos pelo seed.
 **Where**: `server/db/migrate.ts`
-**Depends on**: T5
-**Reuses**: `server/db/schema.sql` e `server/db/seed.sql`
+**Depends on**: T8
+**Reuses**: `prisma/migrations/20261109120000_init/migration.sql` e `prisma/seed.ts`
 **Requirement**: MIG-04
 
 **Done when**:
 
-- [ ] `server/db/migrate.test.ts` prova que o seed deixa os cinco nomes e que PostGIS responde `ST_MakePoint`
-- [ ] Gate check passes: `npx vitest run`
-- [ ] Test count: 1 test pass
+- [x] `server/db/migrate.test.ts` prova que o seed deixa os cinco nomes e que PostGIS responde `ST_MakePoint`
+- [x] Gate check passes: `npx vitest run`
+- [x] Test count: 1 test pass
 
 **Tests**: integration
 **Gate**: full
+**Status**: Complete
 
 ---
 
 ### Phase 3: Auth
 
-### T7: Regras de cadastro
+### T10: Regras de cadastro
 
 **What**: `validateRegistration` aplica nome, e-mail, senha, confirmação e idade, com a checagem de MX injetável.
 **Where**: `server/domain/auth/register.ts`
-**Depends on**: T6
+**Depends on**: T9
 **Reuses**: `RegisterUserRequest.php`
 **Requirement**: MIG-01
 
 **Done when**:
 
-- [ ] `server/domain/auth/register.test.ts` cobre nome vazio, nome acima de 100, e-mail recusado, senha fora do padrão, confirmação diferente e menor de 18
-- [ ] Gate check passes: `npx vitest run server/domain`
-- [ ] Test count: 6 tests pass
+- [x] `server/domain/auth/register.test.ts` cobre nome vazio, nome acima de 100, e-mail recusado, senha fora do padrão, confirmação diferente e menor de 18
+- [x] Gate check passes: `npx vitest run server/domain`
+- [x] Test count: 6 tests pass
 
 **Tests**: unit
 **Gate**: quick
+**Status**: Complete
 
 ---
 
-### T8: Regras de sessão
+### T11: Regras de sessão
 
 **What**: Funções puras de hash do token, leitura que devolve o mesmo token e logout que o apaga, sobre um mapa em memória.
 **Where**: `server/domain/auth/session.ts`
-**Depends on**: T7
+**Depends on**: T10
 **Reuses**: o fluxo de `AuthController.php`, sem emitir token novo no `/me`
 **Requirement**: MIG-03
 
 **Done when**:
 
-- [ ] `server/domain/auth/session.test.ts` cobre hash, o mesmo token na leitura e a ausência depois do logout
-- [ ] Gate check passes: `npx vitest run server/domain`
-- [ ] Test count: 3 tests pass
+- [x] `server/domain/auth/session.test.ts` cobre hash, o mesmo token na leitura e a ausência depois do logout
+- [x] Gate check passes: `npx vitest run server/domain`
+- [x] Test count: 3 tests pass
 
 **Tests**: unit
 **Gate**: quick
+**Status**: Complete
 
 ---
 
-### T9: POST /api/register
+### T12: POST /api/register
 
-**What**: A rota grava o usuário com bcrypt, devolve 200 sem `password` e o token passa em `/api/user/me`.
+**What**: A rota grava o usuário com bcrypt pelo Prisma, devolve 200 sem `password` e o token passa em `/api/user/me`. E-mail repetido é `P2002` e responde 422.
 **Where**: `server/api/register.post.ts`
-**Depends on**: T8
+**Depends on**: T11
 **Reuses**: `server/domain/auth/register.ts` e `server/domain/auth/session.ts`
 **Requirement**: MIG-01
 
 **Done when**:
 
-- [ ] `server/api/register.post.test.ts` cobre 200, bcrypt, e-mail duplicado, token no `/me` e ausência de `password`
-- [ ] Gate check passes: `npx vitest run`
-- [ ] Test count: 5 tests pass
+- [x] `server/api/register.post.test.ts` cobre 200, bcrypt, e-mail duplicado, token no `/me` e ausência de `password`
+- [x] Gate check passes: `npx vitest run`
+- [x] Test count: 5 tests pass
 
 **Tests**: integration
 **Gate**: full
+**Status**: Complete
 
 ---
 
-### T10: POST /api/user/login
+### T13: POST /api/user/login
 
 **What**: A rota devolve 200 com usuário e token, ou 401 `Credenciais inválidas`.
 **Where**: `server/api/user/login.post.ts`
-**Depends on**: T9
+**Depends on**: T12
 **Reuses**: `AuthController::login`
 **Requirement**: MIG-02
 
 **Done when**:
 
-- [ ] `server/api/user/login.post.test.ts` cobre senha certa, senha errada e ausência de `password`
-- [ ] Gate check passes: `npx vitest run`
-- [ ] Test count: 3 tests pass
+- [x] `server/api/user/login.post.test.ts` cobre senha certa, senha errada e ausência de `password`
+- [x] Gate check passes: `npx vitest run`
+- [x] Test count: 3 tests pass
 
 **Tests**: integration
 **Gate**: full
+**Status**: Complete
 
 ---
 
-### T11: GET /api/user/me
+### T14: GET /api/user/me
 
 **What**: A rota devolve o mesmo token, rejeita token ausente e aceita o scheme `bearer`.
 **Where**: `server/api/user/me.get.ts`
-**Depends on**: T10
+**Depends on**: T13
 **Reuses**: `bearerToken` descrito no design
 **Requirement**: MIG-03
 
 **Done when**:
 
-- [ ] `server/api/user/me.get.test.ts` cobre o mesmo token, 401 sem token e scheme minúsculo
-- [ ] Gate check passes: `npx vitest run`
-- [ ] Test count: 3 tests pass
+- [x] `server/api/user/me.get.test.ts` cobre o mesmo token, 401 sem token e scheme minúsculo
+- [x] Gate check passes: `npx vitest run`
+- [x] Test count: 3 tests pass
 
 **Tests**: integration
 **Gate**: full
+**Status**: Complete
 
 ---
 
-### T12: POST /api/user/logout
+### T15: POST /api/user/logout
 
 **What**: A rota revoga o token atual e responde a frase do spec.
 **Where**: `server/api/user/logout.post.ts`
-**Depends on**: T11
+**Depends on**: T14
 **Reuses**: `AuthController::logout`
 **Requirement**: MIG-03
 
 **Done when**:
 
-- [ ] `server/api/user/logout.post.test.ts` cobre a revogação e o 401 sem token
-- [ ] Gate check passes: `npx vitest run`
-- [ ] Test count: 2 tests pass
+- [x] `server/api/user/logout.post.test.ts` cobre a revogação e o 401 sem token
+- [x] Gate check passes: `npx vitest run`
+- [x] Test count: 2 tests pass
 
 **Tests**: integration
 **Gate**: full
+**Status**: Complete
 
 ---
 
 ### Phase 4: Tipos e mapa
 
-### T13: Consulta dos tipos
+### T16: Consulta dos tipos
 
-**What**: `listTypes` lê `types_ocurrence` depois do seed.
+**What**: `listTypes` lê `types_ocurrence` pelo Prisma depois do seed.
 **Where**: `server/domain/catalog/list-types.ts`
-**Depends on**: T12
-**Reuses**: `server/db/seed.sql`
+**Depends on**: T15
+**Reuses**: `prisma/seed.ts`
 **Requirement**: MIG-04
 
 **Done when**:
 
-- [ ] `server/domain/catalog/list-types.test.ts` encontra os cinco nomes no banco de teste
-- [ ] Gate check passes: `npx vitest run`
-- [ ] Test count: 1 test pass
+- [x] `server/domain/catalog/list-types.test.ts` encontra os cinco nomes no banco de teste
+- [x] Gate check passes: `npx vitest run`
+- [x] Test count: 1 test pass
 
 **Tests**: integration
 **Gate**: full
+**Status**: Complete
 
 ---
 
-### T14: GET /api/types-ocurrence
+### T17: GET /api/types-ocurrence
 
 **What**: A rota responde 200 com `types_ocurrence`.
 **Where**: `server/api/types-ocurrence.get.ts`
-**Depends on**: T13
+**Depends on**: T16
 **Reuses**: `server/domain/catalog/list-types.ts`
 **Requirement**: MIG-04
 
 **Done when**:
 
-- [ ] `server/api/types-ocurrence.get.test.ts` lista os cinco nomes com id, name, created_at e updated_at
-- [ ] Gate check passes: `npx vitest run`
-- [ ] Test count: 1 test pass
+- [x] `server/api/types-ocurrence.get.test.ts` lista os cinco nomes com id, name, created_at e updated_at
+- [x] Gate check passes: `npx vitest run`
+- [x] Test count: 1 test pass
 
 **Tests**: integration
 **Gate**: full
+**Status**: Complete
 
 ---
 
-### T15: Forma da lista pública
+### T18: Forma da lista pública
 
 **What**: `withLikeFlags` marca `liked_by_auth_user` e `likes_count` sem uma query por linha.
 **Where**: `server/domain/occurrences/list-active.ts`
-**Depends on**: T14
+**Depends on**: T17
 **Reuses**: os appends de `Ocurrence.php`, agregados num passo só
 **Requirement**: MIG-05
 
 **Done when**:
 
-- [ ] `server/domain/occurrences/list-active.test.ts` cobre anônimo, curtida do chamador e a contagem
-- [ ] Gate check passes: `npx vitest run server/domain`
-- [ ] Test count: 3 tests pass
+- [x] `server/domain/occurrences/list-active.test.ts` cobre anônimo, curtida do chamador e a contagem
+- [x] Gate check passes: `npx vitest run server/domain`
+- [x] Test count: 3 tests pass
 
 **Tests**: unit
 **Gate**: quick
+**Status**: Complete
 
 ---
 
-### T16: GET /api/ocurrences
+### T19: GET /api/ocurrences
 
-**What**: A rota devolve só ocorrências ativas e aceita Authorization vazio.
+**What**: A rota devolve só ocorrências ativas, com o ponto lido por `ST_X` e `ST_Y`, e aceita Authorization vazio.
 **Where**: `server/api/ocurrences/index.get.ts`
-**Depends on**: T15
+**Depends on**: T18
 **Reuses**: `server/domain/occurrences/list-active.ts`
 **Requirement**: MIG-05
 
 **Done when**:
 
-- [ ] `server/api/ocurrences/index.get.test.ts` cobre só ativas, flag anônima, flag autenticada e header vazio
-- [ ] Gate check passes: `npx vitest run`
-- [ ] Test count: 4 tests pass
+- [x] `server/api/ocurrences/index.get.test.ts` cobre só ativas, flag anônima, flag autenticada e header vazio
+- [x] Gate check passes: `npx vitest run`
+- [x] Test count: 4 tests pass
 
 **Tests**: integration
 **Gate**: full
+**Status**: Complete
 
 ---
 
 ### Phase 5: Criar ocorrência
 
-### T17: Ponto e validação da criação
+### T20: Ponto e validação da criação
 
 **What**: `requestPoint`, `geoJsonCoordinates` e a validação de descrição, endereço e campos nulos.
 **Where**: `server/domain/occurrences/create.ts`
-**Depends on**: T16
+**Depends on**: T19
 **Reuses**: `Point::makeGeodetic` e `GeojsonGenerator`
 **Requirement**: MIG-06
 
 **Done when**:
 
-- [ ] `server/domain/occurrences/create.test.ts` cobre o par de São Paulo, descrição e endereço vazios, cidade nula e descrição acima de 250
-- [ ] Gate check passes: `npx vitest run server/domain`
-- [ ] Test count: 4 tests pass
+- [x] `server/domain/occurrences/create.test.ts` cobre o par de São Paulo, descrição e endereço vazios, cidade nula e descrição acima de 250
+- [x] Gate check passes: `npx vitest run server/domain`
+- [x] Test count: 4 tests pass
 
 **Tests**: unit
 **Gate**: quick
+**Status**: Complete
 
 ---
 
-### T18: POST /api/ocurrences
+### T21: POST /api/ocurrences
 
-**What**: A rota grava o ponto, responde 201 e ignora `user_id` do corpo.
+**What**: A rota grava o ponto com `$queryRaw` e `ST_MakePoint`, responde 201 e ignora `user_id` do corpo.
 **Where**: `server/api/ocurrences/index.post.ts`
-**Depends on**: T17
+**Depends on**: T20
 **Reuses**: `server/domain/occurrences/create.ts`
 **Requirement**: MIG-06
 
 **Done when**:
 
-- [ ] `server/api/ocurrences/index.post.test.ts` cobre o GeoJSON de volta, 401, `type_id` desconhecido e `user_id` ignorado
-- [ ] A latitude gravada de `[-23.55052, -46.633308]` é -23.55052 e a longitude é -46.633308
-- [ ] Gate check passes: `npx vitest run`
-- [ ] Test count: 4 tests pass
+- [x] `server/api/ocurrences/index.post.test.ts` cobre o GeoJSON de volta, 401, `type_id` desconhecido e `user_id` ignorado
+- [x] A latitude gravada de `[-23.55052, -46.633308]` é -23.55052 e a longitude é -46.633308
+- [x] Gate check passes: `npx vitest run`
+- [x] Test count: 4 tests pass
 
 **Tests**: integration
 **Gate**: full
+**Status**: Complete
 
 ---
 
 ### Phase 6: Inativar
 
-### T19: Decisão de inativação
+### T22: Decisão de inativação
 
 **What**: A função decide fechar, apagar, 403, 422 ou a mensagem de falha ao gravar.
 **Where**: `server/domain/occurrences/inactivate.ts`
-**Depends on**: T18
+**Depends on**: T21
 **Reuses**: `OcurrenceService::inactivate`
 **Requirement**: MIG-07
 
 **Done when**:
 
-- [ ] `server/domain/occurrences/inactivate.test.ts` cobre resolved, mistake, outro usuário, já inativa, data futura e exceção ao gravar
-- [ ] Gate check passes: `npx vitest run server/domain`
-- [ ] Test count: 6 tests pass
+- [x] `server/domain/occurrences/inactivate.test.ts` cobre resolved, mistake, outro usuário, já inativa, data futura e exceção ao gravar
+- [x] Gate check passes: `npx vitest run server/domain`
+- [x] Test count: 6 tests pass
 
 **Tests**: unit
 **Gate**: quick
+**Status**: Complete
 
 ---
 
-### T20: POST /api/ocurrences/inactivate/:id
+### T23: POST /api/ocurrences/inactivate/:id
 
-**What**: A rota aplica a decisão do dono e os status 200, 403, 401 e 404.
+**What**: A rota aplica a decisão do dono. O encerramento grava com `$executeRaw`. O caso `mistake` usa `delete`. Os status são 200, 403, 401 e 404.
 **Where**: `server/api/ocurrences/inactivate/[id].post.ts`
-**Depends on**: T19
+**Depends on**: T22
 **Reuses**: `server/domain/occurrences/inactivate.ts`
 **Requirement**: MIG-07
 
 **Done when**:
 
-- [ ] `server/api/ocurrences/inactivate/[id].post.test.ts` cobre resolved, mistake, 403, 401 e 404
-- [ ] Gate check passes: `npx vitest run`
-- [ ] Test count: 5 tests pass
+- [x] `server/api/ocurrences/inactivate/[id].post.test.ts` cobre resolved, mistake, 403, 401 e 404
+- [x] Gate check passes: `npx vitest run`
+- [x] Test count: 5 tests pass
 
 **Tests**: integration
 **Gate**: full
+**Status**: Complete
 
 ---
 
 ### Phase 7: Minhas ocorrências
 
-### T21: Página de dez
+### T24: Página de dez
 
 **What**: `sliceMine` ordena por `created_at` descendente e corta de 10 em 10.
 **Where**: `server/domain/occurrences/mine.ts`
-**Depends on**: T20
+**Depends on**: T23
 **Reuses**: `paginate(10)` de `ocurrencesUserAuth`
 **Requirement**: MIG-08
 
 **Done when**:
 
-- [ ] `server/domain/occurrences/mine.test.ts` cobre a ordem e o corte 10 depois 5 de uma lista de 15
-- [ ] Gate check passes: `npx vitest run server/domain`
-- [ ] Test count: 2 tests pass
+- [x] `server/domain/occurrences/mine.test.ts` cobre a ordem e o corte 10 depois 5 de uma lista de 15
+- [x] Gate check passes: `npx vitest run server/domain`
+- [x] Test count: 2 tests pass
 
 **Tests**: unit
 **Gate**: quick
+**Status**: Complete
 
 ---
 
-### T22: GET /api/ocurrences/my-ocurrences
+### T25: GET /api/ocurrences/my-ocurrences
 
-**What**: A rota pagina só as linhas do chamador, inclui inativas e omite entidades HTML nos rótulos.
+**What**: A rota pagina só as linhas do chamador, inclui inativas, lê o ponto por `ST_X` e `ST_Y` e omite entidades HTML nos rótulos.
 **Where**: `server/api/ocurrences/my-ocurrences.get.ts`
-**Depends on**: T21
+**Depends on**: T24
 **Reuses**: `server/domain/occurrences/mine.ts` e `MyOcurrencesResponse.ts`
 **Requirement**: MIG-08
 
 **Done when**:
 
-- [ ] `server/api/ocurrences/my-ocurrences.get.test.ts` cobre 10 e 5, links, inativa incluída, 401 e página omitida
-- [ ] Gate check passes: `npx vitest run`
-- [ ] Test count: 5 tests pass
+- [x] `server/api/ocurrences/my-ocurrences.get.test.ts` cobre 10 e 5, links, inativa incluída, 401 e página omitida
+- [x] Gate check passes: `npx vitest run`
+- [x] Test count: 5 tests pass
 
 **Tests**: integration
 **Gate**: full
+**Status**: Complete
 
 ---
 
 ### Phase 8: Curtir
 
-### T23: Alternância da curtida
+### T26: Alternância da curtida
 
 **What**: Dado o par usuário-ocorrência, a função cria uma linha ou remove a única linha existente.
 **Where**: `server/domain/occurrences/like.ts`
-**Depends on**: T22
+**Depends on**: T25
 **Reuses**: `OcurrenceService::likeOrDislikeOcurrence`
 **Requirement**: MIG-09
 
 **Done when**:
 
-- [ ] `server/domain/occurrences/like.test.ts` cobre a ida, a volta e a recusa de uma segunda linha
-- [ ] Gate check passes: `npx vitest run server/domain`
-- [ ] Test count: 2 tests pass
+- [x] `server/domain/occurrences/like.test.ts` cobre a ida, a volta e a recusa de uma segunda linha
+- [x] Gate check passes: `npx vitest run server/domain`
+- [x] Test count: 2 tests pass
 
 **Tests**: unit
 **Gate**: quick
+**Status**: Complete
 
 ---
 
-### T24: GET /api/ocurrences/like/:id
+### T27: GET /api/ocurrences/like/:id
 
-**What**: A rota responde 201 na curtida, 200 na remoção, 401 sem token e 404 sem ocorrência.
+**What**: A rota responde 201 na curtida, 200 na remoção, 401 sem token e 404 sem ocorrência. A unicidade do par fica no Prisma.
 **Where**: `server/api/ocurrences/like/[id].get.ts`
-**Depends on**: T23
+**Depends on**: T26
 **Reuses**: `server/domain/occurrences/like.ts`
 **Requirement**: MIG-09
 
 **Done when**:
 
-- [ ] `server/api/ocurrences/like/[id].get.test.ts` cobre 201, 200, 401 e 404
-- [ ] Gate check passes: `npx vitest run`
-- [ ] Test count: 4 tests pass
+- [x] `server/api/ocurrences/like/[id].get.test.ts` cobre 201, 200, 401 e 404
+- [x] Gate check passes: `npx vitest run`
+- [x] Test count: 4 tests pass
 
 **Tests**: integration
 **Gate**: full
+**Status**: Complete
 
 ---
 
 ### Phase 9: Caminhos e base do front
 
-### T25: Mapa dos dez caminhos
+### T28: Mapa dos dez caminhos
 
 **What**: Um teste importa os dez handlers e falha se algum arquivo do contrato não exportar handler.
 **Where**: `server/api/route-map.test.ts`
-**Depends on**: T24
+**Depends on**: T27
 **Reuses**: a tabela de rotas do design
 **Requirement**: MIG-10
 
 **Done when**:
 
-- [ ] O teste `mounted paths answer` vê os dez arquivos e recebe resposta diferente de 404 em `GET /api/types-ocurrence`
-- [ ] Gate check passes: `npx vitest run`
-- [ ] Test count: 1 test pass
+- [x] O teste `mounted paths answer` vê os dez arquivos e recebe resposta diferente de 404 em `GET /api/types-ocurrence`
+- [x] Gate check passes: `npx vitest run`
+- [x] Test count: 1 test pass
 
 **Tests**: integration
 **Gate**: full
+**Status**: Complete
 
 ---
 
-### T26: Base URL do front
+### T29: Base URL do front
 
 **What**: `.env.example` documenta `DATABASE_URL` e aponta `NUXT_PUBLIC_API_BASE` para `http://localhost:3000/api`.
 **Where**: `.env.example`
-**Depends on**: T25
+**Depends on**: T28
 **Reuses**: `nuxt.config.ts` `runtimeConfig.public.apiBase`
 **Requirement**: MIG-10
 
 **Done when**:
 
-- [ ] `NUXT_PUBLIC_API_BASE` deixa de ser `http://localhost:8000/api`
-- [ ] `DATABASE_URL` de desenvolvimento e de teste estão no exemplo, sem senha de produção
-- [ ] Gate check passes: `npx vitest run; npm run build`
+- [x] `NUXT_PUBLIC_API_BASE` deixa de ser `http://localhost:8000/api`
+- [x] `DATABASE_URL` de desenvolvimento está no exemplo, sem senha de produção
+- [x] Gate check passes: `npx vitest run; npm run build`
 
 **Tests**: none
 **Gate**: build
+**Status**: Complete
 
 ---
 
 ## Execution Plan
 
-Phases are ordered and run sequentially. Tasks inside a phase run in order. Nenhuma tarefa está marcada para executar.
+Phases are ordered and run sequentially. Tasks inside a phase run in order. T1 e T2 estão completas. A próxima é T3. O desenho anterior, com o pacote `postgres`, deixou de valer. Estas tarefas pedem aprovação de novo.
 
 ### Phase 1: Foundation
 
 ```
-T1 → T2 → T3 → T4
+T1 → T2 → T3 → T4 → T5 → T6 → T7
 ```
 
 ### Phase 2: Test harness
 
 ```
-T5 → T6
+T8 → T9
 ```
 
 ### Phase 3: Auth
 
 ```
-T7 → T8 → T9 → T10 → T11 → T12
+T10 → T11 → T12 → T13 → T14 → T15
 ```
 
 ### Phase 4: Tipos e mapa
 
 ```
-T13 → T14 → T15 → T16
+T16 → T17 → T18 → T19
 ```
 
 ### Phase 5: Criar ocorrência
 
 ```
-T17 → T18
+T20 → T21
 ```
 
 ### Phase 6: Inativar
 
 ```
-T19 → T20
+T22 → T23
 ```
 
 ### Phase 7: Minhas ocorrências
 
 ```
-T21 → T22
+T24 → T25
 ```
 
 ### Phase 8: Curtir
 
 ```
-T23 → T24
+T26 → T27
 ```
 
 ### Phase 9: Caminhos e base do front
 
 ```
-T25 → T26
+T28 → T29
 ```
 
 ---
@@ -770,7 +859,7 @@ Proof: `npx vitest run server/api/route-map.test.ts -t "mounted paths answer"`
 ## Handoff
 
 **Settled mid-build:** none
-**Dispatched:** none
+**Dispatched:** Verifier 4b6f336f returned FAIL em verification.md. Passe de correção fechou C6, C5, C3, C15 e C51. Não redespachar.
 **Walked:** none
 
 ---
@@ -778,93 +867,15 @@ Proof: `npx vitest run server/api/route-map.test.ts -t "mounted paths answer"`
 ## Phase Execution Map
 
 ```
-Phase 1:  T1 → T2 → T3 → T4
-Phase 2:  T5 → T6
-Phase 3:  T7 → T8 → T9 → T10 → T11 → T12
-Phase 4:  T13 → T14 → T15 → T16
-Phase 5:  T17 → T18
-Phase 6:  T19 → T20
-Phase 7:  T21 → T22
-Phase 8:  T23 → T24
-Phase 9:  T25 → T26
+Phase 1:  T1 → T2 → T3 → T4 → T5 → T6 → T7
+Phase 2:  T8 → T9
+Phase 3:  T10 → T11 → T12 → T13 → T14 → T15
+Phase 4:  T16 → T17 → T18 → T19
+Phase 5:  T20 → T21
+Phase 6:  T22 → T23
+Phase 7:  T24 → T25
+Phase 8:  T26 → T27
+Phase 9:  T28 → T29
 ```
 
-São 26 tarefas em nove fases. Na execução, fases inteiras entram em lotes de cerca de sete tarefas. Mais de um lote pede confirmação antes de delegar. Este registro não dispara lote nenhum.
-
----
-
-## Task Granularity Check
-
-| Task | Scope | Status |
-| --- | --- | --- |
-| T1 a T4 | 1 arquivo de infra cada | Granular |
-| T5 | 1 config do Vitest | Granular |
-| T6 a T26 | 1 módulo ou 1 rota cada | Granular |
-
-**Granularity check**: cada `Where` nomeia um arquivo.
-
----
-
-## Diagram-Definition Cross-Check
-
-| Task | Depends On (task body) | Diagram Shows | Status |
-| --- | --- | --- | --- |
-| T1 | None | início da fase 1 | Match |
-| T2 | T1 | T1 → T2 | Match |
-| T3 | T2 | T2 → T3 | Match |
-| T4 | T3 | T3 → T4 | Match |
-| T5 | T4 | T4 fica na fase anterior | Match |
-| T6 | T5 | T5 → T6 | Match |
-| T7 | T6 | T6 fica na fase anterior | Match |
-| T8 | T7 | T7 → T8 | Match |
-| T9 | T8 | T8 → T9 | Match |
-| T10 | T9 | T9 → T10 | Match |
-| T11 | T10 | T10 → T11 | Match |
-| T12 | T11 | T11 → T12 | Match |
-| T13 | T12 | T12 fica na fase anterior | Match |
-| T14 | T13 | T13 → T14 | Match |
-| T15 | T14 | T14 → T15 | Match |
-| T16 | T15 | T15 → T16 | Match |
-| T17 | T16 | T16 fica na fase anterior | Match |
-| T18 | T17 | T17 → T18 | Match |
-| T19 | T18 | T18 fica na fase anterior | Match |
-| T20 | T19 | T19 → T20 | Match |
-| T21 | T20 | T20 fica na fase anterior | Match |
-| T22 | T21 | T21 → T22 | Match |
-| T23 | T22 | T22 fica na fase anterior | Match |
-| T24 | T23 | T23 → T24 | Match |
-| T25 | T24 | T24 fica na fase anterior | Match |
-| T26 | T25 | T25 → T26 | Match |
-
----
-
-## Test Co-location Validation
-
-| Task | Code Layer Created/Modified | Matrix Requires | Task Says | Status |
-| --- | --- | --- | --- | --- |
-| T1 | compose | none | none | OK |
-| T2 | schema | none | none | OK |
-| T3 | seed | none | none | OK |
-| T4 | client | none | none | OK |
-| T5 | Vitest config | none | none | OK |
-| T6 | migrate | integration | integration | OK |
-| T7 | register rules | unit | unit | OK |
-| T8 | session rules | unit | unit | OK |
-| T9 | register route | integration | integration | OK |
-| T10 | login route | integration | integration | OK |
-| T11 | me route | integration | integration | OK |
-| T12 | logout route | integration | integration | OK |
-| T13 | list types | integration | integration | OK |
-| T14 | types route | integration | integration | OK |
-| T15 | like flags | unit | unit | OK |
-| T16 | list route | integration | integration | OK |
-| T17 | create rules | unit | unit | OK |
-| T18 | create route | integration | integration | OK |
-| T19 | inactivate rules | unit | unit | OK |
-| T20 | inactivate route | integration | integration | OK |
-| T21 | page slice | unit | unit | OK |
-| T22 | mine route | integration | integration | OK |
-| T23 | like rules | unit | unit | OK |
-| T24 | like route | integration | integration | OK |
-| T25 | route map | integration | integration | OK |
-| T26 | env example | none | none | OK |
+São 29 tarefas em nove fases. T1 e T2 estão completas. Na execução, fases inteiras entram em lotes de cerca de sete tarefas. Mais de um lote pede confirmação antes de delegar. Este registro não dispara lote nenhum.

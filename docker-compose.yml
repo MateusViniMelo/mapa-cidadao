@@ -1,0 +1,31 @@
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: mapa_cidadao
+      POSTGRES_PASSWORD: mapa_cidadao
+      POSTGRES_DB: mapa_cidadao
+    volumes:
+      - postgis_data:/var/lib/postgresql/data
+    configs:
+      - source: create_test_database
+        target: /docker-entrypoint-initdb.d/20_create_test_database.sh
+        mode: 0755
+
+configs:
+  create_test_database:
+    content: |
+      #!/bin/bash
+      set -e
+      psql -v ON_ERROR_STOP=1 --username mapa_cidadao --dbname mapa_cidadao <<'SQL'
+      SELECT 'CREATE DATABASE mapa_cidadao_test'
+      WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'mapa_cidadao_test')\gexec
+      SQL
+      psql -v ON_ERROR_STOP=1 --username mapa_cidadao --dbname mapa_cidadao_test <<'SQL'
+      CREATE EXTENSION IF NOT EXISTS postgis;
+      SQL
+
+volumes:
+  postgis_data:

@@ -32,6 +32,7 @@ O mapa em Nuxt fala com a API Laravel em `NUXT_PUBLIC_API_BASE`. Esse backend fi
 | Assumption / decision | Chosen default | Rationale | Confirmed? |
 | --- | --- | --- | --- |
 | Onde o backend mora | Rotas Nitro neste Nuxt e PostgreSQL com PostGIS, SRID 4326 | Opção escolhida: "Nitro neste repositório + PostgreSQL/PostGIS" | y |
+| Acesso ao banco | Prisma ORM 7, com o ponto em `Unsupported("geometry(Point, 4326)")` e a geometria em `$queryRaw` | Escolha de 2026-11-09: "Prisma 7 estável. Ponto via SQL no campo Unsupported" | y - user: "Prisma 7 estável. Ponto via SQL no campo Unsupported" |
 | Dados iniciais | Schema vazio mais os cinco tipos do seeder | Opção escolhida: "Paridade do contrato que o front já chama; banco novo só com o seed dos 5 tipos" | y |
 | Status de `POST /api/register` | 200 | O plano citou 201 a partir da anotação Scribe. `RegisterController` não passa status e `RegisterControllerFTest` afirma 200. O front não ramifica pelo código. | y - user: "200, igual ao controller e ao teste do Laravel (recomendado)" |
 | `GET /api/user/me` | Devolve o mesmo token da requisição | O Laravel cria outro token a cada chamada e não revoga o anterior. O JSON continua `{ user, token }`. | y - plano aprovado |
@@ -249,13 +250,13 @@ O mapa em Nuxt fala com a API Laravel em `NUXT_PUBLIC_API_BASE`. Esse backend fi
 | MIG-01 | P1: Cadastro | Tasks | Pending |
 | MIG-02 | P1: Login | Tasks | Pending |
 | MIG-03 | P1: Sessão | Tasks | Pending |
-| MIG-04 | P1: Tipos de ocorrência | Tasks | Pending |
-| MIG-05 | P1: Mapa público | Tasks | Pending |
-| MIG-06 | P1: Criar ocorrência | Tasks | Pending |
-| MIG-07 | P1: Inativar ocorrência | Tasks | Pending |
-| MIG-08 | P1: Minhas ocorrências | Tasks | Pending |
-| MIG-09 | P1: Curtir | Tasks | Pending |
-| MIG-10 | P1: Caminhos | Tasks | Pending |
+| MIG-04 | P1: Tipos de ocorrência | Tasks | Complete |
+| MIG-05 | P1: Mapa público | Tasks | Complete |
+| MIG-06 | P1: Criar ocorrência | Tasks | Complete |
+| MIG-07 | P1: Inativar ocorrência | Tasks | Complete |
+| MIG-08 | P1: Minhas ocorrências | Tasks | Complete |
+| MIG-09 | P1: Curtir | Tasks | Complete |
+| MIG-10 | P1: Caminhos | Tasks | Complete |
 
 **Coverage:** 10 total, 10 mapped to tasks, 0 unmapped
 

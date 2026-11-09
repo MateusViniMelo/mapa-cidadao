@@ -1,5 +1,13 @@
+import { fileURLToPath } from "node:url";
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  alias: {
+    generated: fileURLToPath(new URL("./generated", import.meta.url)),
+  },
+  nitro: {
+    ignore: ["**/*.test.ts"],
+  },
   compatibilityDate: "2024-11-01",
   devtools: { enabled: true },
   runtimeConfig: {

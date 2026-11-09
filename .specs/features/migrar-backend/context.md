@@ -35,9 +35,16 @@ Trazer para este Nuxt as rotas que o front já chama na API Laravel: cadastro, l
 - Senha em bcrypt e token opaco hasheado.
 - Paginator sem os rótulos HTML `&laquo;` e `&raquo;`.
 
+### Acesso ao banco
+
+- Prisma ORM no lugar do pacote `postgres` e do SQL à mão. O PostgreSQL com PostGIS do AD-001 permanece.
+- Palavras da escolha: "mude o .specs/features/migrar-backend/ para usar o prisma orm".
+- Linha fechada: Prisma ORM 7. Palavras da escolha: "Prisma 7 estável. Ponto via SQL no campo Unsupported".
+- A coluna do ponto fica `Unsupported("geometry(Point, 4326)")`. A geometria entra e sai por `$queryRaw` e `$executeRaw`. O restante usa o client.
+
 ### Agent's Discretion
 
-Nenhuma. O plano já fixou Vitest, SQL e o pacote `postgres`, sem ORM.
+Vitest permanece. O cliente SQL e a ausência de ORM deixaram de valer em 2026-11-09.
 
 ### Declined / Undiscussed Gray Areas → Assumptions
 
