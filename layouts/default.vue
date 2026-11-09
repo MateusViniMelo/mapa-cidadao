@@ -1,11 +1,9 @@
 <template>
-  <div>
+  <div class="flex flex-col min-h-screen">
     <Navbar />
-    <div class="bg-white dark:bg-gray-900 min-h-screen lg:p-0">
+    <main class="flex-1 bg-white dark:bg-gray-900 lg:p-0">
       <slot />
-    </div>
+    </main>
+    <Footer />
   </div>
 </template>
-<script>
-import Footer from "~/components/Footer.vue";
-</script>

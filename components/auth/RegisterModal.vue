@@ -1,20 +1,18 @@
 <template>
   <UModal
-    v-model:open="open"
+    v-model:open="isOpen"
     title="Criar Conta"
+    :dismissible="false"
     :close="{
       color: 'tertiary',
       variant: 'outline',
       class: 'rounded-full cursor-pointer',
-      onClick() {
-        resetForm();
-      },
+      onClick: resetForm,
     }"
-    :dismissible="false"
   >
     <span
-      @click="openModal()"
       class="text-indigo-700 hover:underline dark:text-indigo-500 cursor-pointer"
+      @click="isOpen = true"
     >
       Criar conta
     </span>
@@ -29,15 +27,12 @@
         <UFormField label="Nome" name="name" class="w-full">
           <UInput v-model="state.name" class="w-full" color="tertiary" />
         </UFormField>
+
         <div class="flex justify-between space-x-4">
           <UFormField label="Email" name="email" class="w-full">
             <UInput v-model="state.email" class="w-full" color="tertiary" />
           </UFormField>
-          <UFormField
-            label="Data de nascimento"
-            name="date_birth"
-            class="w-full"
-          >
+          <UFormField label="Data de nascimento" name="date_birth" class="w-full">
             <UInput
               v-model="state.date_birth"
               color="tertiary"
@@ -52,9 +47,9 @@
             <UInput
               v-model="state.password"
               placeholder="Digite sua senha"
-              :color="color"
+              :color="passwordColor"
               :type="showPassword ? 'text' : 'password'"
-              :aria-invalid="score < 5"
+              :aria-invalid="passwordScore < 5"
               aria-describedby="password-strength"
               :ui="{ trailing: 'pe-1' }"
               class="w-full"
@@ -67,7 +62,6 @@
                   :icon="showPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'"
                   :aria-label="showPassword ? 'Ocultar senha' : 'Mostrar senha'"
                   :aria-pressed="showPassword"
-                  aria-controls="password"
                   @click="showPassword = !showPassword"
                 />
               </template>
@@ -75,20 +69,20 @@
           </UFormField>
 
           <UProgress
-            :color="color"
-            :indicator="text"
-            :model-value="score"
+            :color="passwordColor"
+            :indicator="passwordLabel"
+            :model-value="passwordScore"
             :max="5"
             size="sm"
           />
 
           <p id="password-strength" class="text-sm font-medium">
-            {{ text }}. A senha deve conter:
+            {{ passwordLabel }}. A senha deve conter:
           </p>
 
           <ul class="space-y-1" aria-label="Requisitos da senha">
             <li
-              v-for="(req, index) in strength"
+              v-for="(req, index) in passwordStrength"
               :key="index"
               class="flex items-center gap-0.5"
               :class="req.met ? 'text-success' : 'text-muted'"
@@ -100,25 +94,18 @@
               <span class="text-xs font-light">
                 {{ req.text }}
                 <span class="sr-only">
-                  {{
-                    req.met
-                      ? " - Requisito atendido"
-                      : " - Requisito não atendido"
-                  }}
+                  {{ req.met ? " - Requisito atendido" : " - Requisito não atendido" }}
                 </span>
               </span>
             </li>
           </ul>
         </div>
-        <UFormField
-          label="Confirmar Senha"
-          name="password_confirmation"
-          class="w-full"
-        >
+
+        <UFormField label="Confirmar Senha" name="password_confirmation" class="w-full">
           <UInput
+            v-model="state.password_confirmation"
             class="w-full"
             color="tertiary"
-            v-model="state.password_confirmation"
             placeholder="Confirme a sua senha"
             :type="showPasswordConfirmation ? 'text' : 'password'"
             :ui="{ trailing: 'pe-1' }"
@@ -128,14 +115,9 @@
                 color="neutral"
                 variant="link"
                 size="sm"
-                :icon="
-                  showPasswordConfirmation ? 'i-lucide-eye-off' : 'i-lucide-eye'
-                "
-                :aria-label="
-                  showPasswordConfirmation ? 'Hide password' : 'Show password'
-                "
+                :icon="showPasswordConfirmation ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+                :aria-label="showPasswordConfirmation ? 'Ocultar senha' : 'Mostrar senha'"
                 :aria-pressed="showPasswordConfirmation"
-                aria-controls="password"
                 @click="showPasswordConfirmation = !showPasswordConfirmation"
               />
             </template>
@@ -146,9 +128,7 @@
           type="submit"
           :loading="authStore.loading"
           class="w-full flex justify-center"
-          :ui="{
-            base: 'text-white bg-indigo-700  hover:bg-indigo-800 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800 cursor-pointer',
-          }"
+          :ui="{ base: primaryButtonClass }"
         >
           Cadastrar
         </UButton>
@@ -158,17 +138,18 @@
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from "@/stores/authStore";
-
+import type { FormSubmitEvent } from "@nuxt/ui";
 import {
   registerUserSchema,
   type RegisterUserSchema,
-} from "@/validators/registerUserSchema";
+} from "~/validators/registerUserSchema";
 
-import type { FormSubmitEvent } from "@nuxt/ui";
+const primaryButtonClass =
+  "text-white bg-indigo-700 hover:bg-indigo-800 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800 cursor-pointer";
 
 const showPassword = ref(false);
 const showPasswordConfirmation = ref(false);
+const isOpen = ref(false);
 
 const state = reactive<Partial<RegisterUserSchema>>({
   email: undefined,
@@ -178,7 +159,9 @@ const state = reactive<Partial<RegisterUserSchema>>({
   password_confirmation: undefined,
 });
 
-function checkStrength(str: string) {
+const authStore = useAuthStore();
+
+function checkStrength(password: string) {
   const requirements = [
     { regex: /.{8,}/, text: "Pelo menos 8 caracteres" },
     { regex: /\d/, text: "Pelo menos 1 número" },
@@ -191,39 +174,33 @@ function checkStrength(str: string) {
   ];
 
   return requirements.map((req) => ({
-    met: req.regex.test(str),
+    met: req.regex.test(password),
     text: req.text,
   }));
 }
 
-const strength = computed(() => checkStrength(state.password ?? ""));
-const score = computed(() => strength.value.filter((req) => req.met).length);
+const passwordStrength = computed(() => checkStrength(state.password ?? ""));
+const passwordScore = computed(
+  () => passwordStrength.value.filter((req) => req.met).length
+);
 
-const color = computed(() => {
-  if (score.value === 0) return "tertiary";
-  if (score.value <= 2) return "error";
-  if (score.value <= 3) return "warning";
-  if (score.value === 4) return "warning";
+const passwordColor = computed(() => {
+  if (passwordScore.value === 0) return "tertiary";
+  if (passwordScore.value <= 2) return "error";
+  if (passwordScore.value <= 4) return "warning";
   return "success";
 });
 
-const text = computed(() => {
-  if (score.value === 0) return "Digite uma senha";
-  if (score.value <= 2) return "Senha fraca";
-  if (score.value === 3) return "Senha média";
-  if (score.value === 4) return "Senha boa";
+const passwordLabel = computed(() => {
+  if (passwordScore.value === 0) return "Digite uma senha";
+  if (passwordScore.value <= 2) return "Senha fraca";
+  if (passwordScore.value === 3) return "Senha média";
+  if (passwordScore.value === 4) return "Senha boa";
   return "Senha forte";
 });
 
-const open = ref(false);
-function openModal() {
-  open.value = true;
-}
-
-const authStore = useAuthStore();
-
-async function onSubmit(formEvent: FormSubmitEvent<RegisterUserSchema>) {
-  await authStore.register(formEvent.data);
+async function onSubmit(event: FormSubmitEvent<RegisterUserSchema>) {
+  await authStore.register(event.data);
 }
 
 function resetForm() {
@@ -232,12 +209,7 @@ function resetForm() {
   state.password = undefined;
   state.password_confirmation = undefined;
   state.date_birth = undefined;
-
   showPassword.value = false;
   showPasswordConfirmation.value = false;
 }
-
-defineShortcuts({
-  o: () => (open.value = !open.value),
-});
 </script>
