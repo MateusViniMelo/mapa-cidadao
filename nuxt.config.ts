@@ -43,14 +43,19 @@ export default defineNuxtConfig({
     },
   ],
   modules: [
-    "@nuxt/fonts",
     "@nuxt/icon",
     "@nuxt/image",
     "@nuxt/ui",
     "@pinia/nuxt",
   ],
   css: ["~/assets/css/main.css"],
+  runtimeConfig: {
+    public: {
+      cartoApiKey: process.env.NUXT_PUBLIC_CARTO_API_KEY || "",
+    },
+  },
   ui: {
+    fonts: false,
     theme: {
       colors: [
         "primary",

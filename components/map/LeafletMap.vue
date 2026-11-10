@@ -15,7 +15,7 @@
     v-model:description="descricao"
     :address="enderecoAchado"
     :loading-address="carregando"
-    :address-error="erroEndereco"
+    :address-error="erroEndereco != null"
     :type-options="typeOptions"
     :loading="occurrenceStore.loading || carregando"
     :max-length="MAX_DESCRIPTION_LENGTH"
@@ -47,6 +47,8 @@ import {
   buildRecenterButtonHtml,
   INFORM_PROBLEM_POPUP_HTML,
 } from "~/utils/mapPopup";
+
+const cartoApiKey = useRuntimeConfig().public.cartoApiKey;
 
 const MAX_DESCRIPTION_LENGTH = 250;
 const DEFAULT_MAP_CENTER: L.LatLngExpression = [-1.45, -48.49];
@@ -401,15 +403,24 @@ onMounted(async () => {
     DEFAULT_MAP_ZOOM
   );
 
-  L.tileLayer(
-    "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
-    {
-      attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-      subdomains: "abcd",
-      maxZoom: 20,
-    }
-  ).addTo(map);
+  const basemap = cartoApiKey
+    ? {
+        url: `https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png?key=${cartoApiKey}`,
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        maxZoom: 20,
+      }
+    : {
+        url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        maxZoom: 19,
+      };
+
+  L.tileLayer(basemap.url, {
+    attribution: basemap.attribution,
+    maxZoom: basemap.maxZoom,
+  }).addTo(map);
 
   adicionarLegenda();
   adicionarBotaoRecentrar();

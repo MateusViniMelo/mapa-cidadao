@@ -21,18 +21,26 @@
    Do instead: passar `DATABASE_URL=postgresql://mapa_cidadao:mapa_cidadao@localhost:5432/mapa_cidadao` só no comando de `prisma generate`. Não exportar essa URL na sessão do vitest: o config recusa qualquer banco que não seja `mapa_cidadao_test`.
 
 ## Domain Behavior Guardrails
-1. **[2026-11-09] `useToast()` no store criado pelo plugin não desenha o toast**
+1. **[2026-11-10] Tiles da CARTO exigem API key**
+   Do instead: guardar a chave em `NUXT_PUBLIC_CARTO_API_KEY` no `.env`. A URL é `https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png?key=`. Sem a variável, o mapa usa o OpenStreetMap.
+2. **[2026-11-10] CSS virtual do `@nuxt/fonts` responde 404 JSON no dev**
+   Do instead: deixar `ui.fonts: false` e não listar `@nuxt/fonts` em `modules`. O CSS global fica vazio e o Vite devolve `application/json`.
+3. **[2026-11-10] `UModal` fora do `UApp` não acha o locale**
+   Do instead: em `app.vue`, o `<UApp>` envolve `<NuxtLayout>`, não só `<NuxtPage>`.
+4. **[2026-11-10] Visitante anônimo dispara 401 em `/api/user/me`**
+   Do instead: no servidor, só chamar a rota se o cookie `auth_token` tiver valor. No cliente com SSR, reutilizar o usuário já hidratado no Pinia.
+5. **[2026-11-09] `useToast()` no store criado pelo plugin não desenha o toast**
    Do instead: gravar direto em `useState("toasts")` dentro da ação de login e de cadastro. A fila do `useToast()` capturada no setup do plugin não chega no `UApp`.
-2. **[2026-11-09] PostGIS deixa o `public` não vazio e o deploy responde P3005**
+6. **[2026-11-09] PostGIS deixa o `public` não vazio e o deploy responde P3005**
    Do instead: no banco `mapa_cidadao_test`, se `prisma migrate deploy` devolver P3005, apagar só o schema `public`, recriar e repetir o deploy. Não fazer isso em `mapa_cidadao`.
-3. **[2026-11-09] `h3` 1.15.3 não exporta `callHandler`**
+7. **[2026-11-09] `h3` 1.15.3 não exporta `callHandler`**
    Do instead: montar o evento com `createEvent` do h3 e chamar o handler real. Não subir `nuxt dev`.
-4. **[2026-11-09] `date_birth` no fuso local vira o dia anterior**
+8. **[2026-11-09] `date_birth` no fuso local vira o dia anterior**
    Do instead: gravar `YYYY-MM-DDT00:00:00.000Z` e serializar com `toISOString().slice(0, 10)`. Não usar `getDate()` local.
-5. **[2026-11-09] Coordenada da ocorrência é GeoJSON nos dois sentidos**
+9. **[2026-11-09] Coordenada da ocorrência é GeoJSON nos dois sentidos**
    Do instead: pedido e resposta usam `[longitude, latitude]`. O par de prova é `[-46.633308, -23.55052]`. `toRequestCoordinates(latitude, longitude)` devolve esse par. O marcador lê `coordinates[1]`, `coordinates[0]`.
-6. **[2026-11-09] `npm audit fix --force` no Nuxt**
-   Do instead: tratar as dezenas de avisos de auditoria como dependências transitivas. Não rodar `--force` sem revisar o que seria rebaixado.
+10. **[2026-11-09] `npm audit fix --force` no Nuxt**
+    Do instead: tratar as dezenas de avisos de auditoria como dependências transitivas. Não rodar `--force` sem revisar o que seria rebaixado.
 
 ## User Directives
 1. **[2026-11-09] Interface só com o Nuxt UI**

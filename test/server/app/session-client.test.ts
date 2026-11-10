@@ -84,6 +84,8 @@ test("public api base is gone", () => {
 test("plugin reloads the user", () => {
   expect(plugin).toContain("const requestFetch = useRequestFetch();");
   expect(plugin).toContain('auth.user = (await requestFetch<{ user: IUser }>("/api/user/me")).user;');
+  expect(plugin).toContain("payload.serverRendered");
+  expect(plugin).toContain("auth_token=\\S");
 });
 
 test("middleware follows the user", () => {

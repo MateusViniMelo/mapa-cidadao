@@ -1,10 +1,8 @@
 <template>
-  <div>
+  <UApp :toaster="{ position: 'top-center' }">
     <NuxtLoadingIndicator color="tertiary" />
     <NuxtLayout>
-      <UApp :toaster="{ position: 'top-center' }">
-        <NuxtPage />
-      </UApp>
+      <NuxtPage />
     </NuxtLayout>
-  </div>
+  </UApp>
 </template>
