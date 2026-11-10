@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { geoJsonCoordinates, normalizeOccurrence, requestPoint } from "./create";
+import { geoJsonCoordinates, normalizeOccurrence, requestPoint } from "../../../../server/domain/occurrences/create";
 
 const point = {
   location: { type: "Point" as const, coordinates: [-23.55052, -46.633308] as [number, number] },

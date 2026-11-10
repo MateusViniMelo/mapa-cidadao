@@ -1,12 +1,12 @@
 import { afterAll, beforeEach, expect, test, vi } from "vitest";
-import { disconnectPrisma, getPrisma } from "../../db/client";
-import { resetTestDatabase } from "../../db/migrate";
-import { callHandler } from "../../test/call-handler";
-import registerHandler from "../register.post";
-import meHandler from "./me.get";
-import logoutHandler from "./logout.post";
+import { disconnectPrisma, getPrisma } from "../../../../server/db/client";
+import { resetTestDatabase } from "../../../../server/db/migrate";
+import { callHandler } from "../../../../server/test/call-handler";
+import registerHandler from "../../../../server/api/register.post";
+import meHandler from "../../../../server/api/user/me.get";
+import logoutHandler from "../../../../server/api/user/logout.post";
 
-vi.mock("../../domain/auth/email-domain", () => ({
+vi.mock("../../../../server/domain/auth/email-domain", () => ({
   emailDomainAcceptsMail: async () => true,
 }));
 

@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
-import { disconnectPrisma, getPrisma } from "./client";
-import { resetTestDatabase } from "./migrate";
+import { disconnectPrisma, getPrisma } from "../../../server/db/client";
+import { resetTestDatabase } from "../../../server/db/migrate";
 
 const TYPE_NAMES = [
   "Problema de Iluminação",

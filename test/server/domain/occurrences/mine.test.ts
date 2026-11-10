@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { sliceMine } from "./mine";
+import { sliceMine } from "../../../../server/domain/occurrences/mine";
 
 test("orders by created_at descending", () => {
   const older = "2026-01-01T00:00:00.000Z";

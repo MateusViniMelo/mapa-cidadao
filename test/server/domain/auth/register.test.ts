@@ -1,10 +1,10 @@
 import { afterAll, expect, test } from "vitest";
-import { disconnectPrisma, getPrisma } from "../../db/client";
-import { resetTestDatabase } from "../../db/migrate";
-import { callHandler } from "../../test/call-handler";
-import registerHandler from "../../api/register.post";
-import { emailDomainAcceptsMail } from "./email-domain";
-import { validateRegistration, type RegistrationInput } from "./register";
+import { disconnectPrisma, getPrisma } from "../../../../server/db/client";
+import { resetTestDatabase } from "../../../../server/db/migrate";
+import { callHandler } from "../../../../server/test/call-handler";
+import registerHandler from "../../../../server/api/register.post";
+import { emailDomainAcceptsMail } from "../../../../server/domain/auth/email-domain";
+import { validateRegistration, type RegistrationInput } from "../../../../server/domain/auth/register";
 
 const EMAIL_MESSAGE = "O e-mail informado não é válido ou o domínio não existe.";
 const PASSWORD_MESSAGE =

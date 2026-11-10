@@ -1,9 +1,9 @@
 import { afterAll, beforeEach, expect, test } from "vitest";
-import { disconnectPrisma, getPrisma } from "../../db/client";
-import { resetTestDatabase } from "../../db/migrate";
-import { createToken, hashToken } from "../../domain/auth/session";
-import { callHandler } from "../../test/call-handler";
-import createHandler from "./index.post";
+import { disconnectPrisma, getPrisma } from "../../../../server/db/client";
+import { resetTestDatabase } from "../../../../server/db/migrate";
+import { createToken, hashToken } from "../../../../server/domain/auth/session";
+import { callHandler } from "../../../../server/test/call-handler";
+import createHandler from "../../../../server/api/ocurrences/index.post";
 
 const LATITUDE = -23.55052;
 const LONGITUDE = -46.633308;

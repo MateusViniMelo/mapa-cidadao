@@ -33,11 +33,7 @@ export default defineConfig({
     },
   },
   test: {
-    include: [
-      "server/domain/**/*.test.ts",
-      "server/api/**/*.test.ts",
-      "server/db/**/*.test.ts",
-    ],
+    include: ["test/server/**/*.test.ts"],
     passWithNoTests: true,
     fileParallelism: false,
     testTimeout: 30_000,

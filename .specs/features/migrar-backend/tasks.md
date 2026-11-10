@@ -22,8 +22,8 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 | Code Layer | Required Test Type | Coverage Expectation | Location Pattern | Run Command |
 | --- | --- | --- | --- | --- |
-| Pure domain (validation, geo, like decision, page slice) | unit | All branches; 1:1 to the ACs proved in that file | `server/domain/**/*.test.ts` | `npx vitest run server/domain` |
-| Prisma queries and HTTP routes | integration | Every route in scope: happy path, edge, error | `server/api/**/*.test.ts`, `server/db/**/*.test.ts` | `npx vitest run` |
+| Pure domain (validation, geo, like decision, page slice) | unit | All branches; 1:1 to the ACs proved in that file | `test/server/domain/**/*.test.ts` | `npx vitest run server/domain` |
+| Prisma queries and HTTP routes | integration | Every route in scope: happy path, edge, error | `test/server/api/**/*.test.ts`, `test/server/db/**/*.test.ts` | `npx vitest run` |
 | Schema Prisma, migration, seed, config, client, compose, Vitest, env example | none | build gate only | `prisma/schema.prisma`, `prisma.config.ts`, `prisma/seed.ts`, `prisma/migrations/20261109120000_init/migration.sql`, `server/db/client.ts`, `docker-compose.yml`, `vitest.config.ts`, `.env.example` | `npm run build` |
 
 ## Gate Check Commands
@@ -186,7 +186,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 ### T8: Vitest
 
-**What**: Configurar o Vitest para `server/domain/**/*.test.ts`, `server/api/**/*.test.ts` e `server/db/**/*.test.ts`. A URL de teste é a do banco `mapa_cidadao_test` e o runner recusa outro nome de banco.
+**What**: Configurar o Vitest para `test/server/domain/**/*.test.ts`, `test/server/api/**/*.test.ts` e `test/server/db/**/*.test.ts`. A URL de teste é a do banco `mapa_cidadao_test` e o runner recusa outro nome de banco.
 **Where**: `vitest.config.ts`
 **Depends on**: T7
 **Reuses**: o `package.json` deste Nuxt, que ainda não tem script de teste
@@ -214,7 +214,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Done when**:
 
-- [x] `server/db/migrate.test.ts` prova que o seed deixa os cinco nomes e que PostGIS responde `ST_MakePoint`
+- [x] `test/server/db/migrate.test.ts` prova que o seed deixa os cinco nomes e que PostGIS responde `ST_MakePoint`
 - [x] Gate check passes: `npx vitest run`
 - [x] Test count: 1 test pass
 
@@ -236,7 +236,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Done when**:
 
-- [x] `server/domain/auth/register.test.ts` cobre nome vazio, nome acima de 100, e-mail recusado, senha fora do padrão, confirmação diferente e menor de 18
+- [x] `test/server/domain/auth/register.test.ts` cobre nome vazio, nome acima de 100, e-mail recusado, senha fora do padrão, confirmação diferente e menor de 18
 - [x] Gate check passes: `npx vitest run server/domain`
 - [x] Test count: 6 tests pass
 
@@ -256,7 +256,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Done when**:
 
-- [x] `server/domain/auth/session.test.ts` cobre hash, o mesmo token na leitura e a ausência depois do logout
+- [x] `test/server/domain/auth/session.test.ts` cobre hash, o mesmo token na leitura e a ausência depois do logout
 - [x] Gate check passes: `npx vitest run server/domain`
 - [x] Test count: 3 tests pass
 
@@ -276,7 +276,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Done when**:
 
-- [x] `server/api/register.post.test.ts` cobre 200, bcrypt, e-mail duplicado, token no `/me` e ausência de `password`
+- [x] `test/server/api/register.post.test.ts` cobre 200, bcrypt, e-mail duplicado, token no `/me` e ausência de `password`
 - [x] Gate check passes: `npx vitest run`
 - [x] Test count: 5 tests pass
 
@@ -296,7 +296,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Done when**:
 
-- [x] `server/api/user/login.post.test.ts` cobre senha certa, senha errada e ausência de `password`
+- [x] `test/server/api/user/login.post.test.ts` cobre senha certa, senha errada e ausência de `password`
 - [x] Gate check passes: `npx vitest run`
 - [x] Test count: 3 tests pass
 
@@ -316,7 +316,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Done when**:
 
-- [x] `server/api/user/me.get.test.ts` cobre o mesmo token, 401 sem token e scheme minúsculo
+- [x] `test/server/api/user/me.get.test.ts` cobre o mesmo token, 401 sem token e scheme minúsculo
 - [x] Gate check passes: `npx vitest run`
 - [x] Test count: 3 tests pass
 
@@ -336,7 +336,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Done when**:
 
-- [x] `server/api/user/logout.post.test.ts` cobre a revogação e o 401 sem token
+- [x] `test/server/api/user/logout.post.test.ts` cobre a revogação e o 401 sem token
 - [x] Gate check passes: `npx vitest run`
 - [x] Test count: 2 tests pass
 
@@ -358,7 +358,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Done when**:
 
-- [x] `server/domain/catalog/list-types.test.ts` encontra os cinco nomes no banco de teste
+- [x] `test/server/domain/catalog/list-types.test.ts` encontra os cinco nomes no banco de teste
 - [x] Gate check passes: `npx vitest run`
 - [x] Test count: 1 test pass
 
@@ -378,7 +378,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Done when**:
 
-- [x] `server/api/types-ocurrence.get.test.ts` lista os cinco nomes com id, name, created_at e updated_at
+- [x] `test/server/api/types-ocurrence.get.test.ts` lista os cinco nomes com id, name, created_at e updated_at
 - [x] Gate check passes: `npx vitest run`
 - [x] Test count: 1 test pass
 
@@ -398,7 +398,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Done when**:
 
-- [x] `server/domain/occurrences/list-active.test.ts` cobre anônimo, curtida do chamador e a contagem
+- [x] `test/server/domain/occurrences/list-active.test.ts` cobre anônimo, curtida do chamador e a contagem
 - [x] Gate check passes: `npx vitest run server/domain`
 - [x] Test count: 3 tests pass
 
@@ -418,7 +418,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Done when**:
 
-- [x] `server/api/ocurrences/index.get.test.ts` cobre só ativas, flag anônima, flag autenticada e header vazio
+- [x] `test/server/api/ocurrences/index.get.test.ts` cobre só ativas, flag anônima, flag autenticada e header vazio
 - [x] Gate check passes: `npx vitest run`
 - [x] Test count: 4 tests pass
 
@@ -440,7 +440,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Done when**:
 
-- [x] `server/domain/occurrences/create.test.ts` cobre o par de São Paulo, descrição e endereço vazios, cidade nula e descrição acima de 250
+- [x] `test/server/domain/occurrences/create.test.ts` cobre o par de São Paulo, descrição e endereço vazios, cidade nula e descrição acima de 250
 - [x] Gate check passes: `npx vitest run server/domain`
 - [x] Test count: 4 tests pass
 
@@ -460,7 +460,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Done when**:
 
-- [x] `server/api/ocurrences/index.post.test.ts` cobre o GeoJSON de volta, 401, `type_id` desconhecido e `user_id` ignorado
+- [x] `test/server/api/ocurrences/index.post.test.ts` cobre o GeoJSON de volta, 401, `type_id` desconhecido e `user_id` ignorado
 - [x] A latitude gravada de `[-23.55052, -46.633308]` é -23.55052 e a longitude é -46.633308
 - [x] Gate check passes: `npx vitest run`
 - [x] Test count: 4 tests pass
@@ -483,7 +483,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Done when**:
 
-- [x] `server/domain/occurrences/inactivate.test.ts` cobre resolved, mistake, outro usuário, já inativa, data futura e exceção ao gravar
+- [x] `test/server/domain/occurrences/inactivate.test.ts` cobre resolved, mistake, outro usuário, já inativa, data futura e exceção ao gravar
 - [x] Gate check passes: `npx vitest run server/domain`
 - [x] Test count: 6 tests pass
 
@@ -503,7 +503,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Done when**:
 
-- [x] `server/api/ocurrences/inactivate/[id].post.test.ts` cobre resolved, mistake, 403, 401 e 404
+- [x] `test/server/api/ocurrences/inactivate/[id].post.test.ts` cobre resolved, mistake, 403, 401 e 404
 - [x] Gate check passes: `npx vitest run`
 - [x] Test count: 5 tests pass
 
@@ -525,7 +525,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Done when**:
 
-- [x] `server/domain/occurrences/mine.test.ts` cobre a ordem e o corte 10 depois 5 de uma lista de 15
+- [x] `test/server/domain/occurrences/mine.test.ts` cobre a ordem e o corte 10 depois 5 de uma lista de 15
 - [x] Gate check passes: `npx vitest run server/domain`
 - [x] Test count: 2 tests pass
 
@@ -545,7 +545,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Done when**:
 
-- [x] `server/api/ocurrences/my-ocurrences.get.test.ts` cobre 10 e 5, links, inativa incluída, 401 e página omitida
+- [x] `test/server/api/ocurrences/my-ocurrences.get.test.ts` cobre 10 e 5, links, inativa incluída, 401 e página omitida
 - [x] Gate check passes: `npx vitest run`
 - [x] Test count: 5 tests pass
 
@@ -567,7 +567,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Done when**:
 
-- [x] `server/domain/occurrences/like.test.ts` cobre a ida, a volta e a recusa de uma segunda linha
+- [x] `test/server/domain/occurrences/like.test.ts` cobre a ida, a volta e a recusa de uma segunda linha
 - [x] Gate check passes: `npx vitest run server/domain`
 - [x] Test count: 2 tests pass
 
@@ -587,7 +587,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Done when**:
 
-- [x] `server/api/ocurrences/like/[id].get.test.ts` cobre 201, 200, 401 e 404
+- [x] `test/server/api/ocurrences/like/[id].get.test.ts` cobre 201, 200, 401 e 404
 - [x] Gate check passes: `npx vitest run`
 - [x] Test count: 4 tests pass
 
@@ -602,7 +602,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ### T28: Mapa dos dez caminhos
 
 **What**: Um teste importa os dez handlers e falha se algum arquivo do contrato não exportar handler.
-**Where**: `server/api/route-map.test.ts`
+**Where**: `test/server/api/route-map.test.ts`
 **Depends on**: T27
 **Reuses**: a tabela de rotas do design
 **Requirement**: MIG-10
@@ -702,157 +702,157 @@ T28 → T29
 ## Checks
 
 **C1** - Cadastro válido responde 200 com user e token, e date_birth igual ao YYYY-MM-DD enviado (MIG-01, AC 1)
-Proof: `npx vitest run server/api/register.post.test.ts -t "register returns 200 with user and token"`
+Proof: `npx vitest run test/server/api/register.post.test.ts -t "register returns 200 with user and token"`
 
 **C2** - A senha gravada passa no bcrypt e o texto puro não fica na coluna (MIG-01, AC 2)
-Proof: `npx vitest run server/api/register.post.test.ts -t "register stores a bcrypt password"`
+Proof: `npx vitest run test/server/api/register.post.test.ts -t "register stores a bcrypt password"`
 
 **C3** - Nome vazio responde 422 em errors.name e não insere usuário (MIG-01, AC 3)
-Proof: `npx vitest run server/domain/auth/register.test.ts -t "rejects a blank name"`
+Proof: `npx vitest run test/server/domain/auth/register.test.ts -t "rejects a blank name"`
 
 **C4** - Nome acima de 100 caracteres responde 422 em errors.name e não insere usuário (MIG-01, AC 4)
-Proof: `npx vitest run server/domain/auth/register.test.ts -t "rejects a name over 100 characters"`
+Proof: `npx vitest run test/server/domain/auth/register.test.ts -t "rejects a name over 100 characters"`
 
 **C5** - E-mail sem forma RFC ou sem MX inclui "O e-mail informado não é válido ou o domínio não existe." (MIG-01, AC 5)
-Proof: `npx vitest run server/domain/auth/register.test.ts -t "rejects an email the domain check refuses"`
+Proof: `npx vitest run test/server/domain/auth/register.test.ts -t "rejects an email the domain check refuses"`
 
 **C6** - Senha fora do padrão inclui "A senha deve conter pelo menos uma letra maiúscula, uma minúscula, um número e um caractere especial." (MIG-01, AC 6)
-Proof: `npx vitest run server/domain/auth/register.test.ts -t "rejects a password outside the pattern"`
+Proof: `npx vitest run test/server/domain/auth/register.test.ts -t "rejects a password outside the pattern"`
 
 **C7** - Confirmação diferente inclui "A confirmação da senha não corresponde." (MIG-01, AC 7)
-Proof: `npx vitest run server/domain/auth/register.test.ts -t "rejects a mismatched confirmation"`
+Proof: `npx vitest run test/server/domain/auth/register.test.ts -t "rejects a mismatched confirmation"`
 
 **C8** - Data de nascimento depois do limite de 18 anos UTC inclui "Você deve ter pelo menos 18 anos." (MIG-01, AC 8)
-Proof: `npx vitest run server/domain/auth/register.test.ts -t "rejects a birth date under 18"`
+Proof: `npx vitest run test/server/domain/auth/register.test.ts -t "rejects a birth date under 18"`
 
 **C9** - E-mail já gravado responde 422 e não cria segundo usuário (MIG-01, AC 9)
-Proof: `npx vitest run server/api/register.post.test.ts -t "rejects a duplicate email"`
+Proof: `npx vitest run test/server/api/register.post.test.ts -t "rejects a duplicate email"`
 
 **C10** - O token do cadastro lê GET /api/user/me com o mesmo user.id (MIG-01, AC 10)
-Proof: `npx vitest run server/api/register.post.test.ts -t "register token reads me"`
+Proof: `npx vitest run test/server/api/register.post.test.ts -t "register token reads me"`
 
 **C11** - Nenhum JSON de usuário traz password nem remember_token (MIG-01, AC 11)
-Proof: `npx vitest run server/api/register.post.test.ts -t "register omits the password"`
+Proof: `npx vitest run test/server/api/register.post.test.ts -t "register omits the password"`
 
 **C12** - Login certo responde 200 com user e token (MIG-02, AC 1)
-Proof: `npx vitest run server/api/user/login.post.test.ts -t "login returns 200"`
+Proof: `npx vitest run test/server/api/user/login.post.test.ts -t "login returns 200"`
 
 **C13** - Login errado responde 401 com message "Credenciais inválidas" e sem token (MIG-02, AC 2)
-Proof: `npx vitest run server/api/user/login.post.test.ts -t "login rejects bad credentials"`
+Proof: `npx vitest run test/server/api/user/login.post.test.ts -t "login rejects bad credentials"`
 
 **C14** - O user do login não traz password (MIG-02, AC 3)
-Proof: `npx vitest run server/api/user/login.post.test.ts -t "login omits the password"`
+Proof: `npx vitest run test/server/api/user/login.post.test.ts -t "login omits the password"`
 
 **C15** - GET /api/user/me devolve o mesmo token enviado (MIG-03, AC 1)
-Proof: `npx vitest run server/api/user/me.get.test.ts -t "me returns the same token"`
+Proof: `npx vitest run test/server/api/user/me.get.test.ts -t "me returns the same token"`
 
 **C16** - GET /api/user/me sem bearer ou com token desconhecido responde 401 (MIG-03, AC 2)
-Proof: `npx vitest run server/api/user/me.get.test.ts -t "me rejects a missing token"`
+Proof: `npx vitest run test/server/api/user/me.get.test.ts -t "me rejects a missing token"`
 
 **C17** - Logout responde "Logout realizado com sucesso" e o token seguinte recebe 401 (MIG-03, AC 3)
-Proof: `npx vitest run server/api/user/logout.post.test.ts -t "logout revokes the token"`
+Proof: `npx vitest run test/server/api/user/logout.post.test.ts -t "logout revokes the token"`
 
 **C18** - Logout sem bearer responde 401 (MIG-03, AC 4)
-Proof: `npx vitest run server/api/user/logout.post.test.ts -t "logout rejects a missing token"`
+Proof: `npx vitest run test/server/api/user/logout.post.test.ts -t "logout rejects a missing token"`
 
 **C19** - O scheme bearer minúsculo autentica (MIG-03, AC 5)
-Proof: `npx vitest run server/api/user/me.get.test.ts -t "me accepts a lowercase bearer scheme"`
+Proof: `npx vitest run test/server/api/user/me.get.test.ts -t "me accepts a lowercase bearer scheme"`
 
 **C20** - GET /api/types-ocurrence devolve os cinco nomes do seed (MIG-04, AC 1)
-Proof: `npx vitest run server/api/types-ocurrence.get.test.ts -t "lists the five seeded types"`
+Proof: `npx vitest run test/server/api/types-ocurrence.get.test.ts -t "lists the five seeded types"`
 
 **C21** - GET /api/ocurrences devolve só linhas ativas com type, likes_count e liked_by_auth_user (MIG-05, AC 1)
-Proof: `npx vitest run server/api/ocurrences/index.get.test.ts -t "lists only active occurrences"`
+Proof: `npx vitest run test/server/api/ocurrences/index.get.test.ts -t "lists only active occurrences"`
 
 **C22** - Sem usuário válido, liked_by_auth_user é false (MIG-05, AC 2)
-Proof: `npx vitest run server/domain/occurrences/list-active.test.ts -t "anonymous list sets liked_by_auth_user false"`
+Proof: `npx vitest run test/server/domain/occurrences/list-active.test.ts -t "anonymous list sets liked_by_auth_user false"`
 
 **C23** - Com curtida do chamador, liked_by_auth_user é true e likes_count é o número de linhas (MIG-05, AC 3)
-Proof: `npx vitest run server/domain/occurrences/list-active.test.ts -t "list reports the caller like and the count"`
+Proof: `npx vitest run test/server/domain/occurrences/list-active.test.ts -t "list reports the caller like and the count"`
 
 **C24** - Authorization vazio em GET /api/ocurrences responde 200 (MIG-05, AC 4)
-Proof: `npx vitest run server/api/ocurrences/index.get.test.ts -t "empty authorization still lists"`
+Proof: `npx vitest run test/server/api/ocurrences/index.get.test.ts -t "empty authorization still lists"`
 
 **C25** - O ponto [-23.55052, -46.633308] grava essa latitude e longitude e volta [-46.633308, -23.55052] (MIG-06, AC 1)
-Proof: `npx vitest run server/api/ocurrences/index.post.test.ts -t "stores latitude first and returns longitude first"`
+Proof: `npx vitest run test/server/api/ocurrences/index.post.test.ts -t "stores latitude first and returns longitude first"`
 
 **C26** - description ou address_name omitido vira string vazia (MIG-06, AC 2)
-Proof: `npx vitest run server/domain/occurrences/create.test.ts -t "stores blank description and address"`
+Proof: `npx vitest run test/server/domain/occurrences/create.test.ts -t "stores blank description and address"`
 
 **C27** - city, state ou country omitido fica null (MIG-06, AC 3)
-Proof: `npx vitest run server/domain/occurrences/create.test.ts -t "stores null city state and country"`
+Proof: `npx vitest run test/server/domain/occurrences/create.test.ts -t "stores null city state and country"`
 
 **C28** - Criar sem token responde 401 e não insere linha (MIG-06, AC 4)
-Proof: `npx vitest run server/api/ocurrences/index.post.test.ts -t "create rejects a missing token"`
+Proof: `npx vitest run test/server/api/ocurrences/index.post.test.ts -t "create rejects a missing token"`
 
 **C29** - type_id inexistente inclui "O campo type id selecionado é inválido." (MIG-06, AC 5)
-Proof: `npx vitest run server/api/ocurrences/index.post.test.ts -t "create rejects an unknown type"`
+Proof: `npx vitest run test/server/api/ocurrences/index.post.test.ts -t "create rejects an unknown type"`
 
 **C30** - description acima de 250 ou address_name acima de 500 responde 422 sem linha (MIG-06, AC 6)
-Proof: `npx vitest run server/domain/occurrences/create.test.ts -t "rejects a description over 250"`
+Proof: `npx vitest run test/server/domain/occurrences/create.test.ts -t "rejects a description over 250"`
 
 **C31** - user_id do corpo é ignorado (MIG-06, AC 7)
-Proof: `npx vitest run server/api/ocurrences/index.post.test.ts -t "create ignores a body user id"`
+Proof: `npx vitest run test/server/api/ocurrences/index.post.test.ts -t "create ignores a body user id"`
 
 **C32** - Dono com resolved ou other responde "Ocorrência inativada com sucesso." e grava is_active false (MIG-07, AC 1)
-Proof: `npx vitest run server/api/ocurrences/inactivate/[id].post.test.ts -t "owner closes with resolved"`
+Proof: `npx vitest run test/server/api/ocurrences/inactivate/[id].post.test.ts -t "owner closes with resolved"`
 
 **C33** - type_closure mistake apaga a linha e responde a mesma frase (MIG-07, AC 2)
-Proof: `npx vitest run server/api/ocurrences/inactivate/[id].post.test.ts -t "owner mistake deletes the row"`
+Proof: `npx vitest run test/server/api/ocurrences/inactivate/[id].post.test.ts -t "owner mistake deletes the row"`
 
 **C34** - Outro usuário recebe 403 "Você não tem permissão para inativar esta ocorrência." (MIG-07, AC 3)
-Proof: `npx vitest run server/api/ocurrences/inactivate/[id].post.test.ts -t "other user receives 403"`
+Proof: `npx vitest run test/server/api/ocurrences/inactivate/[id].post.test.ts -t "other user receives 403"`
 
 **C35** - Ocorrência já inativa responde 422 "Ocorrência já inativada." (MIG-07, AC 4)
-Proof: `npx vitest run server/domain/occurrences/inactivate.test.ts -t "already inactive returns 422"`
+Proof: `npx vitest run test/server/domain/occurrences/inactivate.test.ts -t "already inactive returns 422"`
 
 **C36** - Payload inválido ou data futura responde 422 e a linha continua ativa (MIG-07, AC 5)
-Proof: `npx vitest run server/domain/occurrences/inactivate.test.ts -t "rejects a future resolution date"`
+Proof: `npx vitest run test/server/domain/occurrences/inactivate.test.ts -t "rejects a future resolution date"`
 
 **C37** - Inativar sem token responde 401 (MIG-07, AC 6)
-Proof: `npx vitest run server/api/ocurrences/inactivate/[id].post.test.ts -t "inactivate rejects a missing token"`
+Proof: `npx vitest run test/server/api/ocurrences/inactivate/[id].post.test.ts -t "inactivate rejects a missing token"`
 
 **C38** - Id inexistente ao inativar responde 404 (MIG-07, AC 7)
-Proof: `npx vitest run server/api/ocurrences/inactivate/[id].post.test.ts -t "inactivate missing id returns 404"`
+Proof: `npx vitest run test/server/api/ocurrences/inactivate/[id].post.test.ts -t "inactivate missing id returns 404"`
 
 **C39** - Falha ao gravar responde 422 "Não foi possível inativar a ocorrência." (MIG-07, AC 8)
-Proof: `npx vitest run server/domain/occurrences/inactivate.test.ts -t "save failure returns the message object"`
+Proof: `npx vitest run test/server/domain/occurrences/inactivate.test.ts -t "save failure returns the message object"`
 
 **C40** - 15 ocorrências do chamador viram página de 10 e página de 5, com total 15 (MIG-08, AC 1)
-Proof: `npx vitest run server/api/ocurrences/my-ocurrences.get.test.ts -t "pages the caller ten then five"`
+Proof: `npx vitest run test/server/api/ocurrences/my-ocurrences.get.test.ts -t "pages the caller ten then five"`
 
 **C41** - A lista do chamador vem por created_at descendente (MIG-08, AC 2)
-Proof: `npx vitest run server/domain/occurrences/mine.test.ts -t "orders by created_at descending"`
+Proof: `npx vitest run test/server/domain/occurrences/mine.test.ts -t "orders by created_at descending"`
 
 **C42** - links têm url, label, page e active, sem `&laquo;` nem `&raquo;` (MIG-08, AC 3)
-Proof: `npx vitest run server/api/ocurrences/my-ocurrences.get.test.ts -t "links have no html entities"`
+Proof: `npx vitest run test/server/api/ocurrences/my-ocurrences.get.test.ts -t "links have no html entities"`
 
 **C43** - Ocorrência inativa do chamador entra na página (MIG-08, AC 4)
-Proof: `npx vitest run server/api/ocurrences/my-ocurrences.get.test.ts -t "includes inactive rows"`
+Proof: `npx vitest run test/server/api/ocurrences/my-ocurrences.get.test.ts -t "includes inactive rows"`
 
 **C44** - Minhas ocorrências sem token responde 401 (MIG-08, AC 5)
-Proof: `npx vitest run server/api/ocurrences/my-ocurrences.get.test.ts -t "my occurrences rejects a missing token"`
+Proof: `npx vitest run test/server/api/ocurrences/my-ocurrences.get.test.ts -t "my occurrences rejects a missing token"`
 
 **C45** - page omitido devolve current_page 1 (MIG-08, AC 6)
-Proof: `npx vitest run server/api/ocurrences/my-ocurrences.get.test.ts -t "omitted page is page 1"`
+Proof: `npx vitest run test/server/api/ocurrences/my-ocurrences.get.test.ts -t "omitted page is page 1"`
 
 **C46** - Primeira curtida responde 201 "Ocorrência curtida com sucesso." (MIG-09, AC 1)
-Proof: `npx vitest run server/api/ocurrences/like/[id].get.test.ts -t "first like returns 201"`
+Proof: `npx vitest run test/server/api/ocurrences/like/[id].get.test.ts -t "first like returns 201"`
 
 **C47** - Segunda chamada responde 200 "Curtida removida com sucesso." e some a linha (MIG-09, AC 2)
-Proof: `npx vitest run server/api/ocurrences/like/[id].get.test.ts -t "second like returns 200 and removes the row"`
+Proof: `npx vitest run test/server/api/ocurrences/like/[id].get.test.ts -t "second like returns 200 and removes the row"`
 
 **C48** - O par user_id e ocurrence_id fica com no máximo uma linha (MIG-09, AC 3)
-Proof: `npx vitest run server/domain/occurrences/like.test.ts -t "keeps one row per user and occurrence"`
+Proof: `npx vitest run test/server/domain/occurrences/like.test.ts -t "keeps one row per user and occurrence"`
 
 **C49** - Curtir sem token responde 401 e não insere linha (MIG-09, AC 4)
-Proof: `npx vitest run server/api/ocurrences/like/[id].get.test.ts -t "like rejects a missing token"`
+Proof: `npx vitest run test/server/api/ocurrences/like/[id].get.test.ts -t "like rejects a missing token"`
 
 **C50** - Curtir id inexistente responde 404 (MIG-09, AC 5)
-Proof: `npx vitest run server/api/ocurrences/like/[id].get.test.ts -t "like missing id returns 404"`
+Proof: `npx vitest run test/server/api/ocurrences/like/[id].get.test.ts -t "like missing id returns 404"`
 
 **C51** - Os dez caminhos do contrato existem sob /api (MIG-10, AC 1)
-Proof: `npx vitest run server/api/route-map.test.ts -t "mounted paths answer"`
+Proof: `npx vitest run test/server/api/route-map.test.ts -t "mounted paths answer"`
 
 ---
 

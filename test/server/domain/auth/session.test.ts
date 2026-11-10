@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { expect, test } from "vitest";
-import { createMemorySessions, hashToken } from "./session";
+import { createMemorySessions, hashToken } from "../../../../server/domain/auth/session";
 
 test("hashes the token with sha-256", () => {
   const token = "plain-token";

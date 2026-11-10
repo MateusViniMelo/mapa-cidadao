@@ -44,6 +44,12 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: C51 (routes)
 - last seen: 2026-11-09T22:55:16Z
 
+### L-006 - Chame o guarda do nome do banco com o nome aceito e com um nome recusado. Não procure só o texto do nome no arquivo.
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `vitest` · harmful: 0
+- features: mover-testes
+- evidence: vitest.config.ts:17 (vitest)
+- last seen: 2026-11-10T00:22:43Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 6,
+  "next_id": 7,
   "lessons": [
     {
       "id": "L-001",
@@ -94,6 +94,24 @@
       ],
       "created": "2026-11-09T22:55:16Z",
       "last_seen": "2026-11-09T22:55:16Z"
+    },
+    {
+      "id": "L-006",
+      "key": "surviving_mutant::chame o guarda do nome do banco com o nome aceito e com um nome recusado nao procure so o texto do nome no arquivo",
+      "text": "Chame o guarda do nome do banco com o nome aceito e com um nome recusado. Não procure só o texto do nome no arquivo.",
+      "signal": "surviving_mutant",
+      "scope": "vitest",
+      "status": "candidate",
+      "features": [
+        "mover-testes"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "vitest.config.ts:17 (vitest)"
+      ],
+      "created": "2026-11-10T00:22:43Z",
+      "last_seen": "2026-11-10T00:22:43Z"
     }
   ]
 }

@@ -3,7 +3,7 @@ import {
   inactivateOccurrence,
   type CloseData,
   type OccurrenceState,
-} from "./inactivate";
+} from "../../../../server/domain/occurrences/inactivate";
 
 const SUCCESS = "Ocorrência inativada com sucesso.";
 const NOW = new Date("2026-11-09T15:00:00.000Z");

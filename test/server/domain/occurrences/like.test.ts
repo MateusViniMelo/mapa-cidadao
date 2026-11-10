@@ -1,7 +1,7 @@
 import { afterAll, beforeEach, expect, test } from "vitest";
-import { disconnectPrisma, getPrisma } from "../../db/client";
-import { resetTestDatabase } from "../../db/migrate";
-import { toggleLike } from "./like";
+import { disconnectPrisma, getPrisma } from "../../../../server/db/client";
+import { resetTestDatabase } from "../../../../server/db/migrate";
+import { toggleLike } from "../../../../server/domain/occurrences/like";
 
 const LATITUDE = -23.55052;
 const LONGITUDE = -46.633308;

@@ -1,17 +1,17 @@
 import { afterAll, beforeEach, expect, test } from "vitest";
-import { disconnectPrisma, getPrisma } from "../db/client";
-import { resetTestDatabase } from "../db/migrate";
-import { callHandler } from "../test/call-handler";
-import registerHandler from "./register.post";
-import loginHandler from "./user/login.post";
-import meHandler from "./user/me.get";
-import logoutHandler from "./user/logout.post";
-import typesHandler from "./types-ocurrence.get";
-import occurrencesGetHandler from "./ocurrences/index.get";
-import occurrencesPostHandler from "./ocurrences/index.post";
-import inactivateHandler from "./ocurrences/inactivate/[id].post";
-import myOccurrencesHandler from "./ocurrences/my-ocurrences.get";
-import likeHandler from "./ocurrences/like/[id].get";
+import { disconnectPrisma, getPrisma } from "../../../server/db/client";
+import { resetTestDatabase } from "../../../server/db/migrate";
+import { callHandler } from "../../../server/test/call-handler";
+import registerHandler from "../../../server/api/register.post";
+import loginHandler from "../../../server/api/user/login.post";
+import meHandler from "../../../server/api/user/me.get";
+import logoutHandler from "../../../server/api/user/logout.post";
+import typesHandler from "../../../server/api/types-ocurrence.get";
+import occurrencesGetHandler from "../../../server/api/ocurrences/index.get";
+import occurrencesPostHandler from "../../../server/api/ocurrences/index.post";
+import inactivateHandler from "../../../server/api/ocurrences/inactivate/[id].post";
+import myOccurrencesHandler from "../../../server/api/ocurrences/my-ocurrences.get";
+import likeHandler from "../../../server/api/ocurrences/like/[id].get";
 
 const handlers = [
   registerHandler,

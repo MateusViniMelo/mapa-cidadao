@@ -1,0 +1,23 @@
+[
+  {
+    "file": "vitest.config.ts",
+    "old": "if (name !== \"mapa_cidadao_test\")",
+    "new": "if (name === \"mapa_cidadao_test\")",
+    "proof": "node .specs/features/mover-testes/check-layout.mjs vitest-guard",
+    "label": "condição do guarda !== -> ==="
+  },
+  {
+    "file": "vitest.config.ts",
+    "old": "include: [\"test/server/**/*.test.ts\"]",
+    "new": "include: [\"server/**/*.test.ts\"]",
+    "proof": "node .specs/features/mover-testes/check-layout.mjs vitest-include",
+    "label": "filtro include test/server -> server"
+  },
+  {
+    "file": "test/server/api/ocurrences/inactivate/[id].post.test.ts",
+    "old": "from \"../../../../../server/db/client\"",
+    "new": "from \"../../../../server/db/client\"",
+    "proof": "node .specs/features/mover-testes/check-layout.mjs imports",
+    "label": "import do client com um ../ a menos"
+  }
+]

@@ -1,8 +1,8 @@
 import { afterAll, beforeEach, expect, test } from "vitest";
-import { disconnectPrisma, getPrisma } from "../db/client";
-import { resetTestDatabase } from "../db/migrate";
-import { callHandler } from "../test/call-handler";
-import typesHandler from "./types-ocurrence.get";
+import { disconnectPrisma, getPrisma } from "../../../server/db/client";
+import { resetTestDatabase } from "../../../server/db/migrate";
+import { callHandler } from "../../../server/test/call-handler";
+import typesHandler from "../../../server/api/types-ocurrence.get";
 
 const TYPE_NAMES = [
   "Problema de Iluminação",

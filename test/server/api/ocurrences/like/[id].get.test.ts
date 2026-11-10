@@ -1,9 +1,9 @@
 import { afterAll, beforeEach, expect, test } from "vitest";
-import { disconnectPrisma, getPrisma } from "../../../db/client";
-import { resetTestDatabase } from "../../../db/migrate";
-import { createToken, hashToken } from "../../../domain/auth/session";
-import { callHandler } from "../../../test/call-handler";
-import likeHandler from "./[id].get";
+import { disconnectPrisma, getPrisma } from "../../../../../server/db/client";
+import { resetTestDatabase } from "../../../../../server/db/migrate";
+import { createToken, hashToken } from "../../../../../server/domain/auth/session";
+import { callHandler } from "../../../../../server/test/call-handler";
+import likeHandler from "../../../../../server/api/ocurrences/like/[id].get";
 
 const LIKED = "Ocorrência curtida com sucesso.";
 const REMOVED = "Curtida removida com sucesso.";

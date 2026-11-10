@@ -3,21 +3,21 @@
     "file": "server/domain/auth/register.ts",
     "old": "{8,}",
     "new": "{9,}",
-    "proof": "npx vitest run server/domain/auth/register.test.ts -t \"rejects a password outside the pattern\"",
+    "proof": "npx vitest run test/server/domain/auth/register.test.ts -t \"rejects a password outside the pattern\"",
     "label": "password minimum length 8 -> 9"
   },
   {
     "file": "server/domain/auth/email-domain.ts",
     "old": "} catch {\n    return false;\n  }",
     "new": "} catch {\n    return true;\n  }",
-    "proof": "npx vitest run server/domain/auth/register.test.ts -t \"rejects an email the domain check refuses\"",
+    "proof": "npx vitest run test/server/domain/auth/register.test.ts -t \"rejects an email the domain check refuses\"",
     "label": "mx failure accepts the email"
   },
   {
     "file": "server/api/register.post.ts",
     "old": "if (!validated.ok) {\n    setResponseStatus(event, 422);",
     "new": "if (!validated.ok) {\n    setResponseStatus(event, 400);",
-    "proof": "npx vitest run server/domain/auth/register.test.ts -t \"rejects a blank name\"",
+    "proof": "npx vitest run test/server/domain/auth/register.test.ts -t \"rejects a blank name\"",
     "label": "registration validation status 422 -> 400"
   }
 ]

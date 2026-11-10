@@ -1,0 +1,153 @@
+{
+  "imports": {
+    "server/api/ocurrences/inactivate/[id].post.test.ts": [
+      "server/api/ocurrences/inactivate/[id].post",
+      "server/db/client",
+      "server/db/migrate",
+      "server/domain/auth/session",
+      "server/test/call-handler"
+    ],
+    "server/api/ocurrences/index.get.test.ts": [
+      "server/api/ocurrences/index.get",
+      "server/db/client",
+      "server/db/migrate",
+      "server/domain/auth/session",
+      "server/test/call-handler"
+    ],
+    "server/api/ocurrences/index.post.test.ts": [
+      "server/api/ocurrences/index.post",
+      "server/db/client",
+      "server/db/migrate",
+      "server/domain/auth/session",
+      "server/test/call-handler"
+    ],
+    "server/api/ocurrences/like/[id].get.test.ts": [
+      "server/api/ocurrences/like/[id].get",
+      "server/db/client",
+      "server/db/migrate",
+      "server/domain/auth/session",
+      "server/test/call-handler"
+    ],
+    "server/api/ocurrences/my-ocurrences.get.test.ts": [
+      "server/api/ocurrences/my-ocurrences.get",
+      "server/db/client",
+      "server/db/migrate",
+      "server/domain/auth/session",
+      "server/test/call-handler"
+    ],
+    "server/api/register.post.test.ts": [
+      "server/api/register.post",
+      "server/api/user/me.get",
+      "server/db/client",
+      "server/db/migrate",
+      "server/domain/auth/email-domain",
+      "server/test/call-handler"
+    ],
+    "server/api/route-map.test.ts": [
+      "server/api/ocurrences/inactivate/[id].post",
+      "server/api/ocurrences/index.get",
+      "server/api/ocurrences/index.post",
+      "server/api/ocurrences/like/[id].get",
+      "server/api/ocurrences/my-ocurrences.get",
+      "server/api/register.post",
+      "server/api/types-ocurrence.get",
+      "server/api/user/login.post",
+      "server/api/user/logout.post",
+      "server/api/user/me.get",
+      "server/db/client",
+      "server/db/migrate",
+      "server/test/call-handler"
+    ],
+    "server/api/types-ocurrence.get.test.ts": [
+      "server/api/types-ocurrence.get",
+      "server/db/client",
+      "server/db/migrate",
+      "server/test/call-handler"
+    ],
+    "server/api/user/login.post.test.ts": [
+      "server/api/register.post",
+      "server/api/user/login.post",
+      "server/db/client",
+      "server/db/migrate",
+      "server/domain/auth/email-domain",
+      "server/test/call-handler"
+    ],
+    "server/api/user/logout.post.test.ts": [
+      "server/api/register.post",
+      "server/api/user/logout.post",
+      "server/api/user/me.get",
+      "server/db/client",
+      "server/db/migrate",
+      "server/domain/auth/email-domain",
+      "server/test/call-handler"
+    ],
+    "server/api/user/me.get.test.ts": [
+      "server/api/register.post",
+      "server/api/user/me.get",
+      "server/db/client",
+      "server/db/migrate",
+      "server/domain/auth/email-domain",
+      "server/test/call-handler"
+    ],
+    "server/db/migrate.test.ts": [
+      "server/db/client",
+      "server/db/migrate"
+    ],
+    "server/domain/auth/register.test.ts": [
+      "server/api/register.post",
+      "server/db/client",
+      "server/db/migrate",
+      "server/domain/auth/email-domain",
+      "server/domain/auth/register",
+      "server/test/call-handler"
+    ],
+    "server/domain/auth/session.test.ts": [
+      "server/domain/auth/session"
+    ],
+    "server/domain/catalog/list-types.test.ts": [
+      "server/db/client",
+      "server/db/migrate",
+      "server/domain/catalog/list-types"
+    ],
+    "server/domain/occurrences/create.test.ts": [
+      "server/domain/occurrences/create"
+    ],
+    "server/domain/occurrences/inactivate.test.ts": [
+      "server/domain/occurrences/inactivate"
+    ],
+    "server/domain/occurrences/like.test.ts": [
+      "server/db/client",
+      "server/db/migrate",
+      "server/domain/occurrences/like"
+    ],
+    "server/domain/occurrences/list-active.test.ts": [
+      "server/domain/occurrences/list-active"
+    ],
+    "server/domain/occurrences/mine.test.ts": [
+      "server/domain/occurrences/mine"
+    ]
+  },
+  "bodies": {
+    "server/api/ocurrences/inactivate/[id].post.test.ts": "f7b9cb7bece671c5256afd51ebf10cea8d1c347404a6ee067c9399d61b4d077e",
+    "server/api/ocurrences/index.get.test.ts": "081be17e378d183afdd3d58cdbac9de1c4563c8321967767a610604d5b31a864",
+    "server/api/ocurrences/index.post.test.ts": "a66e4a733b6d03f91e5bee3cd2113a8fcb88d7d4a70fda9d25e9d4f59fc2345e",
+    "server/api/ocurrences/like/[id].get.test.ts": "26b89d1c23bd77df39b8e3416533a40e4d703d46e4d2ed400a3147f9721005e8",
+    "server/api/ocurrences/my-ocurrences.get.test.ts": "ce5bd57ea8b62578d8d0ae8d13af55c220f88e1c0b9c2023bc676435447308b3",
+    "server/api/register.post.test.ts": "3c47b43086bc878ed2f1a24659fccaba34e168ecd961076dbce23b998c15ea98",
+    "server/api/route-map.test.ts": "2770a54be5506967ad44ab58e6692e13e3190aabe3fff89994fe00c15beffb5d",
+    "server/api/types-ocurrence.get.test.ts": "6980b7d80071949609b656d69a5787cb791cc727b3b145a364c90e8433c4f0b1",
+    "server/api/user/login.post.test.ts": "223a18994f286cd28a3cfbcc0b2ab9a08e306ec75464b9565502be4fac854faf",
+    "server/api/user/logout.post.test.ts": "d92f967df313b060e687c74f911153418d3d253f8e032adf78694567b37db756",
+    "server/api/user/me.get.test.ts": "1cb9ceb40a68d9082f6dc8272591086137040524d7d09e897ea8a8015c18e83a",
+    "server/db/migrate.test.ts": "0643b686f04b28b8f7a0629e4155f0d8cc682c63c1c50f2b7ee7ee8f17a8c5e8",
+    "server/domain/auth/register.test.ts": "f607a75fda3458702efef76dac1e82d6945ef91e8c9486aa2cd2d1b61bf8d111",
+    "server/domain/auth/session.test.ts": "c5c8f629c0bc8aaa0ff9c5e477de7c43d7c92a810e4a38ce42e895c44b4633fb",
+    "server/domain/catalog/list-types.test.ts": "69b438d33c27e34fcaf63e22400a9f9027a466190dd1f9a08d99801756e32ca9",
+    "server/domain/occurrences/create.test.ts": "daea6f7394ba0ab0d284837b6e550f72f77074214e373163bebeb3c8b7049c31",
+    "server/domain/occurrences/inactivate.test.ts": "2d41c776eed11e38325330c7ab74cb5a0b7e7c3b394b7d8a15ec7664292b1f66",
+    "server/domain/occurrences/like.test.ts": "90dc07e0f31d5d79d376ffcfe4894bca704d09570b4ecfb9362b0b1b031deb97",
+    "server/domain/occurrences/list-active.test.ts": "187d849e600e9fda0bf8d3fe235ca0f5ab1fe124851be72b18a905a1f5bbbaa5",
+    "server/domain/occurrences/mine.test.ts": "3828b2a581db2b0b0d6afdc3da9a21819ef89ef719e4ef16281aef93ab04689e"
+  },
+  "tests": 65
+}

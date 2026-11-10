@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { withLikeFlags, type LikeRow } from "./list-active";
+import { withLikeFlags, type LikeRow } from "../../../../server/domain/occurrences/list-active";
 
 const rows = [
   { id: 1, description: "ativa" },

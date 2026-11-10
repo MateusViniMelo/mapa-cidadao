@@ -1,7 +1,7 @@
 import { afterAll, beforeEach, expect, test } from "vitest";
-import { disconnectPrisma, getPrisma } from "../../db/client";
-import { resetTestDatabase } from "../../db/migrate";
-import { listTypes } from "./list-types";
+import { disconnectPrisma, getPrisma } from "../../../../server/db/client";
+import { resetTestDatabase } from "../../../../server/db/migrate";
+import { listTypes } from "../../../../server/domain/catalog/list-types";
 
 const TYPE_NAMES = [
   "Problema de Iluminação",
