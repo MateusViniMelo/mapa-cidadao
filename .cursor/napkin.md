@@ -7,11 +7,13 @@
 - Each item includes date + "Do instead".
 
 ## Execution & Validation (Highest Priority)
-1. **[2026-11-10] Deploy na Vercel usa `vercel-build`**
+1. **[2026-11-10] `prisma generate` exige `.nuxt/tsconfig.json`**
+   Do instead: no `postinstall`, rodar `nuxt prepare` antes de `prisma generate`. O `tsconfig.json` da raiz estende esse arquivo, e um clone limpo não tem `.nuxt`.
+2. **[2026-11-10] Deploy na Vercel usa `vercel-build`**
    Do instead: deixar a Vercel rodar `prisma migrate deploy && prisma db seed && nuxt build`. `DATABASE_URL` é a URL do pooler; `DIRECT_URL` é a URL direta. Não apontar o migrate para o pooler.
-2. **[2026-11-09] Scripts do Prisma 7 ficam bloqueados no install**
+3. **[2026-11-09] Scripts do Prisma 7 ficam bloqueados no install**
    Do instead: se o aviso `install-scripts` listar `prisma` e `@prisma/engines`, aprove só esses dois e rode `npm rebuild prisma @prisma/engines`. Não rode `npm audit fix --force`.
-3. **[2026-11-09] `sharp` quebra sem o script de instalação**
+4. **[2026-11-09] `sharp` quebra sem o script de instalação**
    Do instead: aprovar com `npm install-scripts approve sharp` e, se o pacote já estiver em `node_modules`, rodar `npm rebuild sharp`. `esbuild`, `@tailwindcss/oxide` e `@parcel/watcher` podem já funcionar.
 
 ## Shell & Command Reliability
