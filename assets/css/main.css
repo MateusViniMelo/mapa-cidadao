@@ -1,12 +1,5 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
-@import "flowbite/src/themes/default";
-@plugin "flowbite/plugin";
-@source "../../node_modules/flowbite";
-
-.modal-backdrop {
-  display: none !important;
-}
 
 :root {
   --ui-tertiary: var(--ui-color-tertiary-600);

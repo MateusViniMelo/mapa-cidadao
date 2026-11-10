@@ -10,6 +10,4 @@
 definePageMeta({
   title: "Ocorrências",
 });
-
-useInitFlowbite();
 </script>

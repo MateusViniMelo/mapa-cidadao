@@ -35,5 +35,7 @@
    Do instead: tratar as dezenas de avisos de auditoria como dependências transitivas. Não rodar `--force` sem revisar o que seria rebaixado.
 
 ## User Directives
-1. **[2026-11-09] Responder em português**
+1. **[2026-11-09] Interface só com o Nuxt UI**
+   Do instead: não reinstalar o Flowbite nem importar o plugin dele no Tailwind. O menu mobile abre por estado Vue em `components/layout/Navbar.vue`.
+2. **[2026-11-09] Responder em português**
    Do instead: toda resposta ao usuário neste repositório em português.

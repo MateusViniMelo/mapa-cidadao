@@ -41,11 +41,11 @@
         </UDropdownMenu>
 
         <button
-          data-collapse-toggle="navbar-sticky"
           type="button"
           class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-white focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
           aria-controls="navbar-sticky"
-          aria-expanded="false"
+          :aria-expanded="menuOpen"
+          @click="menuOpen = !menuOpen"
         >
           <span class="sr-only">Abrir menu principal</span>
           <svg
@@ -68,7 +68,8 @@
 
       <div
         id="navbar-sticky"
-        class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1"
+        class="items-center justify-between w-full md:flex md:w-auto md:order-1"
+        :class="menuOpen ? 'flex' : 'hidden'"
       >
         <ul
           class="flex flex-col p-4 md:p-0 mt-4 font-medium border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-800 dark:border-gray-700"
@@ -98,6 +99,14 @@
 <script setup lang="ts">
 const authStore = useAuthStore();
 const route = useRoute();
+const menuOpen = ref(false);
+
+watch(
+  () => route.path,
+  () => {
+    menuOpen.value = false;
+  },
+);
 
 const navLinks = [
   { to: "/", label: "Início" },

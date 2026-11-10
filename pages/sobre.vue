@@ -45,6 +45,4 @@
 definePageMeta({
   title: "Sobre",
 });
-
-useInitFlowbite();
 </script>
