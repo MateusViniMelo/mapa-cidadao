@@ -30,8 +30,9 @@ O **Mapas Sociais App** é uma aplicação web desenvolvida com Nuxt 3 para faci
 
 ## Pré-requisitos
 
-- Node.js (versão 16 ou superior)
-- npm ou yarn
+- Node.js 22 ou superior
+- npm
+- PostgreSQL com PostGIS (localmente, `docker compose up -d`)
 
 ## Instalação
 
@@ -45,8 +46,7 @@ O **Mapas Sociais App** é uma aplicação web desenvolvida com Nuxt 3 para faci
    npm install
    ```
 
-3. Configure as variáveis de ambiente (se necessário):
-   - Crie um arquivo `.env` na raiz do projeto e adicione as variáveis necessárias (ex: URLs de API).
+3. Copie `.env.example` para `.env` e ajuste as variáveis.
 
 ## Executando o Projeto
 
@@ -80,33 +80,26 @@ npm run preview
 - `assets/`: Arquivos estáticos (CSS, imagens).
 
 
+## Deploy na Vercel
+
+O build de produção é o script `vercel-build`: ele aplica as migrations, faz o seed dos tipos de ocorrência e roda `nuxt build`. A Vercel usa esse script no lugar de `build`. O runtime é Node.js 22 (`.node-version`). As functions ficam em `pdx1`, ao lado do Postgres do projeto Supabase `mapa-cidadao` (`us-west-2`).
+
+O banco precisa de PostGIS. Crie o banco vazio e não instale a extensão antes: a primeira migration cria a extensão. Se o schema `public` já tiver objetos, `prisma migrate deploy` responde P3005.
+
+No Supabase, use o host do pooler (`aws-0-us-west-2.pooler.supabase.com`), que tem IPv4. O host `db.<ref>.supabase.co` é só IPv6 e o build da Vercel não alcança.
+
+Variáveis no projeto da Vercel (Production e Preview):
+
+| Variável | Uso |
+| --- | --- |
+| `DATABASE_URL` | Pooler em modo transaction, porta `6543`, com `sslmode=require`. A aplicação usa esta URL. |
+| `DIRECT_URL` | Pooler em modo session, porta `5432`, com `sslmode=require`. Migrations e seed usam esta URL. |
+| `NUXT_PUBLIC_CARTO_API_KEY` | Opcional. Sem ela, o mapa usa o OpenStreetMap. |
+
+Localmente as duas URLs podem ser iguais. No Neon, o par é o mesmo: URL com `-pooler` na `DATABASE_URL` e URL direta na `DIRECT_URL`.
+
+A migration `20261110173000_enable_rls` liga RLS nas tabelas do `public`. Sem policies, a Data API do Supabase fica fechada. O Prisma segue acessando pelo papel dono da tabela, que o Postgres isenta do RLS.
+
 ## Licença
 
 Este projeto está licenciado sob a [MIT License](LICENSE).
-
-
-
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.

@@ -27,7 +27,7 @@ export function assertTestDatabase(url: string): void {
 async function migrateDeploy(url: string): Promise<void> {
   await execFileAsync(process.execPath, [prismaCli, "migrate", "deploy"], {
     cwd: root,
-    env: { ...process.env, DATABASE_URL: url },
+    env: { ...process.env, DATABASE_URL: url, DIRECT_URL: url },
   });
 }
 

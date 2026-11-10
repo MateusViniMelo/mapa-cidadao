@@ -7,9 +7,13 @@ export default defineNuxtConfig({
   },
   nitro: {
     ignore: ["**/*.test.ts"],
+    ...(process.env.VERCEL ? { preset: "vercel" as const } : {}),
+    externals: {
+      external: ["pg"],
+    },
   },
   compatibilityDate: "2024-11-01",
-  devtools: { enabled: true },
+  devtools: { enabled: process.env.NODE_ENV === "development" },
   app: {
     head: {
       titleTemplate: 'Mapa Cidadão',

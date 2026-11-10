@@ -1,6 +1,7 @@
 import { pathToFileURL } from "node:url";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../generated/prisma/client";
+import { pgPoolConfig } from "../server/db/pg-config";
 
 const TYPE_NAMES = [
   "Problema de Iluminação",
@@ -21,7 +22,9 @@ export async function seedTypeOccurrences(prisma: PrismaClient): Promise<void> {
 }
 
 async function runCli(): Promise<void> {
-  const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+  const adapter = new PrismaPg(
+    pgPoolConfig(process.env.DIRECT_URL || process.env.DATABASE_URL),
+  );
   const prisma = new PrismaClient({ adapter });
 
   try {
