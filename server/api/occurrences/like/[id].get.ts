@@ -1,13 +1,13 @@
 import {
   defineEventHandler,
-  getHeader,
   getRequestURL,
   getRouterParam,
   setResponseStatus,
   type H3Event,
 } from "h3";
 import { getPrisma } from "../../../db/client";
-import { bearerToken, readSession } from "../../../domain/auth/session";
+import { readSessionCookie } from "../../../domain/auth/cookie";
+import { readSession } from "../../../domain/auth/session";
 import { toggleLike } from "../../../domain/occurrences/like";
 import { findOccurrence } from "../../../domain/occurrences/list-active";
 
@@ -30,7 +30,7 @@ function occurrenceId(event: H3Event): number | null {
 }
 
 export default defineEventHandler(async (event) => {
-  const token = bearerToken(getHeader(event, "authorization"));
+  const token = readSessionCookie(event);
   if (!token) {
     setResponseStatus(event, 401);
     return { message: "Não autenticado" };

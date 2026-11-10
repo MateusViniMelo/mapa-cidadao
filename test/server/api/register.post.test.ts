@@ -59,7 +59,7 @@ function postRegister(body: typeof payload = payload) {
   });
 }
 
-test("register returns 200 with user and token", async () => {
+test("register returns the user without a token", async () => {
   const response = await postRegister();
 
   expect(response.status).toBe(200);
@@ -69,16 +69,29 @@ test("register returns 200 with user and token", async () => {
   expect(response.body.user.date_birth).toBe(payload.date_birth);
   expect(response.body.user.created_at).toMatch(ISO_8601);
   expect(response.body.user.updated_at).toMatch(ISO_8601);
-  expect(response.body.token).toMatch(/^[A-Za-z0-9_-]{43}$/);
+  expect(response.body).not.toHaveProperty("token");
   expect(response.body.user).not.toHaveProperty("password");
+});
+
+test("register sets the session cookie", async () => {
+  const response = await postRegister();
+  const line = response.setCookie.find((item) => item.startsWith("auth_token="));
+  const token = line?.split(";")[0]?.slice("auth_token=".length) ?? "";
+
+  expect(response.status).toBe(200);
+  expect(token).toMatch(/^[A-Za-z0-9_-]{43}$/);
+  expect(line).toContain("HttpOnly");
+  expect(line).toContain("SameSite=Lax");
+  expect(line).toContain("Path=/");
+  expect(line).toContain("Max-Age=604800");
+  expect(line).not.toContain("Secure");
 
   const stored = await prisma.accessToken.findFirstOrThrow({
     where: { user_id: response.body.user.id },
   });
-  expect(stored.token_hash).toBe(
-    createHash("sha256").update(response.body.token ?? "").digest("hex"),
-  );
-  expect(stored.token_hash).not.toBe(response.body.token);
+  expect(stored.token_hash).toBe(createHash("sha256").update(token).digest("hex"));
+  expect(stored.token_hash).not.toBe(token);
+  expect(stored.expires_at.getTime() - stored.created_at.getTime()).toBe(604800 * 1000);
 });
 
 test("register stores a bcrypt password", async () => {
@@ -104,12 +117,15 @@ test("rejects a duplicate email", async () => {
 
 test("register token reads me", async () => {
   const registered = await postRegister();
-  expect(registered.status).toBe(200);
+  const token = registered.setCookie
+    .find((item) => item.startsWith("auth_token="))
+    ?.split(";")[0]
+    ?.slice("auth_token=".length);
 
   const me = await callHandler<{ user: UserJson }>(meHandler, {
     method: "GET",
     url: "/api/user/me",
-    headers: { authorization: `Bearer ${registered.body.token}` },
+    headers: { cookie: `auth_token=${token}` },
   });
 
   expect(me.status).toBe(200);

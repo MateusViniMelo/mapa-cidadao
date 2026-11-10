@@ -80,7 +80,7 @@ function postInactivate(id: number | string, body: unknown, token?: string) {
   return callHandler<MessageBody>(inactivateHandler, {
     method: "POST",
     url: `/api/occurrences/inactivate/${id}`,
-    headers: token ? { authorization: `Bearer ${token}` } : undefined,
+    headers: token ? { cookie: `auth_token=${token}` } : undefined,
     body,
   });
 }
@@ -165,7 +165,7 @@ test("inactivate rejects a missing token", async () => {
   const unknown = await callHandler<MessageBody>(inactivateHandler, {
     method: "POST",
     url: `/api/occurrences/inactivate/${id}`,
-    headers: { authorization: "Bearer not-a-real-token" },
+    headers: { cookie: "auth_token=not-a-real-token" },
     body,
   });
 

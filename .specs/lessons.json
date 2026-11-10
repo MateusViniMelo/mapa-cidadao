@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 9,
+  "next_id": 13,
   "lessons": [
     {
       "id": "L-001",
@@ -148,6 +148,78 @@
       ],
       "created": "2026-11-10T01:44:02Z",
       "last_seen": "2026-11-10T01:44:02Z"
+    },
+    {
+      "id": "L-009",
+      "key": "surviving_mutant::assert the full branch that decides the outcome not a token that an earlier guard also contains",
+      "text": "Assert the full branch that decides the outcome, not a token that an earlier guard also contains.",
+      "signal": "surviving_mutant",
+      "scope": "middleware",
+      "status": "candidate",
+      "features": [
+        "sessao-cookie"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "C26 (middleware)"
+      ],
+      "created": "2026-11-10T02:50:44Z",
+      "last_seen": "2026-11-10T02:50:44Z"
+    },
+    {
+      "id": "L-010",
+      "key": "surviving_mutant::assert the state assignment the screen reads sits inside the action not only the success message",
+      "text": "Assert the state assignment the screen reads sits inside the action, not only the success message.",
+      "signal": "surviving_mutant",
+      "scope": "stores",
+      "status": "candidate",
+      "features": [
+        "sessao-cookie"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "C17 (stores)"
+      ],
+      "created": "2026-11-10T02:50:44Z",
+      "last_seen": "2026-11-10T02:50:44Z"
+    },
+    {
+      "id": "L-011",
+      "key": "surviving_mutant::assert a cookie attribute as its own token so a longer value does not satisfy the shorter one",
+      "text": "Assert a cookie attribute as its own token, so a longer value does not satisfy the shorter one.",
+      "signal": "surviving_mutant",
+      "scope": "cookies",
+      "status": "candidate",
+      "features": [
+        "sessao-cookie"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "C13 (cookies)"
+      ],
+      "created": "2026-11-10T02:50:44Z",
+      "last_seen": "2026-11-10T02:50:44Z"
+    },
+    {
+      "id": "L-012",
+      "key": "spec_precision_gap::assert the http method beside the path the criterion names not the path string alone",
+      "text": "Assert the HTTP method beside the path the criterion names, not the path string alone.",
+      "signal": "spec_precision_gap",
+      "scope": "client",
+      "status": "candidate",
+      "features": [
+        "sessao-cookie"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "C15 (client)"
+      ],
+      "created": "2026-11-10T02:50:44Z",
+      "last_seen": "2026-11-10T02:50:44Z"
     }
   ]
 }

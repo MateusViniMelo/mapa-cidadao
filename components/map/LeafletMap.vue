@@ -63,7 +63,6 @@ const { buscarEndereco, carregando, erroEndereco } = useReverseGeocoding();
 const authStore = useAuthStore();
 const occurrenceStore = useOccurrenceStore();
 const { occurrences, loadingOccurrences } = storeToRefs(occurrenceStore);
-const { fetchTypesOccurrence } = useTypesOccurrencesService();
 
 const modalAberto = ref(false);
 const ocorrenciaRemover = ref<number | null>(null);
@@ -450,7 +449,10 @@ onMounted(async () => {
   adicionarMarcadoresSalvos();
 
   try {
-    types.value = await fetchTypesOccurrence();
+    const { types_occurrence } = await $fetch<{ types_occurrence: ITypeOccurrence[] }>(
+      "/api/types-occurrence",
+    );
+    types.value = types_occurrence;
   } catch (error) {
     console.error("Erro ao carregar tipos de ocorrência:", error);
   }

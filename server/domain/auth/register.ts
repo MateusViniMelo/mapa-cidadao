@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import type { PrismaClient } from "generated/prisma/client";
-import { createToken, hashToken, toPublicUser, type PublicUser } from "./session";
+import { createToken, hashToken, sessionExpiry, toPublicUser, type PublicUser } from "./session";
 
 const PASSWORD_PATTERN =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&^()\-_=+])[A-Za-z\d@$!%*#?&^()\-_=+]{8,}$/;
@@ -156,6 +156,7 @@ export async function registerUser(
 ): Promise<{ user: PublicUser; token: string }> {
   const passwordHash = await bcrypt.hash(input.password, 12);
   const token = createToken();
+  const createdAt = new Date();
 
   const user = await db.$transaction((tx) =>
     tx.user.create({
@@ -165,7 +166,11 @@ export async function registerUser(
         password: passwordHash,
         date_birth: new Date(`${input.date_birth}T00:00:00.000Z`),
         access_tokens: {
-          create: { token_hash: hashToken(token) },
+          create: {
+            token_hash: hashToken(token),
+            created_at: createdAt,
+            expires_at: sessionExpiry(createdAt),
+          },
         },
       },
     }),

@@ -26,13 +26,21 @@
 - **Date**: 2026-11-09
 - **Status**: active
 
+### AD-004
+- **Decision**: A sessão do browser é o cookie HttpOnly `auth_token`, `SameSite=Lax`, `Path=/`, `Max-Age=604800`. `Secure` só entra com `NODE_ENV=production`. O JSON de cadastro, login e `GET /api/user/me` traz `user` e omite `token`. `Authorization` não autentica. `expires_at` é `created_at` mais 7 dias e não renova.
+- **Reason**: Plano Sessão cookie HttpOnly, aprovado em 2026-11-09 com "Implement the plan as specified, it is attached for your reference." O usuário escolheu só o cookie e 7 dias a partir do login ou do cadastro, sem renovar.
+- **Trade-off**: O Bearer e o token no JSON da migração deixam de valer. O like continua GET. Com `SameSite=Lax`, uma navegação de outro site para essa URL leva o cookie. Um login novo não apaga as linhas anteriores.
+- **Scope**: Sessão deste repositório.
+- **Date**: 2026-11-09
+- **Status**: active
+
 ## Handoff
 
-- **Feature**: migrar-backend (`.specs/features/migrar-backend/`). mover-testes está fechado: 20 arquivos em `test/server/`, suíte 65 passou, gate 0.
-- **Phase / Task**: T1–T29 Complete. Verifier 4b6f336f devolveu FAIL. O passe de correção não começou.
-- **Completed**: T1–T29 de migrar-backend. mover-testes verificado em `.specs/features/mover-testes/`.
-- **In-progress**: nenhum arquivo de produto. O relatório de migrar-backend segue com `Closed` vazio.
-- **Next step**: Um passe só, sem commit e sem segundo verificador. Os testes estão em `test/server/`. (1) Em `test/server/domain/auth/register.test.ts`, no teste `rejects a password outside the pattern`, aceitar `Abcdef1!` (8) e recusar `Abcde1!` (7) e `abcdef1!` (sem maiúscula), com a frase da senha. (2) A mutação de MX só morre se o teste `rejects an email the domain check refuses` chamar `emailDomainAcceptsMail` com `resolveMx` que lança e com lista vazia, os dois recusando; um teste novo fora desse `-t` não mata a mutação. (3) A mutação 422→400 só morre se o teste `rejects a blank name` virar o POST `/api/register` com nome em branco, status 422 e a mesma contagem de usuários; o teste de domínio sozinho não lê o HTTP. (4) Em `test/server/api/user/me.get.test.ts`, no teste `me returns the same token`, afirmar as chaves públicas e a ausência de `password` e `remember_token`. (5) Em `test/server/api/route-map.test.ts`, no teste `mounted paths answer`, pedir os dez caminhos e esperar status diferente de 404 em cada um. Preencher `Closed` com C6, C5, C3, C15 e C51. Rodar `check_proofs.py migrar-backend --mutations .specs/features/migrar-backend/mutations.json` e depois `validate_verification.py migrar-backend`. Se o gate sair 0, destilar lições. Não commitar.
-- **Blockers**: nenhum. Não redespachar o verificador de migrar-backend.
-- **Uncommitted files**: branch `main`, árvore suja. Testes saíram de `server/` para `test/server/`. Nada commitado.
+- **Feature**: sessao-cookie (`.specs/features/sessao-cookie/`) fechada. Gate `validate_verification.py` saiu 0. Sem commit.
+- **Phase / Task**: T1–T5 Done. Verifier independent, mutações 3 mortas, `Closed` em C26, C17, C13 e C15/C21/C25.
+- **Completed**: Cookie HttpOnly de 7 dias, cliente no mesmo origin, passe no browser (toast de senha errada, toast de login, sem reload, `document.cookie` vazio).
+- **In-progress**: nenhum arquivo desta feature.
+- **Next step**: migrar-backend continua com o verificador antigo em FAIL e `Closed` vazio, fora deste corte. Não redespachar esse verificador. O passe, se for retomado, está no relatório `.specs/features/migrar-backend/verification.md`. Não commitar.
+- **Blockers**: nenhum.
+- **Uncommitted files**: branch `main`, árvore suja. Sessão cookie, migration `expires_at` e o passe do verificador. Nada commitado.
 - **Branch**: main

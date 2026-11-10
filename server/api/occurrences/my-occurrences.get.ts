@@ -1,6 +1,7 @@
-import { defineEventHandler, getHeader, getQuery, setResponseStatus } from "h3";
+import { defineEventHandler, getQuery, setResponseStatus } from "h3";
 import { getPrisma } from "../../db/client";
-import { bearerToken, readSession } from "../../domain/auth/session";
+import { readSessionCookie } from "../../domain/auth/cookie";
+import { readSession } from "../../domain/auth/session";
 import { listMine, toMineResponse } from "../../domain/occurrences/mine";
 
 function readPage(value: unknown): number {
@@ -13,7 +14,7 @@ function readPage(value: unknown): number {
 }
 
 export default defineEventHandler(async (event) => {
-  const token = bearerToken(getHeader(event, "authorization"));
+  const token = readSessionCookie(event);
   if (!token) {
     setResponseStatus(event, 401);
     return { message: "Não autenticado" };

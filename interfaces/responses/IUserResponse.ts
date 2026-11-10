@@ -1,7 +1,5 @@
 import type { IUser } from "../IUser";
 
-export interface IUserResponse{
-
-    user: IUser
-    token: string
+export interface IUserResponse {
+  user: IUser;
 }

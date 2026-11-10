@@ -4,6 +4,7 @@ import { resetTestDatabase } from "../../../../server/db/migrate";
 import { callHandler } from "../../../../server/test/call-handler";
 import registerHandler from "../../../../server/api/register.post";
 import loginHandler from "../../../../server/api/user/login.post";
+import meHandler from "../../../../server/api/user/me.get";
 
 vi.mock("../../../../server/domain/auth/email-domain", () => ({
   emailDomainAcceptsMail: async () => true,
@@ -44,13 +45,14 @@ afterAll(async () => {
 });
 
 async function register() {
-  const response = await callHandler<{ user: UserJson; token: string }>(registerHandler, {
+  const response = await callHandler<{ user: UserJson }>(registerHandler, {
     method: "POST",
     url: "/api/register",
     body: payload,
   });
   expect(response.status).toBe(200);
-  return response.body;
+  expect(response.body).not.toHaveProperty("token");
+  return response;
 }
 
 function postLogin(body: { email: string; password: string }) {
@@ -61,16 +63,21 @@ function postLogin(body: { email: string; password: string }) {
   });
 }
 
-test("login returns 200", async () => {
+test("login sets the session cookie", async () => {
   const created = await register();
   const response = await postLogin({ email: payload.email, password: payload.password });
+  const line = response.setCookie.find((item) => item.startsWith("auth_token="));
 
   expect(response.status).toBe(200);
-  expect(response.body.user.id).toBe(created.user.id);
+  expect(response.body.user.id).toBe(created.body.user.id);
   expect(response.body.user.email).toBe(payload.email);
   expect(response.body.user.name).toBe(payload.name);
-  expect(response.body.token).toEqual(expect.any(String));
+  expect(response.body).not.toHaveProperty("token");
   expect(response.body.user).not.toHaveProperty("password");
+  expect(line).toContain("HttpOnly");
+  expect(line).toContain("SameSite=Lax");
+  expect(line).toContain("Path=/");
+  expect(line).toContain("Max-Age=604800");
 });
 
 test("login rejects bad credentials", async () => {
@@ -83,6 +90,7 @@ test("login rejects bad credentials", async () => {
   expect(wrongPassword.status).toBe(401);
   expect(wrongPassword.body.message).toBe("Credenciais inválidas");
   expect(wrongPassword.body).not.toHaveProperty("token");
+  expect(wrongPassword.setCookie).toEqual([]);
 
   const unknownEmail = await postLogin({
     email: "missing@example.invalid",
@@ -91,6 +99,7 @@ test("login rejects bad credentials", async () => {
   expect(unknownEmail.status).toBe(401);
   expect(unknownEmail.body.message).toBe("Credenciais inválidas");
   expect(unknownEmail.body).not.toHaveProperty("token");
+  expect(unknownEmail.setCookie).toEqual([]);
 });
 
 test("login omits the password", async () => {
@@ -102,4 +111,27 @@ test("login omits the password", async () => {
   expect(response.body).not.toHaveProperty("remember_token");
   expect(response.body.user).not.toHaveProperty("password");
   expect(response.body.user).not.toHaveProperty("remember_token");
+});
+
+function sessionToken(setCookie: string[]): string {
+  const line = setCookie.find((item) => item.startsWith("auth_token="));
+  return line?.split(";")[0]?.slice("auth_token=".length) ?? "";
+}
+
+test("second login keeps the first cookie", async () => {
+  await register();
+  const first = await postLogin({ email: payload.email, password: payload.password });
+  const second = await postLogin({ email: payload.email, password: payload.password });
+  const firstToken = sessionToken(first.setCookie);
+
+  expect(first.status).toBe(200);
+  expect(second.status).toBe(200);
+  expect(await prisma.accessToken.count()).toBe(3);
+
+  const me = await callHandler(meHandler, {
+    method: "GET",
+    url: "/api/user/me",
+    headers: { cookie: `auth_token=${firstToken}` },
+  });
+  expect(me.status).toBe(200);
 });

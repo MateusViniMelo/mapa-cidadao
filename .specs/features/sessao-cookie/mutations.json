@@ -1,0 +1,23 @@
+[
+  {
+    "file": "middleware/authMiddleware.ts",
+    "old": "  if (!auth.user) {\n    return navigateTo(\"/\");",
+    "new": "  if (auth.user) {\n    return navigateTo(\"/\");",
+    "proof": "npx vitest run test/server/app/session-client.test.ts -t \"middleware follows the user\"",
+    "label": "middleware redirects to / when the user is present instead of absent (C26)"
+  },
+  {
+    "file": "server/domain/auth/cookie.ts",
+    "old": "deleteCookie(event, SESSION_COOKIE, options);",
+    "new": "deleteCookie(event, SESSION_COOKIE, { path: \"/x\" });",
+    "proof": "npx vitest run test/server/api/user/logout.post.test.ts -t \"logout clears a bad cookie\"",
+    "label": "clearing Set-Cookie targets another Path so the browser keeps auth_token (C13)"
+  },
+  {
+    "file": "stores/authStore.ts",
+    "old": "        body: form,\n      });\n      user.value = res.user;\n      showToast({\n        title: \"Sucesso\",\n        description: \"Login realizado",
+    "new": "        body: form,\n      });\n      showToast({\n        title: \"Sucesso\",\n        description: \"Login realizado",
+    "proof": "npx vitest run test/server/app/session-client.test.ts -t \"login success toast\"",
+    "label": "login no longer stores the returned user in memory (C17)"
+  }
+]

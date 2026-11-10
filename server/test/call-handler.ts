@@ -12,7 +12,7 @@ type CallInput = {
 export async function callHandler<T>(
   handler: EventHandler,
   input: CallInput,
-): Promise<{ status: number; body: T }> {
+): Promise<{ status: number; body: T; setCookie: string[] }> {
   const req = new IncomingMessage(new Socket());
   const res = new ServerResponse(req);
   req.method = input.method.toUpperCase();
@@ -33,5 +33,8 @@ export async function callHandler<T>(
 
   const event = createEvent(req, res);
   const body = (await handler(event)) as T;
-  return { status: res.statusCode, body };
+  const raw = res.getHeader("set-cookie");
+  const setCookie =
+    raw === undefined ? [] : (Array.isArray(raw) ? raw : [raw]).map((item) => String(item));
+  return { status: res.statusCode, body, setCookie };
 }

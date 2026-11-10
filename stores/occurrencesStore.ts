@@ -1,38 +1,25 @@
-// stores/occurrenceStore.ts
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import type { IOccurrence } from "~/interfaces/IOccurrence";
 import type { IOccurrencePayload } from "~/interfaces/IOccurrencePayload";
-import { useOccurrencesService } from "@/composables/occurrencesService";
-import {
-  inactiveOccurrenceSchema,
-  type InactivateOccurrenceSchema,
-} from "~/validators/inactivateOccurrenceSchema";
+import type { InactivateOccurrenceSchema } from "~/validators/inactivateOccurrenceSchema";
 import type { MyOccurrencesResponse } from "~/interfaces/responses/MyOccurrencesResponse";
-import type { NuxtDebugModuleMutationRecord } from "nuxt/schema";
 
 export const useOccurrenceStore = defineStore("occurrences", () => {
   const occurrences = ref<IOccurrence[]>([]);
   const loading = ref(false);
-  /** Somente para listagem no mapa (evita misturar com loading de criar/like/inativar). */
   const loadingOccurrences = ref(false);
   const error = ref<any>(null);
   const myOccurrences = ref<MyOccurrencesResponse>();
-
-  const {
-    fetchOccurrences,
-    createOccurrence,
-    deleteOccurrence,
-    getOccurrencesByUserAuth,
-    inactivateOccurrence,
-    likeOrDislike,
-  } = useOccurrencesService();
 
   const loadOccurrences = async () => {
     loadingOccurrences.value = true;
     error.value = null;
     try {
-      occurrences.value = await fetchOccurrences();
+      const { occurrences: rows } = await $fetch<{ occurrences: IOccurrence[] }>(
+        "/api/occurrences",
+      );
+      occurrences.value = rows;
     } catch (err: any) {
       error.value = err?.data || err;
     } finally {
@@ -44,7 +31,10 @@ export const useOccurrenceStore = defineStore("occurrences", () => {
     loading.value = true;
     error.value = null;
     try {
-      const occurrence = await createOccurrence(payload);
+      const { occurrence } = await $fetch<{ occurrence: IOccurrence }>("/api/occurrences", {
+        method: "POST",
+        body: payload,
+      });
       occurrences.value.push(occurrence);
       return occurrence;
     } catch (err: any) {
@@ -59,7 +49,7 @@ export const useOccurrenceStore = defineStore("occurrences", () => {
     loading.value = true;
     error.value = null;
     try {
-      await deleteOccurrence(id);
+      await $fetch(`/api/occurrences/${id}`, { method: "DELETE" });
       occurrences.value = occurrences.value.filter((o) => o.id !== id);
     } catch (err: any) {
       error.value = err?.data || err;
@@ -69,14 +59,14 @@ export const useOccurrenceStore = defineStore("occurrences", () => {
     }
   };
 
-  const inactive = async (
-    inactiveOccurrence: InactivateOccurrenceSchema,
-    id: number
-  ) => {
+  const inactive = async (inactiveOccurrence: InactivateOccurrenceSchema, id: number) => {
     loading.value = true;
     error.value = null;
     try {
-      await inactivateOccurrence(inactiveOccurrence, id);
+      await $fetch(`/api/occurrences/inactivate/${id}`, {
+        method: "POST",
+        body: inactiveOccurrence,
+      });
       occurrences.value = occurrences.value.filter((o) => o.id !== id);
     } catch (err: any) {
       error.value = err?.data || err;
@@ -90,7 +80,9 @@ export const useOccurrenceStore = defineStore("occurrences", () => {
     loading.value = true;
     error.value = null;
     try {
-      myOccurrences.value = await getOccurrencesByUserAuth(page);
+      myOccurrences.value = await $fetch<MyOccurrencesResponse>(
+        `/api/occurrences/my-occurrences?page=${page}`,
+      );
     } catch (err: any) {
       error.value = err?.data || err;
       throw err;
@@ -98,25 +90,24 @@ export const useOccurrenceStore = defineStore("occurrences", () => {
       loading.value = false;
     }
   };
+
   const toggleLikeOccurrence = async (id: number) => {
     loading.value = true;
     error.value = null;
     try {
-      const updatedOccurrence = await likeOrDislike(id);
-      if (!updatedOccurrence) return;
-
-      // substitui a ocorrência na lista
-      const index = occurrences.value.findIndex(
-        (o) => o.id === updatedOccurrence.id
+      const { occurrence } = await $fetch<{ occurrence: IOccurrence | null }>(
+        `/api/occurrences/like/${id}`,
       );
+      if (!occurrence) return;
+
+      const index = occurrences.value.findIndex((o) => o.id === occurrence.id);
       if (index !== -1) {
-        occurrences.value[index] = updatedOccurrence;
+        occurrences.value[index] = occurrence;
       } else {
-        // se não existir na lista, adiciona
-        occurrences.value.push(updatedOccurrence);
+        occurrences.value.push(occurrence);
       }
 
-      return updatedOccurrence;
+      return occurrence;
     } catch (err: any) {
       error.value = err?.data || err;
       throw err;

@@ -215,7 +215,7 @@ test("authenticated flag reports the caller like", async () => {
   });
 
   const response = await getOccurrences({
-    authorization: `Bearer ${caller.token}`,
+    cookie: `auth_token=${caller.token}`,
   });
 
   expect(response.status).toBe(200);
@@ -224,7 +224,7 @@ test("authenticated flag reports the caller like", async () => {
   expect(response.body.occurrences[0]?.likes_count).toBe(2);
 });
 
-test("empty authorization still lists", async () => {
+test("missing cookie still lists", async () => {
   const { user } = await createUser("public@example.invalid");
   const type = await prisma.typeOccurrence.findFirstOrThrow({ orderBy: { id: "asc" } });
   const activeId = await insertOccurrence({
@@ -233,11 +233,30 @@ test("empty authorization still lists", async () => {
     description: "Header vazio",
   });
 
-  const empty = await getOccurrences({ authorization: "" });
+  const empty = await getOccurrences({ authorization: "", cookie: "" });
   const missing = await getOccurrences();
 
   expect(empty.status).toBe(200);
   expect(empty.body.occurrences.map((row) => row.id)).toEqual([activeId]);
   expect(missing.status).toBe(200);
   expect(missing.body.occurrences.map((row) => row.id)).toEqual([activeId]);
+});
+
+test("unknown cookie stays anonymous", async () => {
+  const caller = await createUser("anon@example.invalid");
+  const type = await prisma.typeOccurrence.findFirstOrThrow({ orderBy: { id: "asc" } });
+  const activeId = await insertOccurrence({
+    userId: caller.user.id,
+    typeId: type.id,
+    description: "Cookie desconhecido",
+  });
+  await prisma.likeOccurrence.create({
+    data: { user_id: caller.user.id, occurrence_id: activeId },
+  });
+
+  const response = await getOccurrences({ cookie: "auth_token=not-a-session" });
+
+  expect(response.status).toBe(200);
+  expect(response.body.occurrences[0]?.liked_by_auth_user).toBe(false);
+  expect(response.body.occurrences[0]?.likes_count).toBe(1);
 });

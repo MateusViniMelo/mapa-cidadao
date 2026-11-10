@@ -1,6 +1,7 @@
 import { defineEventHandler, readBody, setResponseStatus } from "h3";
 import { Prisma } from "generated/prisma/client";
 import { getPrisma } from "../db/client";
+import { setSessionCookie } from "../domain/auth/cookie";
 import { emailDomainAcceptsMail } from "../domain/auth/email-domain";
 import {
   firstErrorMessage,
@@ -23,7 +24,9 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    return await registerUser(getPrisma(), validated.value);
+    const created = await registerUser(getPrisma(), validated.value);
+    setSessionCookie(event, created.token);
+    return { user: created.user };
   } catch (error) {
     if (
       error instanceof Prisma.PrismaClientKnownRequestError &&

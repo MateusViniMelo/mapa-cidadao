@@ -68,7 +68,7 @@ function getLike(id: number, token?: string) {
   return callHandler<LikeBody>(likeHandler, {
     method: "GET",
     url: `/api/occurrences/like/${id}`,
-    headers: token ? { authorization: `Bearer ${token}` } : undefined,
+    headers: token ? { cookie: `auth_token=${token}` } : undefined,
   });
 }
 

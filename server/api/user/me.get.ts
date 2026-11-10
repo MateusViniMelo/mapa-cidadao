@@ -1,9 +1,10 @@
-import { defineEventHandler, getHeader, setResponseStatus } from "h3";
+import { defineEventHandler, setResponseStatus } from "h3";
 import { getPrisma } from "../../db/client";
-import { bearerToken, readSession } from "../../domain/auth/session";
+import { readSessionCookie } from "../../domain/auth/cookie";
+import { readSession } from "../../domain/auth/session";
 
 export default defineEventHandler(async (event) => {
-  const token = bearerToken(getHeader(event, "authorization"));
+  const token = readSessionCookie(event);
   if (!token) {
     setResponseStatus(event, 401);
     return { message: "Não autenticado" };
@@ -15,5 +16,5 @@ export default defineEventHandler(async (event) => {
     return { message: "Não autenticado" };
   }
 
-  return session;
+  return { user: session.user };
 });

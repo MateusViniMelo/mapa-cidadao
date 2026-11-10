@@ -1,5 +1,6 @@
 import { defineEventHandler, readBody, setResponseStatus } from "h3";
 import { getPrisma } from "../../db/client";
+import { setSessionCookie } from "../../domain/auth/cookie";
 import { login } from "../../domain/auth/session";
 
 const INVALID_CREDENTIALS = "Credenciais inválidas";
@@ -12,5 +13,6 @@ export default defineEventHandler(async (event) => {
     return { message: INVALID_CREDENTIALS };
   }
 
-  return result;
+  setSessionCookie(event, result.token);
+  return { user: result.user };
 });

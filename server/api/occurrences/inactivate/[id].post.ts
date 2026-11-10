@@ -1,6 +1,5 @@
 import {
   defineEventHandler,
-  getHeader,
   getRequestURL,
   getRouterParam,
   readBody,
@@ -8,7 +7,8 @@ import {
   type H3Event,
 } from "h3";
 import { getPrisma } from "../../../db/client";
-import { bearerToken, readSession } from "../../../domain/auth/session";
+import { readSessionCookie } from "../../../domain/auth/cookie";
+import { readSession } from "../../../domain/auth/session";
 import { inactivateOccurrence, prismaInactivateStore } from "../../../domain/occurrences/inactivate";
 
 function occurrenceId(event: H3Event): number | null {
@@ -27,7 +27,7 @@ function occurrenceId(event: H3Event): number | null {
 }
 
 export default defineEventHandler(async (event) => {
-  const token = bearerToken(getHeader(event, "authorization"));
+  const token = readSessionCookie(event);
   if (!token) {
     setResponseStatus(event, 401);
     return { message: "Não autenticado" };

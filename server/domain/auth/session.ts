@@ -27,6 +27,13 @@ export function createMemorySessions() {
   };
 }
 
+export const SESSION_TTL_SECONDS = 7 * 24 * 60 * 60;
+const SESSION_TTL_MS = SESSION_TTL_SECONDS * 1000;
+
+export function sessionExpiry(from: Date): Date {
+  return new Date(from.getTime() + SESSION_TTL_MS);
+}
+
 export function createToken(): string {
   return randomBytes(32).toString("base64url");
 }
@@ -58,15 +65,6 @@ export function toPublicUser(user: {
   };
 }
 
-export function bearerToken(header: string | undefined): string | null {
-  if (!header?.trim()) {
-    return null;
-  }
-
-  const match = /^bearer\s+(\S+)$/i.exec(header.trim());
-  return match?.[1] ?? null;
-}
-
 export async function readSession(
   db: PrismaClient,
   token: string,
@@ -75,7 +73,7 @@ export async function readSession(
     where: { token_hash: hashToken(token) },
     include: { user: true },
   });
-  if (!row) {
+  if (!row || row.expires_at.getTime() <= Date.now()) {
     return null;
   }
 
@@ -98,8 +96,14 @@ export async function login(
   }
 
   const token = createToken();
+  const createdAt = new Date();
   await db.accessToken.create({
-    data: { user_id: user.id, token_hash: hashToken(token) },
+    data: {
+      user_id: user.id,
+      token_hash: hashToken(token),
+      created_at: createdAt,
+      expires_at: sessionExpiry(createdAt),
+    },
   });
 
   return { user: toPublicUser(user), token };

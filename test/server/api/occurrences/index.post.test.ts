@@ -56,7 +56,7 @@ function postOccurrence(body: unknown, token?: string) {
   return callHandler<CreateBody>(createHandler, {
     method: "POST",
     url: "/api/occurrences",
-    headers: token ? { authorization: `Bearer ${token}` } : undefined,
+    headers: token ? { cookie: `auth_token=${token}` } : undefined,
     body,
   });
 }
@@ -162,7 +162,7 @@ test("create rejects a missing token", async () => {
   const unknown = await callHandler<CreateBody>(createHandler, {
     method: "POST",
     url: "/api/occurrences",
-    headers: { authorization: "Bearer not-a-real-token" },
+    headers: { cookie: "auth_token=not-a-real-token" },
     body: { ...saoPaulo, type_id: type.id },
   });
 

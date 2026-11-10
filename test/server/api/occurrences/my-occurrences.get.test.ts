@@ -126,7 +126,7 @@ function getMine(token?: string, page?: number) {
   return callHandler<MineBody>(myOccurrencesHandler, {
     method: "GET",
     url: `/api/occurrences/my-occurrences${query}`,
-    headers: token ? { authorization: `Bearer ${token}` } : undefined,
+    headers: token ? { cookie: `auth_token=${token}` } : undefined,
   });
 }
 
@@ -226,7 +226,7 @@ test("my occurrences rejects a missing token", async () => {
   const rejected = await callHandler<MineBody>(myOccurrencesHandler, {
     method: "GET",
     url: "/api/occurrences/my-occurrences",
-    headers: { authorization: "Bearer not-a-session" },
+    headers: { cookie: "auth_token=not-a-session" },
   });
   expect(rejected.status).toBe(401);
 });
@@ -278,7 +278,7 @@ test("page abc is page 1", async () => {
   const response = await callHandler<MineBody>(myOccurrencesHandler, {
     method: "GET",
     url: "/api/occurrences/my-occurrences?page=abc",
-    headers: { authorization: `Bearer ${caller.token}` },
+    headers: { cookie: `auth_token=${caller.token}` },
   });
 
   expect(response.status).toBe(200);

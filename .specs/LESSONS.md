@@ -62,6 +62,30 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: server/domain/occurrences/create.ts:89 (occurrences)
 - last seen: 2026-11-10T01:44:02Z
 
+### L-009 - Assert the full branch that decides the outcome, not a token that an earlier guard also contains.
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `middleware` · harmful: 0
+- features: sessao-cookie
+- evidence: C26 (middleware)
+- last seen: 2026-11-10T02:50:44Z
+
+### L-010 - Assert the state assignment the screen reads sits inside the action, not only the success message.
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `stores` · harmful: 0
+- features: sessao-cookie
+- evidence: C17 (stores)
+- last seen: 2026-11-10T02:50:44Z
+
+### L-011 - Assert a cookie attribute as its own token, so a longer value does not satisfy the shorter one.
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `cookies` · harmful: 0
+- features: sessao-cookie
+- evidence: C13 (cookies)
+- last seen: 2026-11-10T02:50:44Z
+
+### L-012 - Assert the HTTP method beside the path the criterion names, not the path string alone.
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `client` · harmful: 0
+- features: sessao-cookie
+- evidence: C15 (client)
+- last seen: 2026-11-10T02:50:44Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.
