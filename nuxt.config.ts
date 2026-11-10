@@ -14,6 +14,16 @@ export default defineNuxtConfig({
     head: {
       titleTemplate: 'Mapa Cidadão',
       link: [
+        { rel: "preconnect", href: "https://fonts.googleapis.com" },
+        {
+          rel: "preconnect",
+          href: "https://fonts.gstatic.com",
+          crossorigin: "",
+        },
+        {
+          rel: "stylesheet",
+          href: "https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,560;1,9..144,560&display=swap",
+        },
         {
           rel: "apple-touch-icon",
           sizes: "180x180",

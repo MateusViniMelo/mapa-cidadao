@@ -1,102 +1,88 @@
 <template>
-  <nav class="bg-white border-gray-200 dark:bg-gray-800">
-    <div
-      class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4"
-    >
-      <NuxtLink to="/" class="flex items-center space-x-3 rtl:space-x-reverse">
-        <UIcon name="hugeicons:maps-search" class="text-3xl text-indigo-500" />
-        <span
-          class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white"
-        >
-          Mapa Cidadão
+  <header class="sticky top-0 z-40 border-b border-default bg-white dark:bg-gray-900">
+    <UContainer class="flex h-16 items-center gap-3">
+      <NuxtLink
+        to="/"
+        class="flex min-w-0 items-baseline gap-2 lg:flex-1"
+        aria-label="Mapa Cidadão, início"
+      >
+        <span class="wordmark truncate text-[1.35rem] leading-none text-highlighted">
+          Mapa
+          <span class="italic text-tertiary">Cidadão</span>
         </span>
       </NuxtLink>
 
-      <div class="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
+      <nav class="hidden lg:flex" aria-label="Principal">
+        <UNavigationMenu
+          :items="navItems"
+          color="neutral"
+          variant="link"
+          highlight
+          highlight-color="tertiary"
+        />
+      </nav>
+
+      <div class="ms-auto flex items-center justify-end gap-1.5 lg:flex-1">
+        <ColorModeButton />
+
         <LoginModal v-if="!authStore.user" />
 
         <UDropdownMenu
           v-else
-          :items="items"
-          :popper="{ placement: 'bottom-end' }"
+          :items="accountItems"
+          :content="{ align: 'end' }"
         >
-          <UAvatar
-            class="cursor-pointer"
-            size="lg"
-            :alt="authStore.user.name"
-            src="https://www.shutterstock.com/image-vector/default-avatar-profile-icon-social-600nw-1906669723.jpg"
-          />
-          <template #logout>
-            <UButton
-              color="error"
-              variant="ghost"
-              icon="i-heroicons-arrow-left-on-rectangle"
-              :loading="authStore.loading"
-              class="w-full cursor-pointer"
-              @click="authStore.logout()"
-            >
-              Sair
-            </UButton>
-          </template>
+          <UButton
+            color="neutral"
+            variant="ghost"
+            class="cursor-pointer px-1.5"
+            :aria-label="`Conta de ${authStore.user.name}`"
+          >
+            <UAvatar :alt="authStore.user.name" size="sm" />
+          </UButton>
         </UDropdownMenu>
 
-        <button
-          type="button"
-          class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-white focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
-          aria-controls="navbar-sticky"
+        <UButton
+          class="cursor-pointer lg:hidden"
+          color="neutral"
+          variant="ghost"
+          square
+          :icon="menuOpen ? 'hugeicons:cancel-01' : 'hugeicons:menu-01'"
           :aria-expanded="menuOpen"
+          aria-controls="navbar-menu"
+          :aria-label="menuOpen ? 'Fechar menu' : 'Abrir menu'"
           @click="menuOpen = !menuOpen"
-        >
-          <span class="sr-only">Abrir menu principal</span>
-          <svg
-            class="w-5 h-5"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 17 14"
-          >
-            <path
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M1 1h15M1 7h15M1 13h15"
-            />
-          </svg>
-        </button>
+        />
       </div>
+    </UContainer>
 
-      <div
-        id="navbar-sticky"
-        class="items-center justify-between w-full md:flex md:w-auto md:order-1"
-        :class="menuOpen ? 'flex' : 'hidden'"
-      >
-        <ul
-          class="flex flex-col p-4 md:p-0 mt-4 font-medium border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-800 dark:border-gray-700"
-        >
-          <li v-for="link in navLinks" :key="link.to">
-            <NuxtLink
-              :to="link.to"
-              :class="[
-                'block py-2 px-3 rounded-sm md:p-0',
-                route.path === link.to
-                  ? 'text-white bg-indigo-700 md:bg-transparent md:text-indigo-700 md:dark:text-indigo-500'
-                  : 'text-gray-900 hover:bg-white md:hover:bg-transparent md:hover:text-indigo-700 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700',
-              ]"
-            >
-              {{ link.label }}
-            </NuxtLink>
-          </li>
-          <li class="text-center">
-            <ColorModeButton />
-          </li>
-        </ul>
+    <div
+      id="navbar-menu"
+      class="nav-panel lg:hidden"
+      :class="menuOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'"
+    >
+      <div class="overflow-hidden">
+        <nav aria-label="Principal, mobile" class="border-t border-default">
+          <UContainer class="py-3">
+            <UNavigationMenu
+              :items="navItems"
+              orientation="vertical"
+              color="neutral"
+              variant="link"
+              highlight
+              highlight-color="tertiary"
+              class="-mx-2.5"
+            />
+          </UContainer>
+        </nav>
       </div>
     </div>
-  </nav>
+  </header>
 </template>
 
 <script setup lang="ts">
+import type { DropdownMenuItem, NavigationMenuItem } from "@nuxt/ui";
+
 const authStore = useAuthStore();
 const route = useRoute();
 const menuOpen = ref(false);
@@ -108,12 +94,22 @@ watch(
   },
 );
 
-const navLinks = [
-  { to: "/", label: "Início" },
-  { to: "/sobre", label: "Sobre" },
-];
+const navItems = computed<NavigationMenuItem[]>(() => [
+  {
+    label: "Início",
+    icon: "hugeicons:maps",
+    to: "/",
+    active: route.path === "/",
+  },
+  {
+    label: "Sobre",
+    icon: "hugeicons:information-circle",
+    to: "/sobre",
+    active: route.path === "/sobre",
+  },
+]);
 
-const items = computed(() => {
+const accountItems = computed<DropdownMenuItem[][]>(() => {
   if (!authStore.user) return [];
 
   return [
@@ -121,15 +117,39 @@ const items = computed(() => {
     [
       {
         label: "Minhas Ocorrências",
-        icon: "material-symbols:list",
+        icon: "hugeicons:left-to-right-list-bullet",
         to: "/my-occurrences",
       },
       {
         label: "Sair",
-        icon: "i-heroicons-arrow-left-on-rectangle",
-        slot: "logout",
+        icon: "hugeicons:logout-01",
+        color: "error",
+        loading: authStore.loading,
+        onSelect: () => {
+          authStore.logout();
+        },
       },
     ],
   ];
 });
 </script>
+
+<style scoped>
+.wordmark {
+  font-family: Fraunces, "Iowan Old Style", Palatino, Georgia, serif;
+  font-optical-sizing: auto;
+  font-weight: 560;
+  letter-spacing: -0.03em;
+}
+
+.nav-panel {
+  display: grid;
+  transition: grid-template-rows 320ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-panel {
+    transition: none;
+  }
+}
+</style>

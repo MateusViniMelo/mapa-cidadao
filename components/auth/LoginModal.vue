@@ -10,7 +10,7 @@
       onClick: resetForm,
     }"
   >
-    <UButton label="Entrar" :ui="{ base: primaryButtonClass }" />
+    <UButton label="Entrar" color="tertiary" class="cursor-pointer" />
 
     <template #body>
       <UForm
