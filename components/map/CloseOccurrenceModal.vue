@@ -92,11 +92,11 @@
 <script setup lang="ts">
 import type { FormSubmitEvent } from "@nuxt/ui";
 import { CLOSURE_TYPE_OPTIONS } from "~/constants/occurrenceClosure";
-import { TypeOccurrenceClosure } from "~/enums/TypeOcurrenceClosure";
+import { TypeOccurrenceClosure } from "~/enums/TypeOccurrenceClosure";
 import {
   inactiveOccurrenceSchema,
-  type InactivateOcurrenceSchema,
-} from "~/validators/inactivateOcurrenceSchema";
+  type InactivateOccurrenceSchema,
+} from "~/validators/inactivateOccurrenceSchema";
 
 const isOpen = defineModel<boolean>("open", { default: false });
 
@@ -105,13 +105,13 @@ defineProps<{
 }>();
 
 const emit = defineEmits<{
-  submit: [data: InactivateOcurrenceSchema];
+  submit: [data: InactivateOccurrenceSchema];
   close: [];
 }>();
 
 const closureTypeOptions = CLOSURE_TYPE_OPTIONS;
 
-const state = reactive<Partial<InactivateOcurrenceSchema>>({
+const state = reactive<Partial<InactivateOccurrenceSchema>>({
   type_closure: TypeOccurrenceClosure.RESOLVED,
   solution_description: undefined,
   resolution_date: undefined,
@@ -140,7 +140,7 @@ function resetAndClose() {
   emit("close");
 }
 
-function onSubmit(event: FormSubmitEvent<InactivateOcurrenceSchema>) {
+function onSubmit(event: FormSubmitEvent<InactivateOccurrenceSchema>) {
   emit("submit", event.data);
 }
 </script>

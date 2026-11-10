@@ -18,7 +18,7 @@
 2. **[2026-11-09] Vitest 5 exige Vite `^6.4`**
    Do instead: instalar `vitest@4.1.12`. O Nuxt deste repo está no Vite 6.3 e o 5 não resolve.
 3. **[2026-11-09] `env("DATABASE_URL")` derruba o CLI mesmo sem banco**
-   Do instead: exportar `DATABASE_URL` no comando de `prisma generate` e `prisma migrate diff --from-empty`. Não subir Docker e não aplicar a migration para gerar o SQL.
+   Do instead: passar `DATABASE_URL=postgresql://mapa_cidadao:mapa_cidadao@localhost:5432/mapa_cidadao` só no comando de `prisma generate`. Não exportar essa URL na sessão do vitest: o config recusa qualquer banco que não seja `mapa_cidadao_test`.
 
 ## Domain Behavior Guardrails
 1. **[2026-11-09] PostGIS deixa o `public` não vazio e o deploy responde P3005**
@@ -27,8 +27,8 @@
    Do instead: montar o evento com `createEvent` do h3 e chamar o handler real. Não subir `nuxt dev`.
 3. **[2026-11-09] `date_birth` no fuso local vira o dia anterior**
    Do instead: gravar `YYYY-MM-DDT00:00:00.000Z` e serializar com `toISOString().slice(0, 10)`. Não usar `getDate()` local.
-4. **[2026-11-09] Coordenada da ocorrência não é GeoJSON na ida**
-   Do instead: o front envia `[latitude, longitude]` e a resposta devolve `[longitude, latitude]`. Não inverter um dos lados. O par de prova é ida `[-23.55052, -46.633308]` e volta `[-46.633308, -23.55052]`.
+4. **[2026-11-09] Coordenada da ocorrência é GeoJSON nos dois sentidos**
+   Do instead: pedido e resposta usam `[longitude, latitude]`. O par de prova é `[-46.633308, -23.55052]`. `toRequestCoordinates(latitude, longitude)` devolve esse par. O marcador lê `coordinates[1]`, `coordinates[0]`.
 5. **[2026-11-09] `npm audit fix --force` no Nuxt**
    Do instead: tratar as dezenas de avisos de auditoria como dependências transitivas. Não rodar `--force` sem revisar o que seria rebaixado.
 

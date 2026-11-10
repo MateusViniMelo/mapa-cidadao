@@ -10,9 +10,9 @@ const TYPE_NAMES = [
   "Falta de Pavimentação",
 ] as const;
 
-export async function seedTypeOcurrences(prisma: PrismaClient): Promise<void> {
+export async function seedTypeOccurrences(prisma: PrismaClient): Promise<void> {
   for (const name of TYPE_NAMES) {
-    await prisma.typeOcurrence.upsert({
+    await prisma.typeOccurrence.upsert({
       where: { name },
       update: {},
       create: { name },
@@ -25,7 +25,7 @@ async function runCli(): Promise<void> {
   const prisma = new PrismaClient({ adapter });
 
   try {
-    await seedTypeOcurrences(prisma);
+    await seedTypeOccurrences(prisma);
   } finally {
     await prisma.$disconnect();
   }

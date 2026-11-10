@@ -8,9 +8,9 @@ const rows = [
 
 test("anonymous list sets liked_by_auth_user false", () => {
   const likes: LikeRow[] = [
-    { ocurrence_id: 1, user_id: 8 },
-    { ocurrence_id: 1, user_id: 9 },
-    { ocurrence_id: 2, user_id: 8 },
+    { occurrence_id: 1, user_id: 8 },
+    { occurrence_id: 1, user_id: 9 },
+    { occurrence_id: 2, user_id: 8 },
   ];
 
   const listed = withLikeFlags(rows, likes, null);
@@ -21,9 +21,9 @@ test("anonymous list sets liked_by_auth_user false", () => {
 
 test("list reports the caller like and the count", () => {
   const likes: LikeRow[] = [
-    { ocurrence_id: 1, user_id: 4 },
-    { ocurrence_id: 1, user_id: 7 },
-    { ocurrence_id: 2, user_id: 9 },
+    { occurrence_id: 1, user_id: 4 },
+    { occurrence_id: 1, user_id: 7 },
+    { occurrence_id: 2, user_id: 9 },
   ];
 
   const listed = withLikeFlags(rows, likes, 7);
@@ -38,9 +38,9 @@ test("list reports the caller like and the count", () => {
 
 test("counts likes the caller did not make", () => {
   const likes: LikeRow[] = [
-    { ocurrence_id: 1, user_id: 8 },
-    { ocurrence_id: 1, user_id: 9 },
-    { ocurrence_id: 1, user_id: 10 },
+    { occurrence_id: 1, user_id: 8 },
+    { occurrence_id: 1, user_id: 9 },
+    { occurrence_id: 1, user_id: 10 },
   ];
 
   const listed = withLikeFlags(rows, likes, 7);

@@ -113,7 +113,7 @@ const items = computed(() => {
       {
         label: "Minhas Ocorrências",
         icon: "material-symbols:list",
-        to: "/my-ocurrences",
+        to: "/my-occurrences",
       },
       {
         label: "Sair",

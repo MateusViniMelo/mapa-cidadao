@@ -1,7 +1,7 @@
 import { Prisma, type PrismaClient } from "generated/prisma/client";
 
 export type LikeRow = {
-  ocurrence_id: number;
+  occurrence_id: number;
   user_id: number;
 };
 
@@ -124,8 +124,8 @@ export async function loadOccurrences(
       t.name AS type_name,
       t.created_at AS type_created_at,
       t.updated_at AS type_updated_at
-    FROM ocurrences o
-    INNER JOIN types_ocurrence t ON t.id = o.type_id
+    FROM occurrences o
+    INNER JOIN types_occurrence t ON t.id = o.type_id
     WHERE ${where}
     ORDER BY o.id ASC
   `);
@@ -136,16 +136,16 @@ export async function loadOccurrences(
   }
 
   const likes = await db.$queryRaw<LikeRow[]>`
-    SELECT user_id, ocurrence_id
-    FROM like_ocurrences
-    WHERE ocurrence_id IN (${Prisma.join(listed.map((row) => row.id))})
+    SELECT user_id, occurrence_id
+    FROM like_occurrences
+    WHERE occurrence_id IN (${Prisma.join(listed.map((row) => row.id))})
   `;
 
   return withLikeFlags(
     listed,
     likes.map((like) => ({
       user_id: asNumber(like.user_id),
-      ocurrence_id: asNumber(like.ocurrence_id),
+      occurrence_id: asNumber(like.occurrence_id),
     })),
     userId,
   );
@@ -172,12 +172,12 @@ export function withLikeFlags<T extends { id: number }>(
   const byOccurrence = new Map<number, { count: number; liked: boolean }>();
 
   for (const like of likes) {
-    const current = byOccurrence.get(like.ocurrence_id) ?? { count: 0, liked: false };
+    const current = byOccurrence.get(like.occurrence_id) ?? { count: 0, liked: false };
     current.count += 1;
     if (userId !== null && like.user_id === userId) {
       current.liked = true;
     }
-    byOccurrence.set(like.ocurrence_id, current);
+    byOccurrence.set(like.occurrence_id, current);
   }
 
   return rows.map((row) => {

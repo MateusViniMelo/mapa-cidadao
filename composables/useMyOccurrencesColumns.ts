@@ -1,7 +1,7 @@
 import { h, resolveComponent } from "vue";
 import type { TableColumn } from "@nuxt/ui";
-import type { IOcurrence } from "~/interfaces/IOcurrence";
-import type { ITypeOcurrence } from "~/interfaces/ITypeOcurrence";
+import type { IOccurrence } from "~/interfaces/IOccurrence";
+import type { ITypeOccurrence } from "~/interfaces/ITypeOccurrence";
 import {
   getClosureColor,
   getClosureLabel,
@@ -11,7 +11,7 @@ import { formatTableAddress } from "~/utils/mapPopup";
 export function useMyOccurrencesColumns() {
   const UBadge = resolveComponent("UBadge");
 
-  const columns: TableColumn<IOcurrence>[] = [
+  const columns: TableColumn<IOccurrence>[] = [
     {
       accessorKey: "id",
       header: "#",
@@ -21,7 +21,7 @@ export function useMyOccurrencesColumns() {
       accessorKey: "type",
       header: "Tipo",
       cell: ({ row }) => {
-        const value = row.getValue("type") as ITypeOcurrence | null;
+        const value = row.getValue("type") as ITypeOccurrence | null;
         return value?.name;
       },
     },

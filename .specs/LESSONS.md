@@ -50,6 +50,18 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: vitest.config.ts:17 (vitest)
 - last seen: 2026-11-10T00:22:43Z
 
+### L-007 - When a test proves a call by reading source, assert the argument order, not only the function name.
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `map` · harmful: 0
+- features: contrato-occurrence
+- evidence: test/server/utils/occurrencePoint.test.ts:9 (map)
+- last seen: 2026-11-10T01:44:02Z
+
+### L-008 - A length check of exactly N needs a case longer than N, not only a case shorter than N.
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `occurrences` · harmful: 0
+- features: contrato-occurrence
+- evidence: server/domain/occurrences/create.ts:89 (occurrences)
+- last seen: 2026-11-10T01:44:02Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

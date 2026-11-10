@@ -192,7 +192,7 @@ export function prismaInactivateStore(db: PrismaClient): InactivateStore {
           type_closure::text AS type_closure,
           solution_description,
           to_char(resolution_date, 'YYYY-MM-DD') AS resolution_date
-        FROM ocurrences
+        FROM occurrences
         WHERE id = ${id}
       `;
       const row = rows[0];
@@ -213,7 +213,7 @@ export function prismaInactivateStore(db: PrismaClient): InactivateStore {
     async close(id, data) {
       await db.$transaction(async (tx) => {
         const updated = await tx.$executeRaw`
-          UPDATE ocurrences
+          UPDATE occurrences
           SET is_active = false,
               type_closure = CAST(${data.type_closure} AS "TypeClosure"),
               solution_description = ${data.solution_description}::text,
@@ -229,7 +229,7 @@ export function prismaInactivateStore(db: PrismaClient): InactivateStore {
 
     async remove(id) {
       await db.$transaction(async (tx) => {
-        await tx.ocurrence.delete({ where: { id } });
+        await tx.occurrence.delete({ where: { id } });
       });
     },
   };

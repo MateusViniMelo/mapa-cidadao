@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { sliceMine } from "../../../../server/domain/occurrences/mine";
+import { sliceMine, toMineResponse } from "../../../../server/domain/occurrences/mine";
 
 test("orders by created_at descending", () => {
   const older = "2026-01-01T00:00:00.000Z";
@@ -34,6 +34,28 @@ test("cuts fifteen rows into ten then five", () => {
   expect(second.per_page).toBe(10);
   expect(first.total).toBe(15);
   expect(second.total).toBe(15);
+
+  const firstBody = toMineResponse(first);
+  const secondBody = toMineResponse(second);
+  expect(firstBody.page).toBe(1);
+  expect(firstBody.per_page).toBe(10);
+  expect(firstBody.total).toBe(15);
+  expect(firstBody.data).toHaveLength(10);
+  expect(secondBody.page).toBe(2);
+  expect(secondBody.per_page).toBe(10);
+  expect(secondBody.total).toBe(15);
+  expect(secondBody.data).toHaveLength(5);
   expect(first.data.map((row) => row.id)).toEqual([15, 14, 13, 12, 11, 10, 9, 8, 7, 6]);
   expect(second.data.map((row) => row.id)).toEqual([5, 4, 3, 2, 1]);
+});
+
+test("page past the end keeps the requested page", () => {
+  const body = toMineResponse(
+    sliceMine([{ id: 1, created_at: "2026-01-01T00:00:00.000Z" }], 99),
+  );
+
+  expect(body.data).toEqual([]);
+  expect(body.total).toBe(1);
+  expect(body.page).toBe(99);
+  expect(body.per_page).toBe(10);
 });

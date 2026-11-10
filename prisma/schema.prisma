@@ -23,9 +23,9 @@ model User {
   created_at DateTime @default(now()) @db.Timestamptz(6)
   updated_at DateTime @default(now()) @updatedAt @db.Timestamptz(6)
 
-  access_tokens   AccessToken[]
-  ocurrences      Ocurrence[]
-  like_ocurrences LikeOcurrence[]
+  access_tokens    AccessToken[]
+  occurrences      Occurrence[]
+  like_occurrences LikeOccurrence[]
 
   @@map("users")
 }
@@ -41,18 +41,18 @@ model AccessToken {
   @@map("access_tokens")
 }
 
-model TypeOcurrence {
+model TypeOccurrence {
   id         Int      @id @default(autoincrement())
   name       String   @unique
   created_at DateTime @default(now()) @db.Timestamptz(6)
   updated_at DateTime @default(now()) @updatedAt @db.Timestamptz(6)
 
-  ocurrences Ocurrence[]
+  occurrences Occurrence[]
 
-  @@map("types_ocurrence")
+  @@map("types_occurrence")
 }
 
-model Ocurrence {
+model Occurrence {
   id                   Int          @id @default(autoincrement())
   location             Unsupported("geometry(Point, 4326)")
   type_id              Int
@@ -69,23 +69,23 @@ model Ocurrence {
   created_at           DateTime     @default(now()) @db.Timestamptz(6)
   updated_at           DateTime     @default(now()) @updatedAt @db.Timestamptz(6)
 
-  type            TypeOcurrence   @relation(fields: [type_id], references: [id], onDelete: Cascade)
-  user            User            @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  like_ocurrences LikeOcurrence[]
+  type             TypeOccurrence   @relation(fields: [type_id], references: [id], onDelete: Cascade)
+  user             User             @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  like_occurrences LikeOccurrence[]
 
-  @@map("ocurrences")
+  @@map("occurrences")
 }
 
-model LikeOcurrence {
-  id           Int      @id @default(autoincrement())
-  user_id      Int
-  ocurrence_id Int
-  created_at   DateTime @default(now()) @db.Timestamptz(6)
-  updated_at   DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+model LikeOccurrence {
+  id            Int      @id @default(autoincrement())
+  user_id       Int
+  occurrence_id Int
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime @default(now()) @updatedAt @db.Timestamptz(6)
 
-  user      User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  ocurrence Ocurrence @relation(fields: [ocurrence_id], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  occurrence Occurrence @relation(fields: [occurrence_id], references: [id], onDelete: Cascade)
 
-  @@unique([user_id, ocurrence_id])
-  @@map("like_ocurrences")
+  @@unique([user_id, occurrence_id])
+  @@map("like_occurrences")
 }

@@ -3,7 +3,7 @@ import { promisify } from "node:util";
 import { fileURLToPath } from "node:url";
 import pg from "pg";
 import type { PrismaClient } from "generated/prisma/client";
-import { seedTypeOcurrences } from "../../prisma/seed";
+import { seedTypeOccurrences } from "../../prisma/seed";
 
 const execFileAsync = promisify(execFile);
 const root = fileURLToPath(new URL("../..", import.meta.url));
@@ -78,7 +78,7 @@ export async function resetTestDatabase(prisma: PrismaClient): Promise<void> {
   }
 
   await prisma.$executeRawUnsafe(
-    `TRUNCATE TABLE "users", "access_tokens", "types_ocurrence", "ocurrences", "like_ocurrences" RESTART IDENTITY CASCADE`,
+    `TRUNCATE TABLE "users", "access_tokens", "types_occurrence", "occurrences", "like_occurrences" RESTART IDENTITY CASCADE`,
   );
-  await seedTypeOcurrences(prisma);
+  await seedTypeOccurrences(prisma);
 }

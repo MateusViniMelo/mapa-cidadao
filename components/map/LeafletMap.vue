@@ -5,7 +5,7 @@
       class="relative h-[700px] lg:h-[800px] w-full overflow-hidden rounded-md shadow"
     >
       <div ref="mapContainer" class="h-full w-full" />
-      <MapLoadingOverlay v-if="loadingOcurrences" />
+      <MapLoadingOverlay v-if="loadingOccurrences" />
     </div>
   </div>
 
@@ -17,7 +17,7 @@
     :loading-address="carregando"
     :address-error="erroEndereco"
     :type-options="typeOptions"
-    :loading="ocurrenceStore.loading || carregando"
+    :loading="occurrenceStore.loading || carregando"
     :max-length="MAX_DESCRIPTION_LENGTH"
     @submit="salvarOcorrencia"
     @close="resetCreateForm"
@@ -25,8 +25,8 @@
 
   <CloseOccurrenceModal
     v-model:open="modalFinalizarOcorrencia"
-    :loading="ocurrenceStore.loading"
-    @submit="onSubmitInactivateOcurrence"
+    :loading="occurrenceStore.loading"
+    @submit="onSubmitInactivateOccurrence"
     @close="resetCloseForm"
   />
 </template>
@@ -36,11 +36,12 @@ import { nextTick, onMounted, onUnmounted, ref } from "vue";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useReverseGeocoding } from "~/composables/useReverseGeocoding";
+import { toRequestCoordinates } from "~/utils/occurrencePoint";
 import { markerIcons } from "~/util/makerIcons";
-import type { ITypeOcurrence } from "~/interfaces/ITypeOcurrence";
+import type { ITypeOccurrence } from "~/interfaces/ITypeOccurrence";
 import type { ILocationPoint } from "~/interfaces/ILocationPoint";
-import type { IOcurrencePayload } from "~/interfaces/IOcurrencePayload";
-import type { InactivateOcurrenceSchema } from "~/validators/inactivateOcurrenceSchema";
+import type { IOccurrencePayload } from "~/interfaces/IOccurrencePayload";
+import type { InactivateOccurrenceSchema } from "~/validators/inactivateOccurrenceSchema";
 import {
   buildOccurrencePopupHtml,
   buildRecenterButtonHtml,
@@ -60,15 +61,15 @@ const enderecoAchado = ref<Awaited<ReturnType<typeof buscarEndereco>>>(null);
 const { buscarEndereco, carregando, erroEndereco } = useReverseGeocoding();
 
 const authStore = useAuthStore();
-const ocurrenceStore = useOcurrenceStore();
-const { ocurrences, loadingOcurrences } = storeToRefs(ocurrenceStore);
-const { fetchTypesOcurrence } = useTypesOcurrencesService();
+const occurrenceStore = useOccurrenceStore();
+const { occurrences, loadingOccurrences } = storeToRefs(occurrenceStore);
+const { fetchTypesOccurrence } = useTypesOccurrencesService();
 
 const modalAberto = ref(false);
 const ocorrenciaRemover = ref<number | null>(null);
 const modalFinalizarOcorrencia = ref(false);
 
-const types = ref<ITypeOcurrence[]>([]);
+const types = ref<ITypeOccurrence[]>([]);
 const selectedType = ref<number | undefined>(undefined);
 
 let marcador: L.Marker | null = null;
@@ -123,7 +124,7 @@ function adicionarLegenda() {
 }
 
 function adicionarMarcadoresSalvos() {
-  ocurrences.value.forEach((ocorrencia) => {
+  occurrences.value.forEach((ocorrencia) => {
     const {
       id,
       location,
@@ -157,9 +158,9 @@ function adicionarMarcadoresSalvos() {
   });
 }
 
-async function removerOcorrencia(form: InactivateOcurrenceSchema, id: number) {
+async function removerOcorrencia(form: InactivateOccurrenceSchema, id: number) {
   try {
-    await ocurrenceStore.inactive(form, id);
+    await occurrenceStore.inactive(form, id);
 
     const marcadorAtivo = marcadoresAtivos.get(id);
     if (marcadorAtivo) {
@@ -185,7 +186,7 @@ async function removerOcorrencia(form: InactivateOcurrenceSchema, id: number) {
   }
 }
 
-async function onSubmitInactivateOcurrence(data: InactivateOcurrenceSchema) {
+async function onSubmitInactivateOccurrence(data: InactivateOccurrenceSchema) {
   if (ocorrenciaRemover.value != null) {
     await removerOcorrencia(data, ocorrenciaRemover.value);
   }
@@ -229,13 +230,13 @@ async function salvarOcorrencia() {
 
   const location: ILocationPoint = {
     type: "Point",
-    coordinates: [
+    coordinates: toRequestCoordinates(
       localizacaoSelecionada.value.lat,
       localizacaoSelecionada.value.lng,
-    ],
+    ),
   };
 
-  const ocurrencePayload: IOcurrencePayload = {
+  const occurrencePayload: IOccurrencePayload = {
     location,
     type_id: selectedType.value ?? 1,
     description: descricao.value,
@@ -246,7 +247,7 @@ async function salvarOcorrencia() {
   };
 
   try {
-    await ocurrenceStore.addOcurrence(ocurrencePayload);
+    await occurrenceStore.addOccurrence(occurrencePayload);
     recarregarMarcadores();
     toast.add({
       title: "Ocorrência criada",
@@ -292,23 +293,23 @@ function handleLikeClick(btnLike: HTMLElement) {
   const id = btnLike.getAttribute("data-id");
   if (!id) return;
 
-  ocurrenceStore
-    .toggleLikeOcurrence(Number(id))
-    .then((updatedOcurrence) => {
-      if (!updatedOcurrence) return;
+  occurrenceStore
+    .toggleLikeOccurrence(Number(id))
+    .then((updatedOccurrence) => {
+      if (!updatedOccurrence) return;
 
       const popupEl = btnLike.closest(".leaflet-popup-content");
       const contadorEl = popupEl?.querySelector(".contador") as HTMLElement | null;
       const svgEl = btnLike.querySelector("svg");
 
       if (contadorEl) {
-        contadorEl.textContent = String(updatedOcurrence.likes_count);
+        contadorEl.textContent = String(updatedOccurrence.likes_count);
       }
 
       if (svgEl) {
         svgEl.classList.toggle(
           "text-indigo-500",
-          updatedOcurrence.liked_by_auth_user
+          updatedOccurrence.liked_by_auth_user
         );
       }
     })
@@ -392,7 +393,7 @@ watch(() => authStore.user?.id, () => recarregarMarcadores());
 onMounted(async () => {
   isClient.value = true;
   await nextTick();
-  await ocurrenceStore.loadOcurrences();
+  await occurrenceStore.loadOccurrences();
 
   if (!mapContainer.value) return;
 
@@ -449,7 +450,7 @@ onMounted(async () => {
   adicionarMarcadoresSalvos();
 
   try {
-    types.value = await fetchTypesOcurrence();
+    types.value = await fetchTypesOccurrence();
   } catch (error) {
     console.error("Erro ao carregar tipos de ocorrência:", error);
   }

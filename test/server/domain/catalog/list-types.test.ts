@@ -25,7 +25,7 @@ test("reads the five seeded names from the database", async () => {
   const seeded = await listTypes(prisma);
   expect(seeded.map((type) => type.name)).toEqual(TYPE_NAMES);
 
-  const extra = await prisma.typeOcurrence.create({
+  const extra = await prisma.typeOccurrence.create({
     data: { name: "Tipo extra de prova" },
   });
   const again = await listTypes(prisma);

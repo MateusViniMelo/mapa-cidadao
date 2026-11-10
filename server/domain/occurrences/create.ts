@@ -34,7 +34,7 @@ export function requestPoint(coordinates: [number, number]): {
   latitude: number;
   longitude: number;
 } {
-  return { latitude: coordinates[0], longitude: coordinates[1] };
+  return { latitude: coordinates[1], longitude: coordinates[0] };
 }
 
 export function geoJsonCoordinates(latitude: number, longitude: number): [number, number] {
@@ -91,18 +91,18 @@ function readPoint(
     return null;
   }
 
-  const [latitude, longitude] = point.coordinates;
+  const [longitude, latitude] = point.coordinates;
   if (
-    typeof latitude !== "number" ||
     typeof longitude !== "number" ||
-    !Number.isFinite(latitude) ||
-    !Number.isFinite(longitude)
+    typeof latitude !== "number" ||
+    !Number.isFinite(longitude) ||
+    !Number.isFinite(latitude)
   ) {
     errors.location = ["O campo location deve ser um ponto."];
     return null;
   }
 
-  return requestPoint([latitude, longitude]);
+  return requestPoint([longitude, latitude]);
 }
 
 function readTypeId(value: unknown, errors: OccurrenceFieldErrors): number | null {
@@ -154,7 +154,7 @@ export function firstOccurrenceError(errors: OccurrenceFieldErrors): string {
 }
 
 export type CreateResult =
-  | { ok: true; status: 201; ocurrence: ListedOccurrence }
+  | { ok: true; status: 201; occurrence: ListedOccurrence }
   | { ok: false; status: 422; errors: OccurrenceFieldErrors };
 
 export async function createOccurrence(
@@ -167,7 +167,7 @@ export async function createOccurrence(
     return normalized;
   }
 
-  const type = await db.typeOcurrence.findUnique({
+  const type = await db.typeOccurrence.findUnique({
     where: { id: normalized.value.type_id },
   });
   if (!type) {
@@ -175,9 +175,9 @@ export async function createOccurrence(
   }
 
   const value = normalized.value;
-  const ocurrence = await db.$transaction(async (tx) => {
+  const occurrence = await db.$transaction(async (tx) => {
     const inserted = await tx.$queryRaw<Array<{ id: number }>>`
-      INSERT INTO ocurrences (
+      INSERT INTO occurrences (
         location, type_id, user_id, description, address_name, city, state, country
       ) VALUES (
         ST_SetSRID(ST_MakePoint(${value.longitude}::float8, ${value.latitude}::float8), 4326),
@@ -199,5 +199,5 @@ export async function createOccurrence(
     return row;
   });
 
-  return { ok: true, status: 201, ocurrence };
+  return { ok: true, status: 201, occurrence };
 }

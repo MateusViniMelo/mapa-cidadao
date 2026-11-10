@@ -25,9 +25,9 @@ async function seedPair() {
       date_birth: new Date("1990-01-15T00:00:00.000Z"),
     },
   });
-  const type = await prisma.typeOcurrence.findFirstOrThrow({ orderBy: { id: "asc" } });
+  const type = await prisma.typeOccurrence.findFirstOrThrow({ orderBy: { id: "asc" } });
   const rows = await prisma.$queryRaw<Array<{ id: number }>>`
-    INSERT INTO ocurrences (
+    INSERT INTO occurrences (
       location, type_id, user_id, description, address_name, city, state, country, is_active
     ) VALUES (
       ST_SetSRID(ST_MakePoint(${LONGITUDE}::float8, ${LATITUDE}::float8), 4326),
@@ -46,8 +46,8 @@ async function seedPair() {
 }
 
 function countPair(userId: number, occurrenceId: number) {
-  return prisma.likeOcurrence.count({
-    where: { user_id: userId, ocurrence_id: occurrenceId },
+  return prisma.likeOccurrence.count({
+    where: { user_id: userId, occurrence_id: occurrenceId },
   });
 }
 
@@ -56,8 +56,8 @@ test("keeps one row per user and occurrence", async () => {
 
   await toggleLike(prisma, userId, occurrenceId);
   await expect(
-    prisma.likeOcurrence.create({
-      data: { user_id: userId, ocurrence_id: occurrenceId },
+    prisma.likeOccurrence.create({
+      data: { user_id: userId, occurrence_id: occurrenceId },
     }),
   ).rejects.toMatchObject({ code: "P2002" });
 

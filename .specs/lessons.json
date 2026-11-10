@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 7,
+  "next_id": 9,
   "lessons": [
     {
       "id": "L-001",
@@ -112,6 +112,42 @@
       ],
       "created": "2026-11-10T00:22:43Z",
       "last_seen": "2026-11-10T00:22:43Z"
+    },
+    {
+      "id": "L-007",
+      "key": "surviving_mutant::when a test proves a call by reading source assert the argument order not only the function name",
+      "text": "When a test proves a call by reading source, assert the argument order, not only the function name.",
+      "signal": "surviving_mutant",
+      "scope": "map",
+      "status": "candidate",
+      "features": [
+        "contrato-occurrence"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "test/server/utils/occurrencePoint.test.ts:9 (map)"
+      ],
+      "created": "2026-11-10T01:44:02Z",
+      "last_seen": "2026-11-10T01:44:02Z"
+    },
+    {
+      "id": "L-008",
+      "key": "surviving_mutant::a length check of exactly n needs a case longer than n not only a case shorter than n",
+      "text": "A length check of exactly N needs a case longer than N, not only a case shorter than N.",
+      "signal": "surviving_mutant",
+      "scope": "occurrences",
+      "status": "candidate",
+      "features": [
+        "contrato-occurrence"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "server/domain/occurrences/create.ts:89 (occurrences)"
+      ],
+      "created": "2026-11-10T01:44:02Z",
+      "last_seen": "2026-11-10T01:44:02Z"
     }
   ]
 }

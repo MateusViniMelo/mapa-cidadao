@@ -2,16 +2,23 @@ import { expect, test } from "vitest";
 import { geoJsonCoordinates, normalizeOccurrence, requestPoint } from "../../../../server/domain/occurrences/create";
 
 const point = {
-  location: { type: "Point" as const, coordinates: [-23.55052, -46.633308] as [number, number] },
+  location: { type: "Point" as const, coordinates: [-46.633308, -23.55052] as [number, number] },
   type_id: 1,
 };
 
-test("request point keeps latitude first", () => {
-  expect(requestPoint([-23.55052, -46.633308])).toEqual({
+test("request point reads longitude first", () => {
+  expect(requestPoint([-46.633308, -23.55052])).toEqual({
     latitude: -23.55052,
     longitude: -46.633308,
   });
   expect(geoJsonCoordinates(-23.55052, -46.633308)).toEqual([-46.633308, -23.55052]);
+
+  const normalized = normalizeOccurrence(point);
+  expect(normalized.ok).toBe(true);
+  if (normalized.ok) {
+    expect(normalized.value.longitude).toBe(-46.633308);
+    expect(normalized.value.latitude).toBe(-23.55052);
+  }
 });
 
 test("stores blank description and address", () => {

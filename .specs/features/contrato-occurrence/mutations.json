@@ -1,0 +1,23 @@
+[
+  {
+    "file": "components/map/LeafletMap.vue",
+    "old": "    coordinates: toRequestCoordinates(\n      localizacaoSelecionada.value.lat,\n      localizacaoSelecionada.value.lng,\n    ),",
+    "new": "    coordinates: toRequestCoordinates(\n      localizacaoSelecionada.value.lng,\n      localizacaoSelecionada.value.lat,\n    ),",
+    "proof": "npx vitest run test/server/utils/occurrencePoint.test.ts -t \"click becomes longitude first\"",
+    "label": "map payload latitude then longitude -> swapped"
+  },
+  {
+    "file": "server/domain/occurrences/create.ts",
+    "old": "point.coordinates.length !== 2",
+    "new": "point.coordinates.length < 2",
+    "proof": "npx vitest run test/server/api/occurrences/index.post.test.ts -t \"create rejects a point that is not two finite numbers\"",
+    "label": "coordinate pair length !== 2 -> < 2"
+  },
+  {
+    "file": "server/domain/occurrences/mine.ts",
+    "old": "const start = (current - 1) * MINE_PAGE_SIZE;",
+    "new": "const start = current * MINE_PAGE_SIZE;",
+    "proof": "npx vitest run test/server/domain/occurrences/mine.test.ts -t \"cuts fifteen rows into ten then five\"",
+    "label": "page window starts one page late"
+  }
+]
