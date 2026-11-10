@@ -2,16 +2,28 @@
   <UModal
     v-model:open="isOpen"
     title="Encerrar Ocorrência"
-    :close="{ onClick: resetAndClose }"
+    :close="{
+      color: 'tertiary',
+      variant: 'outline',
+      class: 'mc-dialog__close',
+      onClick: resetAndClose,
+    }"
+    :ui="{
+      overlay: 'mc-overlay',
+      content: 'mc-dialog',
+      header: 'mc-dialog__header',
+      title: 'mc-dialog__title',
+      body: 'mc-dialog__body',
+    }"
   >
     <template #body>
       <UForm
         :schema="inactiveOccurrenceSchema"
         :state="state"
-        class="space-y-4"
+        class="space-y-5"
         @submit="onSubmit"
       >
-        <div class="flex justify-between space-x-4">
+        <div class="flex flex-col gap-5 sm:flex-row sm:gap-4">
           <UFormField
             label="Qual o motivo do encerramento?"
             required
@@ -24,6 +36,11 @@
               placeholder="Escolha o tipo"
               :items="closureTypeOptions"
               class="w-full"
+              :ui="{
+                base: 'mc-field',
+                content: 'mc-menu',
+                item: 'mc-menu__item',
+              }"
             />
           </UFormField>
 
@@ -43,6 +60,7 @@
               color="tertiary"
               class="w-full"
               type="date"
+              :ui="{ base: 'mc-field' }"
             />
           </UFormField>
         </div>
@@ -60,7 +78,7 @@
             class="w-full"
             :maxlength="500"
             aria-describedby="closure-character-count"
-            :ui="{ trailing: 'pointer-events-none' }"
+            :ui="{ base: 'mc-field', trailing: 'pointer-events-none' }"
           >
             <template #trailing>
               <div
@@ -78,7 +96,7 @@
         <UButton
           type="submit"
           color="error"
-          :ui="{ base: 'text-white cursor-pointer' }"
+          :ui="{ base: 'mc-btn mc-btn--danger' }"
           :loading="loading"
           block
         >

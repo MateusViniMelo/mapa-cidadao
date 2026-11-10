@@ -1,4 +1,5 @@
 import { fileURLToPath } from "node:url";
+import vue from "@vitejs/plugin-vue";
 import { defineConfig } from "vitest/config";
 
 const TEST_DATABASE_URL =
@@ -26,10 +27,15 @@ if (fromEnv) {
   assertTestDatabase(fromEnv);
 }
 
+const root = fileURLToPath(new URL("./", import.meta.url));
+
 export default defineConfig({
+  plugins: [vue()],
   resolve: {
     alias: {
       generated: fileURLToPath(new URL("./generated", import.meta.url)),
+      "~": root,
+      "@": root,
     },
   },
   test: {

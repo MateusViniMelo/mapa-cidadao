@@ -1,0 +1,23 @@
+[
+  {
+    "file": "components/map/MapLibreMap.vue",
+    "old": ":coordinates=\"occurrenceLngLat(ocorrencia.location.coordinates)\"",
+    "new": ":coordinates=\"[ocorrencia.location.coordinates[1], ocorrencia.location.coordinates[0]]\"",
+    "proof": "npx vitest run test/server/utils/mapBasemap.test.ts -t \"geojson longitude first\"",
+    "label": "marker reads coordinates[1] as longitude (C7)"
+  },
+  {
+    "file": "components/map/MapLibreMap.vue",
+    "old": ":is-owner=\"userId === ocorrencia.user_id\"",
+    "new": ":is-owner=\"userId !== ocorrencia.user_id\"",
+    "proof": "npx vitest run test/server/components/mapPopupContent.test.ts -t \"encerrar follows the owner\"",
+    "label": "owner rule inverted on the map (C9)"
+  },
+  {
+    "file": "components/map/MapLibreMap.vue",
+    "old": "point.value = { lat, lng };\n  focusToken.value += 1;\n}\n\nfunction showCurrentLocation",
+    "new": "point.value = { lat: lng, lng: lat };\n  focusToken.value += 1;\n}\n\nfunction showCurrentLocation",
+    "proof": "npx vitest run test/server/utils/occurrencePoint.test.ts -t \"click becomes longitude first\"",
+    "label": "map click stores lat and lng swapped (C6)"
+  }
+]

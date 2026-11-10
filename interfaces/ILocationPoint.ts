@@ -1,4 +1,4 @@
 export interface ILocationPoint {
   type: "Point";
-  coordinates: [number, number]; // [lat, lng]
+  coordinates: [number, number]; // [longitude, latitude]
 }

@@ -61,6 +61,7 @@ export default defineNuxtConfig({
     "@nuxt/image",
     "@nuxt/ui",
     "@pinia/nuxt",
+    "nuxt-maplibre",
   ],
   css: ["~/assets/css/main.css"],
   runtimeConfig: {

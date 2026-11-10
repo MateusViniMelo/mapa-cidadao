@@ -28,7 +28,7 @@
 1. **[2026-11-10] Supabase `mapa-cidadao` usa o pooler e o PostGIS nasce na migration**
    Do instead: autenticar `plugin-supabase-supabase` com `mcp_auth`. Projeto `tlkexuwxmkdhllmsxxxl`. `DATABASE_URL` no pooler transaction porta `6543`; `DIRECT_URL` no session porta `5432`; as duas com `sslmode=require`. Não criar PostGIS antes do `prisma migrate deploy`: a migration `init` instala no schema `public`. Em `pgPoolConfig`, tirar `sslmode` da URL antes de passar ao `pg`, senão o `require` vira `verify-full` e apaga `rejectUnauthorized: false`.
 2. **[2026-11-10] Tiles da CARTO exigem API key**
-   Do instead: guardar a chave em `NUXT_PUBLIC_CARTO_API_KEY` no `.env`. A URL é `https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png?key=`. Sem a variável, o mapa usa o OpenStreetMap.
+   Do instead: guardar a chave em `NUXT_PUBLIC_CARTO_API_KEY` no `.env`. A URL é `https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png?key=`, no claro e no escuro, sem filtro sépia. Sem a variável, o mapa usa o OpenStreetMap.
 3. **[2026-11-10] CSS virtual do `@nuxt/fonts` responde 404 JSON no dev**
    Do instead: deixar `ui.fonts: false` e não listar `@nuxt/fonts` em `modules`. O CSS global fica vazio e o Vite devolve `application/json`.
 4. **[2026-11-10] `UModal` fora do `UApp` não acha o locale**
@@ -47,7 +47,9 @@
    Do instead: pedido e resposta usam `[longitude, latitude]`. O par de prova é `[-46.633308, -23.55052]`. `toRequestCoordinates(latitude, longitude)` devolve esse par. O marcador lê `coordinates[1]`, `coordinates[0]`.
 
 ## User Directives
-1. **[2026-11-10] Navbar com os componentes do Nuxt UI 3**
+1. **[2026-11-10] Mapa é superfície de produto, com o índigo do tema**
+   Do instead: controles flutuantes, cartão com sombra suave e botões de ação em `var(--ui-tertiary)`. Não voltar serifa, sombra dura, sépia ou fita no mapa.
+2. **[2026-11-10] Navbar com os componentes do Nuxt UI 3**
    Do instead: usar `UNavigationMenu` em `components/layout/Navbar.vue`. `UHeader` só existe no Nuxt UI 4, que exige Nuxt 4. Não reinstalar o Flowbite.
-2. **[2026-11-09] Responder em português**
+3. **[2026-11-09] Responder em português**
    Do instead: toda resposta ao usuário neste repositório em português.

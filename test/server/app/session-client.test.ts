@@ -14,7 +14,7 @@ function sliceFunction(text: string, name: string): string {
 
 const authStore = source("stores/authStore.ts");
 const occurrenceStore = source("stores/occurrencesStore.ts");
-const map = source("components/map/LeafletMap.vue");
+const map = source("components/map/OccurrenceMap.vue");
 const middleware = source("middleware/authMiddleware.ts");
 const plugin = source("plugins/auth.ts");
 

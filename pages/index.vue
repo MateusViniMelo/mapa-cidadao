@@ -1,7 +1,7 @@
 <template>
   <ClientOnly>
     <div class="w-full">
-      <LeafletMap />
+      <OccurrenceMap />
     </div>
   </ClientOnly>
 </template>
