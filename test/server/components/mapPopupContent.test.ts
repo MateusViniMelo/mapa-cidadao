@@ -1,26 +1,25 @@
 // @vitest-environment happy-dom
-import { createApp } from "vue";
+import { createApp, type Component } from "vue";
 import { expect, test } from "vitest";
-import MapPopupContent from "../../../components/map/MapPopupContent.vue";
+import DraftPopup from "../../../components/map/DraftPopup.vue";
+import OccurrencePopup from "../../../components/map/OccurrencePopup.vue";
 import { tempoAtras } from "../../../util/date";
 
 function mountPopup(
-  props: Record<string, unknown>,
+  component: Component,
+  props: Record<string, unknown> = {},
   on: Record<string, (...args: unknown[]) => void> = {},
 ) {
   const el = document.createElement("div");
   document.body.appendChild(el);
-  const app = createApp(MapPopupContent, { ...props, ...on });
+  const app = createApp(component, { ...props, ...on });
   app.mount(el);
   return el;
 }
 
 test("draft popup says Informar Problema", () => {
   const calls: string[] = [];
-  const el = mountPopup(
-    { mode: "draft" },
-    { onInform: () => calls.push("inform") },
-  );
+  const el = mountPopup(DraftPopup, {}, { onInform: () => calls.push("inform") });
 
   const button = el.querySelector("button");
   expect(button?.textContent).toContain("Informar Problema");
@@ -30,8 +29,7 @@ test("draft popup says Informar Problema", () => {
 
 test("address script is text", () => {
   const createdAt = "2020-01-15T12:00:00.000Z";
-  const el = mountPopup({
-    mode: "occurrence",
+  const el = mountPopup(OccurrencePopup, {
     typeName: "<img src=x onerror=alert(1)>",
     addressName: "<script>alert(1)</script>, Centro, Belém",
     createdAt,
@@ -53,8 +51,7 @@ test("address script is text", () => {
 });
 
 test("empty address stays a blank line", () => {
-  const el = mountPopup({
-    mode: "occurrence",
+  const el = mountPopup(OccurrencePopup, {
     typeName: "Alagamento",
     addressName: "",
     createdAt: "2020-01-15T12:00:00.000Z",
@@ -68,8 +65,7 @@ test("empty address stays a blank line", () => {
 });
 
 test("address without comma stays whole", () => {
-  const el = mountPopup({
-    mode: "occurrence",
+  const el = mountPopup(OccurrencePopup, {
     typeName: "Lixo",
     addressName: "Praça da República",
     createdAt: "2020-01-15T12:00:00.000Z",
@@ -83,8 +79,7 @@ test("address without comma stays whole", () => {
 });
 
 test("encerrar follows the owner", () => {
-  const owner = mountPopup({
-    mode: "occurrence",
+  const owner = mountPopup(OccurrencePopup, {
     typeName: "Alagamento",
     addressName: "Rua A, Centro, Belém",
     createdAt: "2020-01-15T12:00:00.000Z",
@@ -93,8 +88,7 @@ test("encerrar follows the owner", () => {
     liked: false,
     isOwner: true,
   });
-  const other = mountPopup({
-    mode: "occurrence",
+  const other = mountPopup(OccurrencePopup, {
     typeName: "Alagamento",
     addressName: "Rua A, Centro, Belém",
     createdAt: "2020-01-15T12:00:00.000Z",
@@ -109,8 +103,8 @@ test("encerrar follows the owner", () => {
 
   const closed: number[] = [];
   const wired = mountPopup(
+    OccurrencePopup,
     {
-      mode: "occurrence",
       typeName: "Alagamento",
       addressName: "Rua A, Centro",
       createdAt: "2020-01-15T12:00:00.000Z",
@@ -131,8 +125,8 @@ test("encerrar follows the owner", () => {
 test("liked count is pressed", () => {
   const liked: number[] = [];
   const el = mountPopup(
+    OccurrencePopup,
     {
-      mode: "occurrence",
       typeName: "Lixo",
       addressName: "Rua A, Centro, Belém",
       createdAt: "2020-01-15T12:00:00.000Z",

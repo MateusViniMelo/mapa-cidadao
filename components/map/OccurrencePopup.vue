@@ -1,25 +1,37 @@
-<template>
-  <button
-    v-if="mode === 'draft'"
-    type="button"
-    class="mc-inform"
-    @click="emit('inform')"
-  >
-    <svg
-      class="mc-inform__icon"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2.25"
-      stroke-linecap="round"
-      aria-hidden="true"
-    >
-      <path d="M12 4v16M4 12h16" />
-    </svg>
-    Informar Problema
-  </button>
+<script setup lang="ts">
+import { tempoAtras } from "~/util/date";
+import { formatShortAddress } from "~/utils/mapPopup";
 
-  <div v-else class="mc-ficha">
+const {
+  occurrenceId,
+  typeName,
+  likesCount,
+  iconUrl,
+  addressName,
+  createdAt,
+  liked,
+  liking,
+  isOwner,
+} = defineProps<{
+  occurrenceId: number;
+  typeName: string;
+  likesCount: number;
+  iconUrl?: string;
+  addressName?: string;
+  createdAt?: string;
+  liked?: boolean;
+  liking?: boolean;
+  isOwner?: boolean;
+}>();
+
+const emit = defineEmits<{
+  like: [id: number];
+  close: [id: number];
+}>();
+</script>
+
+<template>
+  <div class="mc-ficha">
     <p class="mc-ficha__type">
       <img
         v-if="iconUrl"
@@ -38,7 +50,7 @@
         :aria-pressed="liked"
         :aria-busy="liking"
         :disabled="liking"
-        @click="occurrenceId != null && emit('like', occurrenceId)"
+        @click="emit('like', occurrenceId)"
       >
         <svg
           class="mc-like__icon"
@@ -52,43 +64,19 @@
             d="M12 20.5s-8-4.9-8-11A4.4 4.4 0 0 1 12 6.8a4.4 4.4 0 0 1 8 2.7c0 6.1-8 11-8 11Z"
           />
         </svg>
-        <span data-likes>{{ likesCount ?? 0 }}</span>
+        <span data-likes>{{ likesCount }}</span>
       </button>
       <button
         v-if="isOwner"
         type="button"
         class="mc-end"
-        @click="occurrenceId != null && emit('close', occurrenceId)"
+        @click="emit('close', occurrenceId)"
       >
         Encerrar
       </button>
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-import { tempoAtras } from "~/util/date";
-import { formatShortAddress } from "~/utils/mapPopup";
-
-defineProps<{
-  mode: "draft" | "occurrence";
-  typeName?: string;
-  iconUrl?: string;
-  addressName?: string;
-  createdAt?: string;
-  occurrenceId?: number;
-  likesCount?: number;
-  liked?: boolean;
-  liking?: boolean;
-  isOwner?: boolean;
-}>();
-
-const emit = defineEmits<{
-  inform: [];
-  like: [id: number];
-  close: [id: number];
-}>();
-</script>
 
 <style scoped>
 .mc-ficha {
@@ -172,8 +160,7 @@ const emit = defineEmits<{
   background: color-mix(in oklch, var(--mc-ink) 11%, transparent);
 }
 .mc-like:focus-visible,
-.mc-end:focus-visible,
-.mc-inform:focus-visible {
+.mc-end:focus-visible {
   outline: 2px solid var(--mc-accent);
   outline-offset: 2px;
 }
@@ -208,41 +195,10 @@ const emit = defineEmits<{
   color: var(--mc-urucum-deep);
 }
 
-.mc-inform {
-  display: flex;
-  width: 100%;
-  min-height: 2.75rem;
-  align-items: center;
-  justify-content: center;
-  gap: 0.45rem;
-  margin: 0;
-  padding: 0.6rem 1rem;
-  background: var(--mc-accent);
-  color: var(--mc-on-accent);
-  border: 0;
-  border-radius: var(--mc-radius);
-  font-family: var(--mc-font);
-  font-weight: 700;
-  font-size: 0.95rem;
-  letter-spacing: -0.01em;
-  white-space: nowrap;
-  cursor: pointer;
-  transition: background-color 0.2s var(--mc-ease);
-}
-.mc-inform:hover {
-  background: var(--mc-accent-hover);
-}
-.mc-inform__icon {
-  width: 1rem;
-  height: 1rem;
-  flex: none;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .mc-like,
   .mc-like__icon,
-  .mc-end,
-  .mc-inform {
+  .mc-end {
     transition: none;
   }
 }

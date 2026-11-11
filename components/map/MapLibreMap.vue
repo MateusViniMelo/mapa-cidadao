@@ -7,32 +7,31 @@
     @map:click="onMapClick"
   >
     <MglMarker
-      v-for="ocorrencia in occurrences"
-      :key="ocorrencia.id"
-      :coordinates="occurrenceLngLat(ocorrencia.location.coordinates)"
+      v-for="pin in pins"
+      :key="pin.occurrence.id"
+      :coordinates="pin.coordinates"
       anchor="bottom"
     >
       <template #marker>
         <img
-          :src="markerFor(ocorrencia.type_id).iconUrl"
-          :width="markerFor(ocorrencia.type_id).iconSize[0]"
-          :height="markerFor(ocorrencia.type_id).iconSize[1]"
+          :src="pin.marker.iconUrl"
+          :width="pin.marker.iconSize[0]"
+          :height="pin.marker.iconSize[1]"
           alt=""
           class="mc-pin"
         />
       </template>
       <MglPopup :close-on-click="false" max-width="none">
-        <MapPopupContent
-          mode="occurrence"
-          :type-name="markerFor(ocorrencia.type_id).nome"
-          :icon-url="markerFor(ocorrencia.type_id).iconUrl"
-          :address-name="ocorrencia.address_name"
-          :created-at="ocorrencia.created_at"
-          :occurrence-id="ocorrencia.id"
-          :likes-count="ocorrencia.likes_count"
-          :liked="ocorrencia.liked_by_auth_user"
-          :liking="likingId === ocorrencia.id"
-          :is-owner="userId === ocorrencia.user_id"
+        <OccurrencePopup
+          :type-name="pin.marker.nome"
+          :icon-url="pin.marker.iconUrl"
+          :address-name="pin.occurrence.address_name"
+          :created-at="pin.occurrence.created_at"
+          :occurrence-id="pin.occurrence.id"
+          :likes-count="pin.occurrence.likes_count"
+          :liked="pin.occurrence.liked_by_auth_user"
+          :liking="likingId === pin.occurrence.id"
+          :is-owner="userId === pin.occurrence.user_id"
           @like="emit('like', $event)"
           @close="emit('close', $event)"
         />
@@ -65,7 +64,7 @@
       :close-on-click="false"
       max-width="none"
     >
-      <MapPopupContent mode="draft" @inform="emit('inform')" />
+      <DraftPopup @inform="emit('inform')" />
     </MglPopup>
 
     <MglNavigationControl
@@ -159,11 +158,19 @@ import {
   rasterStyle,
 } from "~/utils/mapBasemap";
 
-defineProps<{
+const { occurrences, userId, likingId } = defineProps<{
   occurrences: IOccurrence[];
   userId: number | null;
   likingId: number | null;
 }>();
+
+const pins = computed(() =>
+  occurrences.map((occurrence) => ({
+    occurrence,
+    marker: markerFor(occurrence.type_id),
+    coordinates: occurrenceLngLat(occurrence.location.coordinates),
+  })),
+);
 
 const point = defineModel<{ lat: number; lng: number } | null>("point", {
   default: null,
