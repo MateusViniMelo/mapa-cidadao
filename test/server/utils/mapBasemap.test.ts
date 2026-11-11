@@ -5,6 +5,7 @@ import {
   MAP_ZOOM,
   currentLocationView,
   occurrenceLngLat,
+  placeCurrentLocation,
   rasterStyle,
 } from "../../../utils/mapBasemap";
 
@@ -46,6 +47,13 @@ test("current location zoom", () => {
     zoom: CURRENT_LOCATION_ZOOM,
   });
   expect(CURRENT_LOCATION_ZOOM).toBe(16);
+});
+
+test("current location places the point and the camera", () => {
+  expect(placeCurrentLocation(-1.45, -48.49)).toEqual({
+    point: { lat: -1.45, lng: -48.49 },
+    view: { center: [-48.49, -1.45], zoom: 16 },
+  });
 });
 
 test("geojson longitude first", () => {

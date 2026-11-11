@@ -42,6 +42,13 @@ export function currentLocationView(latitude: number, longitude: number) {
   };
 }
 
+export function placeCurrentLocation(latitude: number, longitude: number) {
+  return {
+    point: { lat: latitude, lng: longitude },
+    view: currentLocationView(latitude, longitude),
+  };
+}
+
 export function occurrenceLngLat(
   coordinates: [number, number],
 ): [number, number] {

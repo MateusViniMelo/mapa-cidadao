@@ -86,6 +86,36 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: C15 (client)
 - last seen: 2026-11-10T02:50:44Z
 
+### L-013 - When a new request replaces one that already stored a value, assert that value is cleared before the new response arrives.
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `composables` · harmful: 0
+- features: separar-fluxos-mapa
+- evidence: composables/useCreateOccurrence.ts:31 (composables)
+- last seen: 2026-11-11T02:11:43Z
+
+### L-014 - Settle the aborted request while the newer one is still pending, and assert the newer loading flag stays set.
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `composables` · harmful: 0
+- features: separar-fluxos-mapa
+- evidence: composables/useReverseGeocoding.ts:38 (composables)
+- last seen: 2026-11-11T02:11:43Z
+
+### L-015 - Treat a successful empty collection as loaded; do not use a non-empty length as the only loaded flag.
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `composables` · harmful: 0
+- features: separar-fluxos-mapa
+- evidence: composables/useOccurrenceTypes.ts:32 (composables)
+- last seen: 2026-11-11T02:11:43Z
+
+### L-016 - Assert the failure event is emitted and the page shows that notice, not only that the notice text exists.
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `components` · harmful: 0
+- features: separar-fluxos-mapa
+- evidence: C25 (components)
+- last seen: 2026-11-11T02:11:43Z
+
+### L-017 - Run the branch that produces the outcome; a source string that mentions the call is not the behavior.
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `components` · harmful: 0
+- features: separar-fluxos-mapa
+- evidence: C4 (components)
+- last seen: 2026-11-11T02:11:43Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

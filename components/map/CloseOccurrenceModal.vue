@@ -115,15 +115,17 @@ import {
   inactiveOccurrenceSchema,
   type InactivateOccurrenceSchema,
 } from "~/validators/inactivateOccurrenceSchema";
+import { closeOccurrenceSubmission } from "~/utils/occurrencePayload";
 
 const isOpen = defineModel<boolean>("open", { default: false });
 
-defineProps<{
+const props = defineProps<{
+  occurrenceId: number | null;
   loading: boolean;
 }>();
 
 const emit = defineEmits<{
-  submit: [data: InactivateOccurrenceSchema];
+  submit: [submission: InactivateOccurrenceSchema & { id: number }];
   close: [];
 }>();
 
@@ -159,6 +161,7 @@ function resetAndClose() {
 }
 
 function onSubmit(event: FormSubmitEvent<InactivateOccurrenceSchema>) {
-  emit("submit", event.data);
+  if (props.occurrenceId == null) return;
+  emit("submit", closeOccurrenceSubmission(props.occurrenceId, event.data));
 }
 </script>

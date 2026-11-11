@@ -1,0 +1,23 @@
+[
+  {
+    "file": "utils/occurrencePayload.ts",
+    "old": "if (!input.point || input.typeId == null) return null;",
+    "new": "if (!input.point) return null;",
+    "proof": "npx vitest run test/server/utils/occurrencePayload.test.ts -t \"payload refuses a missing category\"",
+    "label": "C10 category guard dropped"
+  },
+  {
+    "file": "composables/useCreateOccurrence.ts",
+    "old": "      controller = next;\n      address.value = null;",
+    "new": "      controller = next;",
+    "proof": "npx vitest run test/server/composables/useCreateOccurrence.test.ts -t \"a second search keeps its address\"",
+    "label": "C18 stored address not cleared when a new search starts"
+  },
+  {
+    "file": "composables/useReverseGeocoding.ts",
+    "old": "if (id === active) carregando.value = false;",
+    "new": "carregando.value = false;",
+    "proof": "npx vitest run test/server/composables/useCreateOccurrence.test.ts -t \"the newer search stays loading\"",
+    "label": "C19 stale search clears the newer loading flag"
+  }
+]

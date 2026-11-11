@@ -114,7 +114,7 @@
           class="mc-locate"
           :disabled="locating"
           :aria-busy="locating"
-          @click="emit('locate')"
+          @click="onLocate"
         >
           <span v-if="locating" class="mc-locate__spin" aria-hidden="true" />
           <svg
@@ -139,6 +139,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
+import { useCurrentLocation } from "~/composables/useCurrentLocation";
 import {
   MglCustomControl,
   MglMap,
@@ -152,15 +153,14 @@ import { legendMarkers, markerFor, markerIcons } from "~/util/makerIcons";
 import {
   MAP_CENTER,
   MAP_ZOOM,
-  currentLocationView,
   occurrenceLngLat,
+  placeCurrentLocation,
   rasterStyle,
 } from "~/utils/mapBasemap";
 
 defineProps<{
   occurrences: IOccurrence[];
   userId: number | null;
-  locating: boolean;
 }>();
 
 const point = defineModel<{ lat: number; lng: number } | null>("point", {
@@ -171,7 +171,7 @@ const emit = defineEmits<{
   inform: [];
   like: [id: number];
   close: [id: number];
-  locate: [];
+  "locate-error": [reason: "unavailable" | "denied"];
 }>();
 
 const cartoApiKey = useRuntimeConfig().public.cartoApiKey;
@@ -185,6 +185,7 @@ const draftPopupOffset: [number, number] = [
   -(markerIcons.Padrao.iconSize[1] + 10),
 ];
 const focusToken = ref(0);
+const { locating, request } = useCurrentLocation();
 const mapInstance = useMap();
 
 const draftCoordinates = computed({
@@ -218,14 +219,29 @@ function onMapClick(payload: {
   focusToken.value += 1;
 }
 
-function showCurrentLocation(latitude: number, longitude: number) {
-  const view = currentLocationView(latitude, longitude);
-  mapInstance.map?.jumpTo(view);
-  point.value = { lat: latitude, lng: longitude };
+async function onLocate() {
+  const outcome = await request(
+    "geolocation" in navigator ? navigator.geolocation : undefined,
+  );
+  if (outcome.status === "unavailable") {
+    emit("locate-error", "unavailable");
+    return;
+  }
+  if (outcome.status === "denied") {
+    const err = outcome.error;
+    console.error("Erro ao obter localização:", err);
+    emit("locate-error", "denied");
+    return;
+  }
+  const coords = {
+    latitude: outcome.latitude,
+    longitude: outcome.longitude,
+  };
+  const placed = placeCurrentLocation(coords.latitude, coords.longitude);
+  mapInstance.map?.jumpTo(placed.view);
+  point.value = placed.point;
   focusToken.value += 1;
 }
-
-defineExpose({ showCurrentLocation, occurrenceLngLat });
 </script>
 
 <style scoped>

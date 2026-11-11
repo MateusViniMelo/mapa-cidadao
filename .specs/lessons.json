@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 13,
+  "next_id": 18,
   "lessons": [
     {
       "id": "L-001",
@@ -220,6 +220,96 @@
       ],
       "created": "2026-11-10T02:50:44Z",
       "last_seen": "2026-11-10T02:50:44Z"
+    },
+    {
+      "id": "L-013",
+      "key": "surviving_mutant::when a new request replaces one that already stored a value assert that value is cleared before the new response arrives",
+      "text": "When a new request replaces one that already stored a value, assert that value is cleared before the new response arrives.",
+      "signal": "surviving_mutant",
+      "scope": "composables",
+      "status": "candidate",
+      "features": [
+        "separar-fluxos-mapa"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "composables/useCreateOccurrence.ts:31 (composables)"
+      ],
+      "created": "2026-11-11T02:11:43Z",
+      "last_seen": "2026-11-11T02:11:43Z"
+    },
+    {
+      "id": "L-014",
+      "key": "surviving_mutant::settle the aborted request while the newer one is still pending and assert the newer loading flag stays set",
+      "text": "Settle the aborted request while the newer one is still pending, and assert the newer loading flag stays set.",
+      "signal": "surviving_mutant",
+      "scope": "composables",
+      "status": "candidate",
+      "features": [
+        "separar-fluxos-mapa"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "composables/useReverseGeocoding.ts:38 (composables)"
+      ],
+      "created": "2026-11-11T02:11:43Z",
+      "last_seen": "2026-11-11T02:11:43Z"
+    },
+    {
+      "id": "L-015",
+      "key": "ac_gap::treat a successful empty collection as loaded do not use a non empty length as the only loaded flag",
+      "text": "Treat a successful empty collection as loaded; do not use a non-empty length as the only loaded flag.",
+      "signal": "ac_gap",
+      "scope": "composables",
+      "status": "candidate",
+      "features": [
+        "separar-fluxos-mapa"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "composables/useOccurrenceTypes.ts:32 (composables)"
+      ],
+      "created": "2026-11-11T02:11:43Z",
+      "last_seen": "2026-11-11T02:11:43Z"
+    },
+    {
+      "id": "L-016",
+      "key": "spec_precision_gap::assert the failure event is emitted and the page shows that notice not only that the notice text exists",
+      "text": "Assert the failure event is emitted and the page shows that notice, not only that the notice text exists.",
+      "signal": "spec_precision_gap",
+      "scope": "components",
+      "status": "candidate",
+      "features": [
+        "separar-fluxos-mapa"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "C25 (components)"
+      ],
+      "created": "2026-11-11T02:11:43Z",
+      "last_seen": "2026-11-11T02:11:43Z"
+    },
+    {
+      "id": "L-017",
+      "key": "spec_precision_gap::run the branch that produces the outcome a source string that mentions the call is not the behavior",
+      "text": "Run the branch that produces the outcome; a source string that mentions the call is not the behavior.",
+      "signal": "spec_precision_gap",
+      "scope": "components",
+      "status": "candidate",
+      "features": [
+        "separar-fluxos-mapa"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "C4 (components)"
+      ],
+      "created": "2026-11-11T02:11:43Z",
+      "last_seen": "2026-11-11T02:11:43Z"
     }
   ]
 }

@@ -2,15 +2,13 @@
   <div class="mc-surface">
     <div class="mc-plate relative w-full overflow-hidden">
       <MapLibreMap
-        ref="mapRef"
         v-model:point="localizacaoSelecionada"
         :occurrences="occurrences"
         :user-id="authStore.user?.id ?? null"
-        :locating="locating"
         @inform="openCreateModal"
         @like="onLike"
         @close="onCloseRequest"
-        @locate="onLocate"
+        @locate-error="onLocateError"
       />
       <MapLoadingOverlay v-if="loadingOccurrences" />
     </div>
@@ -18,77 +16,47 @@
 
   <CreateOccurrenceModal
     v-model:open="modalAberto"
-    v-model:selected-type="selectedType"
-    v-model:description="descricao"
-    :address="enderecoAchado"
-    :loading-address="carregando"
-    :address-error="erroEndereco != null"
-    :type-options="typeOptions"
-    :loading="occurrenceStore.loading || carregando"
-    :max-length="MAX_DESCRIPTION_LENGTH"
+    :point="localizacaoSelecionada"
+    :inform-token="informToken"
+    :loading="occurrenceStore.loading"
     @submit="salvarOcorrencia"
-    @close="resetCreateForm"
+    @missing-point="onMissingPoint"
+    @types-error="onTypesError"
   />
 
   <CloseOccurrenceModal
     v-model:open="modalFinalizarOcorrencia"
+    :occurrence-id="occurrenceToClose"
     :loading="occurrenceStore.loading"
     @submit="onSubmitInactivateOccurrence"
-    @close="resetCloseForm"
+    @close="onCloseFinished"
   />
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
-import { useReverseGeocoding } from "~/composables/useReverseGeocoding";
-import type { EnderecoNominatim } from "~/interfaces/EnderecoNominatim";
-import type { ILocationPoint } from "~/interfaces/ILocationPoint";
+import { onMounted, ref, shallowRef } from "vue";
 import type { IOccurrencePayload } from "~/interfaces/IOccurrencePayload";
-import type { ITypeOccurrence } from "~/interfaces/ITypeOccurrence";
-import { mapNotices } from "~/utils/mapNotices";
-import { toRequestCoordinates } from "~/utils/occurrencePoint";
+import { locateFailureNotice, mapNotices } from "~/utils/mapNotices";
 import type { InactivateOccurrenceSchema } from "~/validators/inactivateOccurrenceSchema";
-
-const MAX_DESCRIPTION_LENGTH = 250;
 
 const authStore = useAuthStore();
 const occurrenceStore = useOccurrenceStore();
 const { occurrences, loadingOccurrences } = storeToRefs(occurrenceStore);
 const toast = useToast();
-const { buscarEndereco, carregando, erroEndereco } = useReverseGeocoding();
 
-const mapRef = ref<{
-  showCurrentLocation: (latitude: number, longitude: number) => void;
-} | null>(null);
 const localizacaoSelecionada = ref<{ lat: number; lng: number } | null>(null);
-const locating = ref(false);
-const descricao = ref("");
-const enderecoAchado = ref<EnderecoNominatim | null>(null);
+const informToken = shallowRef(0);
 const modalAberto = ref(false);
 const modalFinalizarOcorrencia = ref(false);
-const ocorrenciaRemover = ref<number | null>(null);
-const types = ref<ITypeOccurrence[]>([]);
-const selectedType = ref<number | undefined>(undefined);
-
-const typeOptions = computed(() =>
-  types.value.map((type) => ({
-    label: type.name,
-    value: type.id,
-  })),
-);
-
-function resetCreateForm() {
-  enderecoAchado.value = null;
-  descricao.value = "";
-}
-
-function resetCloseForm() {
-  ocorrenciaRemover.value = null;
-}
+const occurrenceToClose = shallowRef<number | null>(null);
 
 function onCloseRequest(id: number) {
-  ocorrenciaRemover.value = id;
+  occurrenceToClose.value = id;
   modalFinalizarOcorrencia.value = true;
+}
+
+function onCloseFinished() {
+  occurrenceToClose.value = null;
 }
 
 async function onLike(id: number) {
@@ -99,108 +67,56 @@ async function onLike(id: number) {
   }
 }
 
-async function onSubmitInactivateOccurrence(data: InactivateOccurrenceSchema) {
-  if (ocorrenciaRemover.value == null) return;
+async function onSubmitInactivateOccurrence(
+  submission: InactivateOccurrenceSchema & { id: number },
+) {
+  const { id, ...data } = submission;
 
   try {
-    await occurrenceStore.inactive(data, ocorrenciaRemover.value);
+    await occurrenceStore.inactive(data, id);
     modalFinalizarOcorrencia.value = false;
-    resetCloseForm();
+    onCloseFinished();
     toast.add(mapNotices.inactivated);
   } catch {
     toast.add(mapNotices.inactivateError);
   }
 }
 
-async function salvarOcorrencia() {
-  if (!localizacaoSelecionada.value) {
-    toast.add(mapNotices.pointRequired);
-    return;
-  }
-
-  const location: ILocationPoint = {
-    type: "Point",
-    coordinates: toRequestCoordinates(
-      localizacaoSelecionada.value.lat,
-      localizacaoSelecionada.value.lng,
-    ),
-  };
-
-  const occurrencePayload: IOccurrencePayload = {
-    location,
-    type_id: selectedType.value ?? 1,
-    description: descricao.value,
-    address_name: enderecoAchado.value?.display_name,
-    city: enderecoAchado.value?.address.city,
-    state: enderecoAchado.value?.address.state,
-    country: enderecoAchado.value?.address.country,
-  };
-
+async function salvarOcorrencia(payload: IOccurrencePayload) {
   try {
-    await occurrenceStore.addOccurrence(occurrencePayload);
+    await occurrenceStore.addOccurrence(payload);
     toast.add(mapNotices.created);
   } catch {
     toast.add(mapNotices.createError);
   } finally {
-    resetCreateForm();
     modalAberto.value = false;
   }
 }
 
-async function openCreateModal() {
+function openCreateModal() {
   if (!authStore.user) {
     toast.add(mapNotices.loginRequired);
     return;
   }
 
   modalAberto.value = true;
-
-  if (localizacaoSelecionada.value) {
-    enderecoAchado.value =
-      (await buscarEndereco(
-        localizacaoSelecionada.value.lat,
-        localizacaoSelecionada.value.lng,
-      )) ?? null;
-  }
+  informToken.value += 1;
 }
 
-function onLocate() {
-  locating.value = true;
+function onMissingPoint() {
+  toast.add(mapNotices.pointRequired);
+}
 
-  const finalizar = () => {
-    locating.value = false;
-  };
+function onTypesError() {
+  toast.add(mapNotices.typesError);
+}
 
-  if (!("geolocation" in navigator)) {
-    toast.add(mapNotices.geoUnavailable);
-    finalizar();
-    return;
-  }
-
-  navigator.geolocation.getCurrentPosition(
-    ({ coords }) => {
-      mapRef.value?.showCurrentLocation(coords.latitude, coords.longitude);
-      finalizar();
-    },
-    (err) => {
-      toast.add(mapNotices.geoDenied);
-      console.error("Erro ao obter localização:", err);
-      finalizar();
-    },
-  );
+function onLocateError(reason: "unavailable" | "denied") {
+  toast.add(locateFailureNotice(reason));
 }
 
 onMounted(async () => {
   await occurrenceStore.loadOccurrences();
-
-  try {
-    const { types_occurrence } = await $fetch<{
-      types_occurrence: ITypeOccurrence[];
-    }>("/api/types-occurrence");
-    types.value = types_occurrence;
-  } catch (error) {
-    console.error("Erro ao carregar tipos de ocorrência:", error);
-  }
 });
 </script>
 

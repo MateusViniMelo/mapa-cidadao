@@ -36,11 +36,11 @@
 
 ## Handoff
 
-- **Feature**: sessao-cookie (`.specs/features/sessao-cookie/`) fechada. Gate `validate_verification.py` saiu 0. Sem commit.
-- **Phase / Task**: T1–T5 Done. Verifier independent, mutações 3 mortas, `Closed` em C26, C17, C13 e C15/C21/C25.
-- **Completed**: Cookie HttpOnly de 7 dias, cliente no mesmo origin, passe no browser (toast de senha errada, toast de login, sem reload, `document.cookie` vazio).
+- **Feature**: separar-fluxos-mapa (`.specs/features/separar-fluxos-mapa/`) fechada. Gate `validate_verification.py` saiu 0. Sem commit.
+- **Phase / Task**: T1–T8 Done. Verifier independent, mutações 3 mortas, `Closed` em C18, C19, C24, C25 e C4, C5, C8, C22.
+- **Completed**: A página só coordena ponto, toasts, curtida e store. O mapa pede a localização. O rascunho emite o payload e cancela a busca anterior. O encerramento devolve o id. O catálogo carrega quando o diálogo abre.
 - **In-progress**: nenhum arquivo desta feature.
-- **Next step**: migrar-backend continua com o verificador antigo em FAIL e `Closed` vazio, fora deste corte. Não redespachar esse verificador. O passe, se for retomado, está no relatório `.specs/features/migrar-backend/verification.md`. Não commitar.
+- **Next step**: migrar-backend continua com o verificador antigo em FAIL e `Closed` vazio, fora deste corte. Não redespachar esse verificador. Não commitar.
 - **Blockers**: nenhum.
-- **Uncommitted files**: branch `main`, árvore suja. Sessão cookie, migration `expires_at` e o passe do verificador. Nada commitado.
+- **Uncommitted files**: branch `main`, árvore suja. O corte do mapa, os specs e as lições. Nada commitado.
 - **Branch**: main

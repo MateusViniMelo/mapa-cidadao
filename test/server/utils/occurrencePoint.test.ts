@@ -3,10 +3,10 @@ import { expect, test } from "vitest";
 import { toRequestCoordinates } from "../../../utils/occurrencePoint";
 
 test("click becomes longitude first", () => {
-  const map = readFileSync("components/map/OccurrenceMap.vue", "utf8");
+  const payload = readFileSync("utils/occurrencePayload.ts", "utf8");
 
   expect(toRequestCoordinates(-23.55052, -46.633308)).toEqual([-46.633308, -23.55052]);
-  expect(map).toContain(
-    "coordinates: toRequestCoordinates(\n      localizacaoSelecionada.value.lat,\n      localizacaoSelecionada.value.lng,\n    )",
+  expect(payload).toContain(
+    "coordinates: toRequestCoordinates(input.point.lat, input.point.lng)",
   );
 });

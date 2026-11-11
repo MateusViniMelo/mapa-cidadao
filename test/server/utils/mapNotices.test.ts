@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { expect, test } from "vitest";
 import { legendMarkers, markerFor } from "../../../util/makerIcons";
-import { mapNotices } from "../../../utils/mapNotices";
+import { locateFailureNotice, mapNotices } from "../../../utils/mapNotices";
 
 test("map notices", () => {
   expect(mapNotices.loginRequired).toEqual({
@@ -47,6 +47,25 @@ test("map notices", () => {
     "Verifique se você concedeu permissão de acesso à sua localização para este site nas configurações do navegador e tente novamente.",
   );
   expect(mapNotices.geoDenied.duration).toBe(10000);
+});
+
+test("category failure toast", () => {
+  expect(mapNotices.typesError).toEqual({
+    title: "Erro",
+    description: "Não foi possível carregar as categorias.",
+    color: "error",
+  });
+});
+
+test("denied geolocation uses the denied notice", () => {
+  const notice = locateFailureNotice("denied");
+
+  expect(notice).toBe(mapNotices.geoDenied);
+  expect(notice.duration).toBe(10000);
+  expect(notice.title).toBe("Não foi possível obter sua localização.");
+  expect(notice.description).toBe(
+    "Verifique se você concedeu permissão de acesso à sua localização para este site nas configurações do navegador e tente novamente.",
+  );
 });
 
 test("legend names", () => {

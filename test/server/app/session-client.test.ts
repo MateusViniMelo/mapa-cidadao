@@ -66,8 +66,10 @@ test("occurrences store calls same origin", () => {
 });
 
 test("map loads types from the same origin", () => {
-  expect(map).toContain('"/api/types-occurrence"');
-  expect(map).not.toContain("useTypesOccurrencesService");
+  const types = source("composables/useOccurrenceTypes.ts");
+  expect(types).toContain('"/api/types-occurrence"');
+  expect(types).not.toContain("useTypesOccurrencesService");
+  expect(map).not.toContain('"/api/types-occurrence"');
 });
 
 test("fetch wrappers are gone", () => {

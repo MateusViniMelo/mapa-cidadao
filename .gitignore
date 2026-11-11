@@ -31,3 +31,6 @@ logs
 
 # Runbook local do agente
 .cursor/napkin.md
+
+# Relatório regenerável do check_proofs.py
+.specs/features/**/proofs.md

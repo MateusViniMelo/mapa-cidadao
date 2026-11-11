@@ -17,10 +17,10 @@
     }"
   >
     <template #body>
-      <form class="space-y-5" @submit.prevent="emit('submit')">
+      <form class="space-y-5" @submit.prevent="onSubmit">
         <UFormField label="Endereço" size="lg" readonly>
           <UInput
-            :loading="loadingAddress"
+            :loading="carregando"
             size="lg"
             :value="address?.display_name ?? null"
             readonly
@@ -74,7 +74,7 @@
 
         <UButton
           type="submit"
-          :loading="loading"
+          :loading="loading || carregando"
           :disabled="selectedType == null"
           color="tertiary"
           :ui="{ base: 'mc-btn' }"
@@ -88,23 +88,66 @@
 </template>
 
 <script setup lang="ts">
-import type { EnderecoNominatim } from "~/interfaces/EnderecoNominatim";
+import { computed, watch } from "vue";
+import { useCreateOccurrence } from "~/composables/useCreateOccurrence";
+import { typesErrorWhileOpen } from "~/composables/useOccurrenceTypes";
+import type { IOccurrencePayload } from "~/interfaces/IOccurrencePayload";
+
+const MAX_LENGTH = 250;
 
 const isOpen = defineModel<boolean>("open", { default: false });
-const selectedType = defineModel<number | undefined>("selectedType");
-const description = defineModel<string>("description", { default: "" });
 
-defineProps<{
-  address: EnderecoNominatim | null;
-  loadingAddress: boolean;
-  addressError: boolean;
-  typeOptions: Array<{ label: string; value: number }>;
+const props = defineProps<{
+  point: { lat: number; lng: number } | null;
+  informToken: number;
   loading: boolean;
-  maxLength: number;
 }>();
 
 const emit = defineEmits<{
-  submit: [];
+  submit: [payload: IOccurrencePayload];
+  "missing-point": [];
+  "types-error": [];
   close: [];
 }>();
+
+const {
+  description,
+  selectedType,
+  address,
+  carregando,
+  erroEndereco,
+  typeOptions,
+  begin,
+  resetDraft,
+  payload,
+} = useCreateOccurrence();
+
+const maxLength = MAX_LENGTH;
+const addressError = computed(() => erroEndereco.value != null);
+
+watch(
+  () => [isOpen.value, props.informToken] as const,
+  async ([open], _previous, onCleanup) => {
+    let current = true;
+    onCleanup(() => {
+      current = false;
+    });
+    if (!open) {
+      resetDraft();
+      return;
+    }
+    const result = await begin(props.point);
+    if (typesErrorWhileOpen(current, result)) emit("types-error");
+  },
+);
+
+function onSubmit() {
+  if (!props.point) {
+    emit("missing-point");
+    return;
+  }
+  const next = payload(props.point);
+  if (!next) return;
+  emit("submit", next);
+}
 </script>

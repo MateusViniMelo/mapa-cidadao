@@ -47,4 +47,14 @@ export const mapNotices = {
     color: "error" as const,
     duration: 10000,
   },
+  typesError: {
+    title: "Erro",
+    description: "Não foi possível carregar as categorias.",
+    color: "error" as const,
+  },
 };
+
+export function locateFailureNotice(reason: "unavailable" | "denied") {
+  if (reason === "unavailable") return mapNotices.geoUnavailable;
+  return mapNotices.geoDenied;
+}
