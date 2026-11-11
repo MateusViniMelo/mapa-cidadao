@@ -1,9 +1,14 @@
 <template>
-  <div class="flex flex-col min-h-screen">
+  <div class="mc-shell">
     <Navbar />
-    <main class="flex-1 bg-white dark:bg-gray-900 lg:p-0">
+    <main class="mc-main">
       <slot />
     </main>
-    <Footer />
+    <Footer v-if="!isMap" />
   </div>
 </template>
+
+<script setup lang="ts">
+const route = useRoute();
+const isMap = computed(() => route.path === "/");
+</script>

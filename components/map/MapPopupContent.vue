@@ -20,7 +20,15 @@
   </button>
 
   <div v-else class="mc-ficha">
-    <p class="mc-ficha__type">{{ typeName }}</p>
+    <p class="mc-ficha__type">
+      <img
+        v-if="iconUrl"
+        :src="iconUrl"
+        alt=""
+        class="mc-ficha__pin"
+      />
+      <span>{{ typeName }}</span>
+    </p>
     <p class="mc-ficha__address" data-address>{{ formatShortAddress(addressName ?? "") }}</p>
     <p class="mc-ficha__when" data-when>{{ createdAt ? tempoAtras(createdAt) : "" }}</p>
     <div class="mc-ficha__actions">
@@ -63,6 +71,7 @@ import { formatShortAddress } from "~/utils/mapPopup";
 defineProps<{
   mode: "draft" | "occurrence";
   typeName?: string;
+  iconUrl?: string;
   addressName?: string;
   createdAt?: string;
   occurrenceId?: number;
@@ -81,7 +90,7 @@ const emit = defineEmits<{
 <style scoped>
 .mc-ficha {
   font-family: var(--mc-font);
-  font-weight: 550;
+  font-weight: 400;
   color: var(--mc-ink);
   text-align: left;
 }
@@ -92,18 +101,26 @@ const emit = defineEmits<{
   padding-inline: 1rem;
 }
 .mc-ficha__type {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   padding-top: 0.9rem;
-  padding-right: 2.4rem;
+  padding-right: 3.4rem;
   font-size: 1.05rem;
-  font-weight: 680;
+  font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1.2;
   text-wrap: balance;
 }
+.mc-ficha__pin {
+  width: 1.15rem;
+  height: auto;
+  flex: none;
+}
 .mc-ficha__address {
   margin-top: 0.3rem;
   font-size: 0.86rem;
-  font-weight: 450;
+  font-weight: 400;
   line-height: 1.35;
   color: var(--mc-ink-soft);
   overflow-wrap: anywhere;
@@ -114,7 +131,7 @@ const emit = defineEmits<{
 .mc-ficha__when {
   margin-top: 0.35rem;
   font-size: 0.75rem;
-  font-weight: 550;
+  font-weight: 400;
   color: var(--mc-ink-soft);
 }
 .mc-ficha__when:empty {
@@ -128,21 +145,22 @@ const emit = defineEmits<{
   gap: 0.75rem;
   margin-top: 0.75rem;
   padding: 0.55rem 0.85rem 0.75rem;
+  border-top: 1px solid var(--mc-rule);
 }
 
 .mc-like {
   display: inline-flex;
-  min-height: 2.25rem;
+  min-height: 2.75rem;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.25rem 0.75rem 0.25rem 0.6rem;
+  padding: 0.25rem 0.85rem 0.25rem 0.7rem;
   background: color-mix(in oklch, var(--mc-ink) 6%, transparent);
   color: var(--mc-ink);
   border: 0;
-  border-radius: 999px;
+  border-radius: var(--mc-radius);
   font: inherit;
   font-size: 0.9rem;
-  font-weight: 650;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
   cursor: pointer;
   transition: background-color 0.2s var(--mc-ease);
@@ -172,14 +190,14 @@ const emit = defineEmits<{
 }
 
 .mc-end {
-  min-height: 2.25rem;
-  padding: 0.25rem 0.35rem;
+  min-height: 2.75rem;
+  padding: 0.25rem 0.55rem;
   background: none;
   border: 0;
   color: var(--mc-ink-soft);
   font: inherit;
   font-size: 0.88rem;
-  font-weight: 650;
+  font-weight: 700;
   cursor: pointer;
   transition: color 0.2s var(--mc-ease);
 }
@@ -189,19 +207,19 @@ const emit = defineEmits<{
 
 .mc-inform {
   display: flex;
-  width: calc(100% - 1.2rem);
+  width: 100%;
   min-height: 2.75rem;
   align-items: center;
   justify-content: center;
   gap: 0.45rem;
-  margin: 0.6rem;
+  margin: 0;
   padding: 0.6rem 1rem;
   background: var(--mc-accent);
   color: var(--mc-on-accent);
   border: 0;
-  border-radius: 999px;
+  border-radius: var(--mc-radius);
   font-family: var(--mc-font);
-  font-weight: 650;
+  font-weight: 700;
   font-size: 0.95rem;
   letter-spacing: -0.01em;
   white-space: nowrap;

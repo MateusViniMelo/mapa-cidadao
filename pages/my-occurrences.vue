@@ -1,19 +1,27 @@
 <template>
-  <div class="mx-auto container p-4">
-    <h1 class="text-2xl font-bold mb-4 dark:text-white">Minhas Ocorrências</h1>
+  <div class="mc-page">
+    <header>
+      <h1 class="mc-display">Minhas Ocorrências</h1>
+      <p class="mc-lead">
+        O que você registrou no mapa, com o status de cada uma.
+      </p>
+    </header>
 
     <UTable
       :loading="loading"
       loading-color="tertiary"
       :data="myOccurrences?.data"
       :columns="columns"
-      class="flex-1"
-    />
-
-    <div
-      v-if="myOccurrences?.data"
-      class="flex justify-center border-t border-default pt-4"
+      class="mc-table"
     >
+      <template #empty>
+        <p v-if="!loading" class="mc-empty">
+          As ocorrências que você criar no mapa aparecem aqui.
+        </p>
+      </template>
+    </UTable>
+
+    <div v-if="myOccurrences?.total" class="mc-pager">
       <UPagination
         v-model:page="currentPage"
         :disabled="loading"

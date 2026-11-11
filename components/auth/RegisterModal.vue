@@ -6,52 +6,71 @@
     :close="{
       color: 'tertiary',
       variant: 'outline',
-      class: 'rounded-full cursor-pointer',
+      class: 'mc-dialog__close',
       onClick: resetForm,
     }"
+    :ui="{
+      overlay: 'mc-overlay',
+      content: 'mc-dialog',
+      header: 'mc-dialog__header',
+      title: 'mc-dialog__title',
+      body: 'mc-dialog__body',
+    }"
   >
-    <span
-      class="text-indigo-700 hover:underline dark:text-indigo-500 cursor-pointer"
-      @click="isOpen = true"
-    >
+    <button type="button" class="mc-text-link" @click="isOpen = true">
       Criar conta
-    </span>
+    </button>
 
     <template #body>
       <UForm
         :schema="registerUserSchema"
         :state="state"
-        class="space-y-4"
+        class="space-y-5"
         @submit="onSubmit"
       >
-        <UFormField label="Nome" name="name" class="w-full">
-          <UInput v-model="state.name" class="w-full" color="tertiary" />
+        <UFormField label="Nome" name="name" class="w-full" size="lg">
+          <UInput
+            v-model="state.name"
+            class="w-full"
+            color="tertiary"
+            size="lg"
+            :ui="{ base: 'mc-field' }"
+          />
         </UFormField>
 
-        <div class="flex justify-between space-x-4">
-          <UFormField label="Email" name="email" class="w-full">
-            <UInput v-model="state.email" class="w-full" color="tertiary" />
+        <div class="grid gap-5 sm:grid-cols-2">
+          <UFormField label="Email" name="email" class="w-full" size="lg">
+            <UInput
+              v-model="state.email"
+              class="w-full"
+              color="tertiary"
+              size="lg"
+              :ui="{ base: 'mc-field' }"
+            />
           </UFormField>
-          <UFormField label="Data de nascimento" name="date_birth" class="w-full">
+          <UFormField label="Data de nascimento" name="date_birth" class="w-full" size="lg">
             <UInput
               v-model="state.date_birth"
               color="tertiary"
               class="w-full"
+              size="lg"
               type="date"
+              :ui="{ base: 'mc-field' }"
             />
           </UFormField>
         </div>
 
         <div class="space-y-2">
-          <UFormField label="Senha" name="password">
+          <UFormField label="Senha" name="password" size="lg">
             <UInput
               v-model="state.password"
               placeholder="Digite sua senha"
               :color="passwordColor"
+              size="lg"
               :type="showPassword ? 'text' : 'password'"
               :aria-invalid="passwordScore < 5"
               aria-describedby="password-strength"
-              :ui="{ trailing: 'pe-1' }"
+              :ui="{ base: 'mc-field', trailing: 'pe-1' }"
               class="w-full"
             >
               <template #trailing>
@@ -101,14 +120,15 @@
           </ul>
         </div>
 
-        <UFormField label="Confirmar Senha" name="password_confirmation" class="w-full">
+        <UFormField label="Confirmar Senha" name="password_confirmation" class="w-full" size="lg">
           <UInput
             v-model="state.password_confirmation"
             class="w-full"
             color="tertiary"
+            size="lg"
             placeholder="Confirme a sua senha"
             :type="showPasswordConfirmation ? 'text' : 'password'"
-            :ui="{ trailing: 'pe-1' }"
+            :ui="{ base: 'mc-field', trailing: 'pe-1' }"
           >
             <template #trailing>
               <UButton
@@ -126,9 +146,10 @@
 
         <UButton
           type="submit"
+          color="tertiary"
           :loading="authStore.loading"
-          class="w-full flex justify-center"
-          :ui="{ base: primaryButtonClass }"
+          :ui="{ base: 'mc-btn' }"
+          block
         >
           Cadastrar
         </UButton>
@@ -143,9 +164,6 @@ import {
   registerUserSchema,
   type RegisterUserSchema,
 } from "~/validators/registerUserSchema";
-
-const primaryButtonClass =
-  "text-white bg-indigo-700 hover:bg-indigo-800 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800 cursor-pointer";
 
 const showPassword = ref(false);
 const showPasswordConfirmation = ref(false);

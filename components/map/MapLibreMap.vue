@@ -25,6 +25,7 @@
         <MapPopupContent
           mode="occurrence"
           :type-name="markerFor(ocorrencia.type_id).nome"
+          :icon-url="markerFor(ocorrencia.type_id).iconUrl"
           :address-name="ocorrencia.address_name"
           :created-at="ocorrencia.created_at"
           :occurrence-id="ocorrencia.id"
@@ -58,17 +59,45 @@
       v-if="point"
       :key="focusToken"
       :coordinates="[point.lng, point.lat]"
+      anchor="bottom"
+      :offset="draftPopupOffset"
       :close-on-click="false"
       max-width="none"
     >
       <MapPopupContent mode="draft" @inform="emit('inform')" />
     </MglPopup>
 
+    <MglNavigationControl
+      position="top-right"
+      :show-compass="false"
+      :show-zoom="true"
+    />
+
     <MglCustomControl position="bottom-right" class="maplibregl-ctrl mc-floating">
       <div class="mc-ctrl" @click.stop>
         <div class="mc-legend-card">
-          <p class="mc-legend__title">Legenda</p>
-          <ul class="mc-legend">
+          <button
+            type="button"
+            class="mc-legend__toggle"
+            :aria-expanded="legendOpen"
+            aria-controls="map-legend"
+            @click="legendOpen = !legendOpen"
+          >
+            <span>Legenda</span>
+            <svg
+              class="mc-legend__chevron"
+              :class="{ 'is-open': legendOpen }"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              aria-hidden="true"
+            >
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </button>
+          <ul v-show="legendOpen" id="map-legend" class="mc-legend">
             <li v-for="item in legend" :key="item.nome" class="mc-legend__item">
               <img
                 :src="item.iconUrl"
@@ -114,6 +143,7 @@ import {
   MglCustomControl,
   MglMap,
   MglMarker,
+  MglNavigationControl,
   MglPopup,
   useMap,
 } from "@indoorequal/vue-maplibre-gl";
@@ -147,6 +177,13 @@ const emit = defineEmits<{
 const cartoApiKey = useRuntimeConfig().public.cartoApiKey;
 const style = computed(() => rasterStyle(cartoApiKey));
 const legend = legendMarkers();
+const legendOpen = ref(
+  import.meta.client ? window.matchMedia("(min-width: 640px)").matches : true,
+);
+const draftPopupOffset: [number, number] = [
+  0,
+  -(markerIcons.Padrao.iconSize[1] + 10),
+];
 const focusToken = ref(0);
 const mapInstance = useMap();
 
@@ -217,18 +254,19 @@ defineExpose({ showCurrentLocation, occurrenceLngLat });
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
-  width: min(16rem, calc(100vw - 4.5rem));
+  width: min(18rem, calc(100vw - 4.5rem));
   background: transparent;
   color: var(--mc-ink);
   font-family: var(--mc-font);
-  font-weight: 550;
-  line-height: 1.25;
+  font-weight: 400;
+  line-height: 1.3;
   text-align: left;
 }
 
 .mc-legend-card {
   overflow: hidden;
   background: var(--mc-card);
+  border: 1px solid var(--mc-rule);
   border-radius: var(--mc-radius);
   box-shadow: var(--mc-shadow);
 }
@@ -244,11 +282,11 @@ defineExpose({ showCurrentLocation, occurrenceLngLat });
   background: var(--mc-accent);
   color: var(--mc-on-accent);
   border: 0;
-  border-radius: 999px;
+  border-radius: var(--mc-radius);
   box-shadow: var(--mc-shadow);
   font-family: inherit;
-  font-size: 0.92rem;
-  font-weight: 650;
+  font-size: 0.95rem;
+  font-weight: 700;
   letter-spacing: -0.01em;
   cursor: pointer;
   transition: background-color 0.2s var(--mc-ease);
@@ -279,55 +317,65 @@ defineExpose({ showCurrentLocation, occurrenceLngLat });
   animation: mc-spin 0.8s linear infinite;
 }
 
-.mc-legend__title {
-  margin: 0;
-  padding: 0.75rem 0.9rem 0.15rem;
-  font-size: 0.72rem;
-  font-weight: 650;
-  letter-spacing: -0.01em;
-  color: var(--mc-ink-soft);
+.mc-legend__toggle {
+  display: flex;
+  width: 100%;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.55rem 0.85rem;
+  background: transparent;
+  color: var(--mc-ink);
+  border: 0;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+}
+.mc-legend__toggle:hover {
+  background: color-mix(in oklch, var(--mc-accent) 10%, transparent);
+}
+.mc-legend__toggle:focus-visible {
+  outline: 2px solid var(--mc-accent);
+  outline-offset: -2px;
+}
+.mc-legend__chevron {
+  width: 1rem;
+  height: 1rem;
+  flex: none;
+  transition: transform 0.2s var(--mc-ease);
+}
+.mc-legend__chevron.is-open {
+  transform: rotate(180deg);
 }
 
 .mc-legend {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.35rem 0.6rem;
+  grid-template-columns: 1fr;
+  gap: 0.1rem;
   margin: 0;
-  padding: 0.35rem 0.9rem 0.8rem;
+  padding: 0.35rem 0.85rem 0.7rem;
   list-style: none;
+  border-top: 1px solid var(--mc-rule);
 }
 .mc-legend__item {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.55rem;
   min-width: 0;
-  font-size: 0.78rem;
-  line-height: 1.15;
+  min-height: 1.75rem;
+  font-size: 0.875rem;
+  line-height: 1.25;
 }
 .mc-legend__item span {
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 .mc-legend__icon {
-  width: 0.95rem;
+  width: 1.15rem;
   height: auto;
   flex: none;
-}
-
-@media (min-width: 640px) {
-  .mc-ctrl {
-    width: 15.5rem;
-  }
-  .mc-legend {
-    grid-template-columns: 1fr;
-    gap: 0.15rem;
-  }
-  .mc-legend__item {
-    padding: 0.28rem 0;
-    font-size: 0.84rem;
-  }
-  .mc-legend__icon {
-    width: 1.05rem;
-  }
 }
 
 @keyframes mc-drop {
@@ -349,7 +397,8 @@ defineExpose({ showCurrentLocation, occurrenceLngLat });
 @media (prefers-reduced-motion: reduce) {
   .mc-pin,
   .mc-pin--draft,
-  .mc-locate__spin {
+  .mc-locate__spin,
+  .mc-legend__chevron {
     animation-duration: 0.01ms;
     animation-iteration-count: 1;
     transition: none;
@@ -373,6 +422,11 @@ defineExpose({ showCurrentLocation, occurrenceLngLat });
   cursor: grabbing;
 }
 
+.maplibregl-map .maplibregl-popup:has(.mc-inform) .maplibregl-popup-content {
+  min-width: 17.5rem;
+  padding: 0.4rem 3.55rem 0.4rem 0.4rem;
+}
+
 .maplibregl-map .maplibregl-popup-content {
   min-width: 15rem;
   max-width: min(19rem, calc(100vw - 2.5rem));
@@ -380,12 +434,12 @@ defineExpose({ showCurrentLocation, occurrenceLngLat });
   overflow: hidden;
   background: var(--mc-card);
   color: var(--mc-ink);
-  border: 0;
+  border: 1px solid var(--mc-rule);
   border-radius: var(--mc-radius);
   box-shadow: var(--mc-shadow);
   font-family: var(--mc-font);
-  font-weight: 550;
-  animation: mc-popup-in 0.34s var(--mc-ease) both;
+  font-weight: 400;
+  animation: mc-popup-in 0.24s var(--mc-ease) both;
 }
 .maplibregl-map [class*="maplibregl-popup-anchor-bottom"] .maplibregl-popup-tip {
   border-top-color: var(--mc-card);
@@ -400,17 +454,17 @@ defineExpose({ showCurrentLocation, occurrenceLngLat });
   border-left-color: var(--mc-card);
 }
 .maplibregl-map .maplibregl-popup-close-button {
-  top: 0.55rem;
-  right: 0.45rem;
-  width: 1.75rem;
-  height: 1.75rem;
+  top: 0.4rem;
+  right: 0.35rem;
+  width: 2.75rem;
+  height: 2.75rem;
   display: grid;
   place-items: center;
   padding: 0;
-  border-radius: 999px;
+  border-radius: var(--mc-radius);
   color: var(--mc-ink-soft);
   font: 1.15rem/1 var(--mc-font);
-  transition: background-color 0.18s var(--mc-ease);
+  transition: background-color 0.2s var(--mc-ease);
 }
 .maplibregl-map .maplibregl-popup-close-button:hover {
   background: color-mix(in oklch, var(--mc-ink) 8%, transparent);
@@ -431,6 +485,35 @@ defineExpose({ showCurrentLocation, occurrenceLngLat });
 }
 .maplibregl-map .maplibregl-ctrl-attrib a {
   color: var(--mc-ink-soft);
+}
+.maplibregl-map .maplibregl-ctrl-attrib a:hover {
+  color: var(--mc-accent);
+}
+
+.maplibregl-map .maplibregl-ctrl-group {
+  overflow: hidden;
+  background: var(--mc-card);
+  border: 1px solid var(--mc-rule);
+  border-radius: var(--mc-radius);
+  box-shadow: var(--mc-shadow);
+}
+.maplibregl-map .maplibregl-ctrl-group button {
+  width: 2.75rem;
+  height: 2.75rem;
+  background-color: transparent;
+}
+.maplibregl-map .maplibregl-ctrl-group button + button {
+  border-top: 1px solid var(--mc-rule);
+}
+.maplibregl-map .maplibregl-ctrl-group button:hover {
+  background-color: color-mix(in oklch, var(--mc-accent) 12%, var(--mc-card));
+}
+.maplibregl-map .maplibregl-ctrl-group button:focus-visible {
+  outline: 2px solid var(--mc-accent);
+  outline-offset: -2px;
+}
+.dark .maplibregl-map .maplibregl-ctrl-icon {
+  filter: invert(1);
 }
 
 @keyframes mc-popup-in {

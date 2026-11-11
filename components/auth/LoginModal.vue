@@ -6,30 +6,44 @@
     :close="{
       color: 'tertiary',
       variant: 'outline',
-      class: 'rounded-full cursor-pointer',
+      class: 'mc-dialog__close',
       onClick: resetForm,
     }"
+    :ui="{
+      overlay: 'mc-overlay',
+      content: 'mc-dialog',
+      header: 'mc-dialog__header',
+      title: 'mc-dialog__title',
+      body: 'mc-dialog__body',
+    }"
   >
-    <UButton label="Entrar" color="tertiary" class="cursor-pointer" />
+    <UButton label="Entrar" color="tertiary" class="min-h-11 cursor-pointer" />
 
     <template #body>
       <UForm
         :schema="loginUserSchema"
         :state="state"
-        class="space-y-4"
+        class="space-y-5"
         @submit="onSubmit"
       >
-        <UFormField label="Email" name="email">
-          <UInput v-model="state.email" class="w-full" color="tertiary" />
+        <UFormField label="Email" name="email" size="lg">
+          <UInput
+            v-model="state.email"
+            class="w-full"
+            color="tertiary"
+            size="lg"
+            :ui="{ base: 'mc-field' }"
+          />
         </UFormField>
 
-        <UFormField label="Senha" name="password">
+        <UFormField label="Senha" name="password" size="lg">
           <UInput
             v-model="state.password"
             class="w-full"
             color="tertiary"
+            size="lg"
             :type="showPassword ? 'text' : 'password'"
-            :ui="{ trailing: 'pe-1' }"
+            :ui="{ base: 'mc-field', trailing: 'pe-1' }"
           >
             <template #trailing>
               <UButton
@@ -47,17 +61,18 @@
 
         <UButton
           type="submit"
-          class="w-full flex justify-center"
+          color="tertiary"
           :loading="authStore.loading"
-          :ui="{ base: primaryButtonClass }"
+          :ui="{ base: 'mc-btn' }"
+          block
         >
           Entrar
         </UButton>
       </UForm>
 
-      <div class="text-sm font-medium text-gray-500 dark:text-gray-300 mt-5">
+      <p class="mc-note mt-5">
         Sem registro? <RegisterModal />
-      </div>
+      </p>
     </template>
   </UModal>
 </template>
@@ -68,9 +83,6 @@ import {
   loginUserSchema,
   type LoginUserSchema,
 } from "~/validators/loginUserSchema";
-
-const primaryButtonClass =
-  "text-white bg-indigo-700 hover:bg-indigo-800 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800 cursor-pointer";
 
 const state = reactive<Partial<LoginUserSchema>>({
   email: undefined,

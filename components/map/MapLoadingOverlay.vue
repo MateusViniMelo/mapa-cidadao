@@ -19,7 +19,7 @@
   background: color-mix(in oklch, var(--mc-card) 88%, transparent);
   color: var(--mc-ink);
   font-family: var(--mc-font);
-  font-weight: 550;
+  font-weight: 400;
   animation: mc-fade 0.3s var(--mc-ease) both;
 }
 
@@ -59,7 +59,7 @@
 .mc-loading__text {
   margin: 0;
   font-size: 0.95rem;
-  font-weight: 650;
+  font-weight: 700;
   letter-spacing: -0.02em;
 }
 

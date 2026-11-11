@@ -1,5 +1,5 @@
 <template>
-  <header class="sticky top-0 z-40 border-b border-default bg-white dark:bg-gray-900">
+  <header class="mc-bar sticky top-0 z-40 border-b border-default">
     <UContainer class="flex h-16 items-center gap-3">
       <NuxtLink
         to="/"
@@ -8,7 +8,7 @@
       >
         <span class="wordmark truncate text-[1.35rem] leading-none text-highlighted">
           Mapa
-          <span class="italic text-tertiary">Cidadão</span>
+          <span class="text-tertiary">Cidadão</span>
         </span>
       </NuxtLink>
 
@@ -35,7 +35,7 @@
           <UButton
             color="neutral"
             variant="ghost"
-            class="cursor-pointer px-1.5"
+            class="min-h-11 min-w-11 cursor-pointer px-1.5"
             :aria-label="`Conta de ${authStore.user.name}`"
           >
             <UAvatar :alt="authStore.user.name" size="sm" />
@@ -43,7 +43,7 @@
         </UDropdownMenu>
 
         <UButton
-          class="cursor-pointer lg:hidden"
+          class="min-h-11 min-w-11 cursor-pointer lg:hidden"
           color="neutral"
           variant="ghost"
           square
@@ -135,16 +135,9 @@ const accountItems = computed<DropdownMenuItem[][]>(() => {
 </script>
 
 <style scoped>
-.wordmark {
-  font-family: Fraunces, "Iowan Old Style", Palatino, Georgia, serif;
-  font-optical-sizing: auto;
-  font-weight: 560;
-  letter-spacing: -0.03em;
-}
-
 .nav-panel {
   display: grid;
-  transition: grid-template-rows 320ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: grid-template-rows 220ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @media (prefers-reduced-motion: reduce) {
