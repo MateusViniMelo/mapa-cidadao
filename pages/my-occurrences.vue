@@ -47,19 +47,13 @@ const { myOccurrences, loadingMine } = storeToRefs(store);
 const { loadMyOccurrences } = store;
 const { columns } = useMyOccurrencesColumns();
 
-const currentPage = ref(1);
+const currentPage = shallowRef(1);
 
-watch(currentPage, (page) => {
-  loadMyOccurrences(page);
-});
-
-watch(myOccurrences, (mine) => {
-  if (mine && mine.page !== currentPage.value) {
-    currentPage.value = mine.page;
-  }
-});
-
-onMounted(async () => {
-  await loadMyOccurrences();
-});
+watch(
+  currentPage,
+  (page) => {
+    loadMyOccurrences(page);
+  },
+  { immediate: true },
+);
 </script>
