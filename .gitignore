@@ -28,3 +28,6 @@ logs
 .env
 .env.*
 !.env.example
+
+# Runbook local do agente
+.cursor/napkin.md
