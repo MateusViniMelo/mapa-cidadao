@@ -17,7 +17,7 @@ export function rasterStyle(cartoApiKey: string) {
         type: "raster" as const,
         tiles: [
           carto
-            ? `https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png?key=${cartoApiKey}`
+            ? `https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png?key=${cartoApiKey}`
             : "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
         ],
         tileSize: 256,

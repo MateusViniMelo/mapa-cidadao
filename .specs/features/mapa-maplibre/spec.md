@@ -51,7 +51,7 @@ A página de ocorrências desenha o mapa com Leaflet, monta o popup como HTML e 
 
 **Acceptance Criteria**:
 
-1. WHERE `NUXT_PUBLIC_CARTO_API_KEY` tem valor THEN the basemap SHALL request `https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png?key=` seguido dessa chave, with `tileSize` 256, `maxzoom` 20, and attribution `&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>`.
+1. WHERE `NUXT_PUBLIC_CARTO_API_KEY` tem valor THEN the basemap SHALL request `https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png?key=` seguido dessa chave, with `tileSize` 256, `maxzoom` 20, and attribution `&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>`.
 2. WHEN the chave está vazia THEN the basemap SHALL request `https://tile.openstreetmap.org/{z}/{x}/{y}.png`, with `tileSize` 256, `maxzoom` 19, and attribution `&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>`.
 3. The map SHALL open at longitude -48.49, latitude -1.45 and zoom 13.
 4. WHEN a localização atual chega THEN the map SHALL center that point at zoom 16.

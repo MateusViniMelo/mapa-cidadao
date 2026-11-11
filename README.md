@@ -1,84 +1,93 @@
-# Mapas Sociais App
+# Mapa Cidadão
 
-## Descrição
-
-O **Mapas Sociais App** é uma aplicação web desenvolvida com Nuxt 3 para facilitar o reporte e visualização de ocorrências sociais em mapas interativos. O projeto permite aos usuários registrar, visualizar e gerenciar ocorrências em um mapa, utilizando geolocalização e autenticação de usuários.
+Aplicação web em Nuxt 3 para registrar e acompanhar problemas da cidade no mapa: iluminação, pavimentação, alagamento e lixo. Quem tem 18 anos ou mais cria uma conta, marca o ponto e outras pessoas podem ver e confirmar a ocorrência.
 
 ## Funcionalidades
 
-- **Autenticação de Usuários**: Login e registro de usuários.
-- **Mapa Interativo**: Visualização de ocorrências em um mapa usando Leaflet.
-- **Reportar Ocorrências**: Usuários podem criar e gerenciar suas próprias ocorrências.
-- **Geolocalização Reversa**: Integração com API para obter endereços a partir de coordenadas.
-- **Modo Escuro/Claro**: Alternância de tema com botão dedicado.
-- **Páginas Principais**:
-  - Página inicial com mapa.
-  - Minhas Ocorrências: Lista de ocorrências do usuário.
-  - Sobre: Informações sobre o projeto.
+- Cadastro e login com sessão em cookie HttpOnly. O e-mail é gravado em minúsculas.
+- Mapa com MapLibre. Com `NUXT_PUBLIC_CARTO_API_KEY`, os tiles vêm da CARTO; sem a chave, o mapa usa o OpenStreetMap.
+- Criação de ocorrência no clique do mapa, com endereço obtido no Nominatim.
+- Curtida e encerramento da própria ocorrência.
+- Lista em Minhas Ocorrências (`/my-occurrences`).
+- Tema claro e escuro.
+- Páginas: início (`/`), sobre (`/sobre`) e minhas ocorrências.
 
-## Tecnologias Utilizadas
+Os cinco tipos gravados no seed são Problema de Iluminação, Problema de Pavimentação, Alagamento, Acúmulo de Lixo e Falta de Pavimentação.
 
-- **Nuxt 3**: Framework Vue.js para aplicações universais.
-- **Vue 3**: Framework JavaScript progressivo.
-- **TypeScript**: Superset tipado do JavaScript.
-- **Leaflet**: Biblioteca para mapas interativos.
-- **Pinia**: Gerenciamento de estado para Vue.js.
-- **Tailwind CSS**: Framework CSS utilitário.
-- **Flowbite**: Componentes UI baseados em Tailwind CSS.
-- **Zod**: Validação de esquemas.
-- **Axios**: Cliente HTTP para requisições API.
+## Tecnologias
+
+- Nuxt 3, Vue 3 e TypeScript
+- Nuxt UI 3 e Tailwind CSS
+- Pinia
+- MapLibre (`nuxt-maplibre`)
+- Prisma 7 com PostgreSQL e PostGIS
+- Zod
+- Vitest
 
 ## Pré-requisitos
 
 - Node.js 22 ou superior
 - npm
-- PostgreSQL com PostGIS (localmente, `docker compose up -d`)
+- Docker, para o Postgres local com PostGIS
 
 ## Instalação
 
-1. Clone o repositório:
-   ```bash
-   cd mapas-sociais-app
-   ```
+1. Copie o ambiente antes de instalar. O `postinstall` gera o Prisma Client e o CLI lê essas variáveis:
 
-2. Instale as dependências:
    ```bash
+   cp .env.example .env
    npm install
    ```
 
-3. Copie `.env.example` para `.env` e ajuste as variáveis.
+2. Suba o banco. O Compose cria `mapa_cidadao` e `mapa_cidadao_test`:
 
-## Executando o Projeto
+   ```bash
+   docker compose up -d
+   ```
 
-Para executar em modo de desenvolvimento:
+3. Aplique as migrations e grave os tipos de ocorrência:
+
+   ```bash
+   npx prisma migrate deploy
+   npx prisma db seed
+   ```
+
+4. Rode o servidor de desenvolvimento:
+
+   ```bash
+   npm run dev
+   ```
+
+A aplicação fica em `http://localhost:3000`.
+
+O seed de produção grava só os cinco tipos. Usuários e ocorrências de Belém e Ananindeua entram apenas no banco de teste:
+
 ```bash
-npm run dev
+npm run db:seed:test
 ```
 
-A aplicação estará disponível em `http://localhost:3000`.
+## Scripts
 
-Para build de produção:
-```bash
-npm run build
-```
+| Comando | O que faz |
+| --- | --- |
+| `npm run dev` | Servidor de desenvolvimento |
+| `npm run build` | Build do Nuxt |
+| `npm run preview` | Preview da build |
+| `npx vitest run` | Testes. Exigem o Postgres local; o Vitest só aceita o banco `mapa_cidadao_test` |
+| `npm run db:seed:test` | Fixtures locais em `mapa_cidadao_test` |
 
-Para preview da build:
-```bash
-npm run preview
-```
+## Estrutura
 
-## Estrutura do Projeto
+- `components/`: mapa, autenticação e layout.
+- `pages/`: `index.vue`, `sobre.vue` e `my-occurrences.vue`.
+- `composables/` e `stores/`: lógica de cliente e estado Pinia.
+- `server/api/`: rotas Nitro.
+- `server/domain/`: autenticação, ocorrências e geocodificação.
+- `prisma/`: schema, migrations e seeds.
+- `validators/`, `interfaces/` e `utils/`: contratos compartilhados.
+- `test/`: testes Vitest.
 
-- `components/`: Componentes Vue reutilizáveis (Navbar, Mapa, Modais, etc.).
-- `pages/`: Páginas da aplicação (index, minhas-ocorrências, sobre).
-- `composables/`: Funções composáveis para lógica reutilizável.
-- `stores/`: Stores Pinia para gerenciamento de estado.
-- `interfaces/`: Definições de tipos TypeScript.
-- `services/`: Serviços para comunicação com APIs.
-- `middleware/`: Middlewares para autenticação e outras lógicas.
-- `server/api/`: APIs do lado servidor (ex: reverse geocoding).
-- `assets/`: Arquivos estáticos (CSS, imagens).
-
+A coordenada da ocorrência trafega como GeoJSON: `[longitude, latitude]`.
 
 ## Deploy na Vercel
 
@@ -99,7 +108,3 @@ Variáveis no projeto da Vercel (Production e Preview):
 Localmente as duas URLs podem ser iguais. No Neon, o par é o mesmo: URL com `-pooler` na `DATABASE_URL` e URL direta na `DIRECT_URL`.
 
 A migration `20261110173000_enable_rls` liga RLS nas tabelas do `public`. Sem policies, a Data API do Supabase fica fechada. O Prisma segue acessando pelo papel dono da tabela, que o Postgres isenta do RLS.
-
-## Licença
-
-Este projeto está licenciado sob a [MIT License](LICENSE).

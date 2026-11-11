@@ -19,7 +19,7 @@ test("voyager raster", () => {
   const source = style.sources.basemap;
 
   expect(source.tiles[0]).toBe(
-    "https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png?key=chave-teste",
+    "https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png?key=chave-teste",
   );
   expect(source.tileSize).toBe(256);
   expect(source.maxzoom).toBe(20);
