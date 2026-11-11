@@ -37,13 +37,13 @@ test("an aborted search does not raise the address error", async () => {
     }),
   );
 
-  const { buscarEndereco, erroEndereco, carregando } = useReverseGeocoding();
-  const pending = buscarEndereco(-1.45, -48.49, controller.signal);
+  const { lookupAddress, addressError, loadingAddress } = useReverseGeocoding();
+  const pending = lookupAddress(-1.45, -48.49, controller.signal);
   controller.abort();
   await pending;
 
-  expect(erroEndereco.value).toBeNull();
-  expect(carregando.value).toBe(false);
+  expect(addressError.value).toBeNull();
+  expect(loadingAddress.value).toBe(false);
 });
 
 test("an older search does not clear the newer loading flag", async () => {
@@ -58,28 +58,28 @@ test("an older search does not clear the newer loading flag", async () => {
     ),
   );
 
-  const { buscarEndereco, carregando } = useReverseGeocoding();
-  const first = buscarEndereco(-1.45, -48.49);
-  const second = buscarEndereco(-1.46, -48.5);
-  expect(carregando.value).toBe(true);
+  const { lookupAddress, loadingAddress } = useReverseGeocoding();
+  const first = lookupAddress(-1.45, -48.49);
+  const second = lookupAddress(-1.46, -48.5);
+  expect(loadingAddress.value).toBe(true);
 
   pending[0]?.(jsonResponse("Primeiro"));
   await first;
-  expect(carregando.value).toBe(true);
+  expect(loadingAddress.value).toBe(true);
 
   pending[1]?.(jsonResponse("Segundo"));
   await second;
-  expect(carregando.value).toBe(false);
+  expect(loadingAddress.value).toBe(false);
 });
 
 test("address flags are readonly", () => {
-  const { carregando, erroEndereco } = useReverseGeocoding();
+  const { loadingAddress, addressError } = useReverseGeocoding();
 
-  expect(isReadonly(carregando)).toBe(true);
-  expect(isReadonly(erroEndereco)).toBe(true);
+  expect(isReadonly(loadingAddress)).toBe(true);
+  expect(isReadonly(addressError)).toBe(true);
 
   const draft = useCreateOccurrence();
-  expect(isReadonly(draft.carregando)).toBe(true);
-  expect(isReadonly(draft.erroEndereco)).toBe(true);
+  expect(isReadonly(draft.loadingAddress)).toBe(true);
+  expect(isReadonly(draft.addressError)).toBe(true);
   expect(isReadonly(draft.address)).toBe(true);
 });

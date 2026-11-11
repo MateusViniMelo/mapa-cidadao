@@ -35,7 +35,7 @@ export function useCreateOccurrence() {
     const typesResult = await catalog.ensureLoaded();
     if (ticket !== session || !point || !next || controller !== next) return typesResult;
 
-    const found = await geocoding.buscarEndereco(point.lat, point.lng, next.signal);
+    const found = await geocoding.lookupAddress(point.lat, point.lng, next.signal);
     if (ticket !== session || controller !== next || next.signal.aborted) return typesResult;
     address.value = found ?? null;
     return typesResult;
@@ -54,8 +54,8 @@ export function useCreateOccurrence() {
     description,
     selectedType,
     address: readonly(address),
-    carregando: geocoding.carregando,
-    erroEndereco: geocoding.erroEndereco,
+    loadingAddress: geocoding.loadingAddress,
+    addressError: geocoding.addressError,
     typeOptions: catalog.typeOptions,
     begin,
     resetDraft,

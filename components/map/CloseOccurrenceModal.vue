@@ -6,7 +6,7 @@
       color: 'tertiary',
       variant: 'outline',
       class: 'mc-dialog__close',
-      onClick: resetAndClose,
+      onClick: () => emit('close'),
     }"
     :ui="{
       overlay: 'mc-overlay',
@@ -46,11 +46,7 @@
 
           <UFormField
             v-if="showDateField"
-            :label="
-              state.type_closure === 'resolved'
-                ? 'Data de solução do problema?'
-                : 'Data de quando aconteceu?'
-            "
+            :label="resolutionDateLabel"
             name="resolution_date"
             class="w-full"
             size="lg"
@@ -66,7 +62,7 @@
         </div>
 
         <UFormField
-          v-if="showDescriptionField"
+          v-if="showDateField"
           label="Descreva o motivo?"
           size="lg"
           name="solution_description"
@@ -137,28 +133,27 @@ const state = reactive<Partial<InactivateOccurrenceSchema>>({
   resolution_date: undefined,
 });
 
+function reset() {
+  state.type_closure = TypeOccurrenceClosure.RESOLVED;
+  state.solution_description = undefined;
+  state.resolution_date = undefined;
+}
+
 watch(isOpen, (open) => {
-  if (!open) {
-    state.type_closure = TypeOccurrenceClosure.RESOLVED;
-    state.solution_description = undefined;
-    state.resolution_date = undefined;
-  }
+  if (!open) reset();
 });
 
 const showDateField = computed(
   () =>
     state.type_closure === TypeOccurrenceClosure.OTHER ||
-    state.type_closure === TypeOccurrenceClosure.RESOLVED
+    state.type_closure === TypeOccurrenceClosure.RESOLVED,
 );
 
-const showDescriptionField = computed(() => showDateField.value);
-
-function resetAndClose() {
-  state.type_closure = TypeOccurrenceClosure.RESOLVED;
-  state.solution_description = undefined;
-  state.resolution_date = undefined;
-  emit("close");
-}
+const resolutionDateLabel = computed(() =>
+  state.type_closure === TypeOccurrenceClosure.RESOLVED
+    ? "Data de solução do problema?"
+    : "Data de quando aconteceu?",
+);
 
 function onSubmit(event: FormSubmitEvent<InactivateOccurrenceSchema>) {
   if (props.occurrenceId == null) return;

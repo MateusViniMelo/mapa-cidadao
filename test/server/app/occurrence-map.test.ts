@@ -143,15 +143,15 @@ test("save stays disabled without a category", () => {
 });
 
 test("save closes the dialog on success", () => {
-  const save = sliceFunction(page, "salvarOcorrencia");
-  const closeAt = save.indexOf("modalAberto.value = false");
+  const save = sliceFunction(page, "saveOccurrence");
+  const closeAt = save.indexOf("createOpen.value = false");
   expect(save).toContain("mapNotices.created");
   expect(closeAt).toBeGreaterThan(save.indexOf("finally"));
 });
 
 test("save closes the dialog on error", () => {
-  const save = sliceFunction(page, "salvarOcorrencia");
-  const closeAt = save.indexOf("modalAberto.value = false");
+  const save = sliceFunction(page, "saveOccurrence");
+  const closeAt = save.indexOf("createOpen.value = false");
   expect(save).toContain("mapNotices.createError");
   expect(closeAt).toBeGreaterThan(save.indexOf("finally"));
 });

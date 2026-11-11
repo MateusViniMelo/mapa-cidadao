@@ -71,7 +71,7 @@ test("a second search keeps its address", async () => {
   await second;
 
   expect(draft.address.value?.display_name).toBe("Segundo");
-  expect(draft.erroEndereco.value).toBeNull();
+  expect(draft.addressError.value).toBeNull();
 });
 
 test("the newer search stays loading", async () => {
@@ -83,19 +83,19 @@ test("the newer search stays loading", async () => {
   const second = draft.begin({ lat: -1.46, lng: -48.5 });
   await vi.waitFor(() => expect(geocodes).toHaveLength(2));
 
-  expect(draft.carregando.value).toBe(true);
+  expect(draft.loadingAddress.value).toBe(true);
 
   const aborted = new Error("The operation was aborted");
   aborted.name = "AbortError";
   geocodes[0]?.reject(aborted);
   await first;
 
-  expect(draft.carregando.value).toBe(true);
-  expect(draft.erroEndereco.value).toBeNull();
+  expect(draft.loadingAddress.value).toBe(true);
+  expect(draft.addressError.value).toBeNull();
 
   geocodes[1]?.resolve(ok(addressBody("Segundo")));
   await second;
-  expect(draft.carregando.value).toBe(false);
+  expect(draft.loadingAddress.value).toBe(false);
 });
 
 test("closing drops a late address", async () => {

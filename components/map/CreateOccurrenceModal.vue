@@ -20,7 +20,7 @@
       <form class="space-y-5" @submit.prevent="onSubmit">
         <UFormField label="Endereço" size="lg" readonly>
           <UInput
-            :loading="carregando"
+            :loading="loadingAddress"
             size="lg"
             :value="address?.display_name ?? null"
             readonly
@@ -28,7 +28,7 @@
             color="tertiary"
             :ui="{ base: 'mc-field' }"
           />
-          <p v-if="addressError" class="mc-note mt-2">
+          <p v-if="hasAddressError" class="mc-note mt-2">
             Não foi possível obter o endereço, mas ainda é possível salvar a
             ocorrência.
           </p>
@@ -74,7 +74,7 @@
 
         <UButton
           type="submit"
-          :loading="loading || carregando"
+          :loading="loading || loadingAddress"
           :disabled="selectedType == null"
           color="tertiary"
           :ui="{ base: 'mc-btn' }"
@@ -114,8 +114,8 @@ const {
   description,
   selectedType,
   address,
-  carregando,
-  erroEndereco,
+  loadingAddress,
+  addressError,
   typeOptions,
   begin,
   resetDraft,
@@ -123,7 +123,7 @@ const {
 } = useCreateOccurrence();
 
 const maxLength = MAX_LENGTH;
-const addressError = computed(() => erroEndereco.value != null);
+const hasAddressError = computed(() => addressError.value != null);
 
 watch(
   () => [isOpen.value, props.informToken] as const,

@@ -6,18 +6,18 @@ function isAbort(error: unknown): boolean {
 }
 
 export function useReverseGeocoding() {
-  const carregando = shallowRef(false);
-  const erroEndereco = shallowRef<string | null>(null);
+  const loadingAddress = shallowRef(false);
+  const addressError = shallowRef<string | null>(null);
   let active = 0;
 
-  async function buscarEndereco(
+  async function lookupAddress(
     lat: number,
     lng: number,
     signal?: AbortSignal,
   ): Promise<EnderecoNominatim | undefined> {
     const id = ++active;
-    carregando.value = true;
-    erroEndereco.value = null;
+    loadingAddress.value = true;
+    addressError.value = null;
 
     try {
       const res = await fetch(`/api/reverse-geocoding?lat=${lat}&lng=${lng}`, {
@@ -30,18 +30,18 @@ export function useReverseGeocoding() {
       return data;
     } catch (error: unknown) {
       if (isAbort(error) || signal?.aborted || id !== active) return;
-      erroEndereco.value =
+      addressError.value =
         error instanceof Error && error.message
           ? error.message
           : "Erro desconhecido";
     } finally {
-      if (id === active) carregando.value = false;
+      if (id === active) loadingAddress.value = false;
     }
   }
 
   return {
-    carregando: readonly(carregando),
-    erroEndereco: readonly(erroEndereco),
-    buscarEndereco,
+    loadingAddress: readonly(loadingAddress),
+    addressError: readonly(addressError),
+    lookupAddress,
   };
 }

@@ -2,7 +2,7 @@
   <div class="mc-surface">
     <div class="mc-plate relative w-full overflow-hidden">
       <MapLibreMap
-        v-model:point="localizacaoSelecionada"
+        v-model:point="selectedPoint"
         :occurrences="occurrences"
         :user-id="authStore.user?.id ?? null"
         :liking-id="likingId"
@@ -16,17 +16,17 @@
   </div>
 
   <CreateOccurrenceModal
-    v-model:open="modalAberto"
-    :point="localizacaoSelecionada"
+    v-model:open="createOpen"
+    :point="selectedPoint"
     :inform-token="informToken"
     :loading="saving"
-    @submit="salvarOcorrencia"
+    @submit="saveOccurrence"
     @missing-point="onMissingPoint"
     @types-error="onTypesError"
   />
 
   <CloseOccurrenceModal
-    v-model:open="modalFinalizarOcorrencia"
+    v-model:open="closeOpen"
     :occurrence-id="occurrenceToClose"
     :loading="closing"
     @submit="onSubmitInactivateOccurrence"
@@ -46,15 +46,15 @@ const { occurrences, loadingOccurrences, saving, closing, likingId } =
   storeToRefs(occurrenceStore);
 const toast = useToast();
 
-const localizacaoSelecionada = ref<{ lat: number; lng: number } | null>(null);
+const selectedPoint = ref<{ lat: number; lng: number } | null>(null);
 const informToken = shallowRef(0);
-const modalAberto = ref(false);
-const modalFinalizarOcorrencia = ref(false);
+const createOpen = ref(false);
+const closeOpen = ref(false);
 const occurrenceToClose = shallowRef<number | null>(null);
 
 function onCloseRequest(id: number) {
   occurrenceToClose.value = id;
-  modalFinalizarOcorrencia.value = true;
+  closeOpen.value = true;
 }
 
 function onCloseFinished() {
@@ -76,7 +76,7 @@ async function onSubmitInactivateOccurrence(
 
   try {
     await occurrenceStore.inactive(data, id);
-    modalFinalizarOcorrencia.value = false;
+    closeOpen.value = false;
     onCloseFinished();
     toast.add(mapNotices.inactivated);
   } catch {
@@ -84,14 +84,14 @@ async function onSubmitInactivateOccurrence(
   }
 }
 
-async function salvarOcorrencia(payload: IOccurrencePayload) {
+async function saveOccurrence(payload: IOccurrencePayload) {
   try {
     await occurrenceStore.addOccurrence(payload);
     toast.add(mapNotices.created);
   } catch {
     toast.add(mapNotices.createError);
   } finally {
-    modalAberto.value = false;
+    createOpen.value = false;
   }
 }
 
@@ -101,7 +101,7 @@ function openCreateModal() {
     return;
   }
 
-  modalAberto.value = true;
+  createOpen.value = true;
   informToken.value += 1;
 }
 
