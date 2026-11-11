@@ -104,6 +104,19 @@ test("register stores a bcrypt password", async () => {
   expect(row.password.split("$")[2]).toBe("12");
 });
 
+test("rejects the same email with different casing", async () => {
+  const first = await postRegister({ ...payload, email: "Ana@Example.invalid" });
+  expect(first.status).toBe(200);
+  expect(first.body.user.email).toBe("ana@example.invalid");
+
+  const row = await prisma.user.findUnique({ where: { email: "ana@example.invalid" } });
+  expect(row?.email).toBe("ana@example.invalid");
+
+  const second = await postRegister({ ...payload, email: "ana@example.invalid" });
+  expect(second.status).toBe(422);
+  expect(await prisma.user.count()).toBe(1);
+});
+
 test("rejects a duplicate email", async () => {
   const first = await postRegister();
   expect(first.status).toBe(200);

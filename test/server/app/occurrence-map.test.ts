@@ -181,6 +181,11 @@ test("each operation keeps its own loading flag", () => {
   expect(mine).not.toContain("closing");
 });
 
+test("address input reads the display name", () => {
+  expect(createDialog).toContain(':model-value="address?.display_name ?? \'\'"');
+  expect(createDialog).not.toContain(":value=");
+});
+
 test("dialogs keep their phrases", () => {
   const createText = createDialog.replace(/\s+/g, " ");
   expect(createText).toContain("UModal");

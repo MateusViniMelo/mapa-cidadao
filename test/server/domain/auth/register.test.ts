@@ -132,6 +132,23 @@ test("rejects a mismatched confirmation", async () => {
   }
 });
 
+test("stores the email in lowercase", async () => {
+  let seen = "";
+  const result = await validateRegistration(
+    { ...valid, email: "  Ana@Example.COM " },
+    async (email) => {
+      seen = email;
+      return true;
+    },
+  );
+
+  expect(seen).toBe("ana@example.com");
+  expect(result.ok).toBe(true);
+  if (result.ok) {
+    expect(result.value.email).toBe("ana@example.com");
+  }
+});
+
 test("rejects a birth date under 18", async () => {
   const limit = utcYearsAgo(18, new Date());
   const tooYoung = await validateRegistration(

@@ -80,6 +80,24 @@ test("login sets the session cookie", async () => {
   expect(line).toContain("Max-Age=604800");
 });
 
+test("login finds the email in lowercase", async () => {
+  const created = await callHandler<{ user: UserJson }>(registerHandler, {
+    method: "POST",
+    url: "/api/register",
+    body: { ...payload, email: "Ana@Example.invalid" },
+  });
+  expect(created.status).toBe(200);
+  expect(created.body.user.email).toBe("ana@example.invalid");
+
+  const response = await postLogin({
+    email: "  ANA@example.invalid ",
+    password: payload.password,
+  });
+  expect(response.status).toBe(200);
+  expect(response.body.user.id).toBe(created.body.user.id);
+  expect(response.body.user.email).toBe("ana@example.invalid");
+});
+
 test("login rejects bad credentials", async () => {
   await register();
 

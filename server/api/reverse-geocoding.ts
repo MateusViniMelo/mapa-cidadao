@@ -1,21 +1,20 @@
-// server/api/reverse-geocoding.ts
+import { defineEventHandler, getQuery, setResponseStatus } from "h3";
+import {
+  fetchNominatimPlace,
+  parseLatitude,
+  parseLongitude,
+  reverseGeocodePoint,
+} from "../domain/geo/reverse-geocode";
+
 export default defineEventHandler(async (event) => {
   const query = getQuery(event);
-  const lat = query.lat;
-  const lon = query.lng;
+  const latitude = parseLatitude(query.lat);
+  const longitude = parseLongitude(query.lng);
 
-  if (!lat || !lon) {
+  if (latitude === null || longitude === null) {
+    setResponseStatus(event, 400);
     return { error: "Coordenadas inválidas" };
   }
 
-  const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`;
-
-  const response = await $fetch(url, {
-    headers: {
-      "Accept-Language": "pt-BR",
-      "User-Agent": "mapa-cidadao/1.0 (email.com@gmail.com)",
-    },
-  });
-
-  return response;
+  return reverseGeocodePoint(latitude, longitude, fetchNominatimPlace);
 });

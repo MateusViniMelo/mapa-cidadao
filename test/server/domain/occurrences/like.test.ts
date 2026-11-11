@@ -1,4 +1,5 @@
 import { afterAll, beforeEach, expect, test } from "vitest";
+import type { PrismaClient } from "generated/prisma/client";
 import { disconnectPrisma, getPrisma } from "../../../../server/db/client";
 import { resetTestDatabase } from "../../../../server/db/migrate";
 import { toggleLike } from "../../../../server/domain/occurrences/like";
@@ -61,6 +62,26 @@ test("keeps one row per user and occurrence", async () => {
     }),
   ).rejects.toMatchObject({ code: "P2002" });
 
+  expect(await countPair(userId, occurrenceId)).toBe(1);
+});
+
+test("a unique conflict counts as already liked", async () => {
+  const { userId, occurrenceId } = await seedPair();
+  await prisma.likeOccurrence.create({
+    data: { user_id: userId, occurrence_id: occurrenceId },
+  });
+
+  const racing = {
+    likeOccurrence: {
+      findFirst: async () => null,
+      delete: prisma.likeOccurrence.delete.bind(prisma.likeOccurrence),
+      create: prisma.likeOccurrence.create.bind(prisma.likeOccurrence),
+    },
+  };
+
+  await expect(
+    toggleLike(racing as unknown as PrismaClient, userId, occurrenceId),
+  ).resolves.toBe("created");
   expect(await countPair(userId, occurrenceId)).toBe(1);
 });
 

@@ -1,4 +1,8 @@
-import type { PrismaClient } from "generated/prisma/client";
+import { Prisma, type PrismaClient } from "generated/prisma/client";
+
+function alreadyLiked(error: unknown): boolean {
+  return error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002";
+}
 
 export async function toggleLike(
   db: PrismaClient,
@@ -14,8 +18,14 @@ export async function toggleLike(
     return "removed";
   }
 
-  await db.likeOccurrence.create({
-    data: { user_id: userId, occurrence_id: occurrenceId },
-  });
+  try {
+    await db.likeOccurrence.create({
+      data: { user_id: userId, occurrence_id: occurrenceId },
+    });
+  } catch (error) {
+    if (alreadyLiked(error)) return "created";
+    throw error;
+  }
+
   return "created";
 }

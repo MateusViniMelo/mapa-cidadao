@@ -22,7 +22,7 @@
           <UInput
             :loading="loadingAddress"
             size="lg"
-            :value="address?.display_name ?? null"
+            :model-value="address?.display_name ?? ''"
             readonly
             class="w-full"
             color="tertiary"

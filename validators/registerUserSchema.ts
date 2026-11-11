@@ -1,5 +1,5 @@
 import { z } from "zod";
-import dayjs from "dayjs";
+import { isAtLeast18 } from "@/utils/adultAge";
 
 export const registerUserSchema = z
   .object({
@@ -25,14 +25,7 @@ export const registerUserSchema = z
 
     date_birth: z
       .string({ required_error: "A data de nascimento é obrigatória" })
-      .refine(
-        (val) => dayjs(val).isBefore(dayjs(), "day"),
-        "A data de nascimento deve ser anterior a hoje"
-      )
-      .refine(
-        (val) => dayjs(val).isBefore(dayjs().subtract(18, "year"), "day"),
-        "Você deve ter pelo menos 18 anos"
-      ),
+      .refine((val) => isAtLeast18(val), "Você deve ter pelo menos 18 anos"),
   })
   .refine((data) => data.password === data.password_confirmation, {
     message: "As senha não são iguais",
