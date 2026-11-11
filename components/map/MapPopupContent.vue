@@ -36,6 +36,8 @@
         type="button"
         class="mc-like"
         :aria-pressed="liked"
+        :aria-busy="liking"
+        :disabled="liking"
         @click="occurrenceId != null && emit('like', occurrenceId)"
       >
         <svg
@@ -77,6 +79,7 @@ defineProps<{
   occurrenceId?: number;
   likesCount?: number;
   liked?: boolean;
+  liking?: boolean;
   isOwner?: boolean;
 }>();
 

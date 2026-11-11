@@ -164,6 +164,23 @@ test("page inactivates with the submitted id", () => {
   );
 });
 
+test("each operation keeps its own loading flag", () => {
+  const mine = readFileSync("pages/my-occurrences.vue", "utf8");
+  const popup = readFileSync("components/map/MapPopupContent.vue", "utf8");
+
+  expect(page).toContain(':loading="saving"');
+  expect(page).toContain(':loading="closing"');
+  expect(page).toContain(':liking-id="likingId"');
+  expect(page).not.toContain("occurrenceStore.loading");
+  expect(map).toContain(':liking="likingId === ocorrencia.id"');
+  expect(popup).toContain(':aria-busy="liking"');
+  expect(popup).toContain(':disabled="liking"');
+  expect(mine).toContain("loadingMine");
+  expect(mine).not.toContain("saving");
+  expect(mine).not.toContain("likingId");
+  expect(mine).not.toContain("closing");
+});
+
 test("dialogs keep their phrases", () => {
   const createText = createDialog.replace(/\s+/g, " ");
   expect(createText).toContain("UModal");

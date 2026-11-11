@@ -31,6 +31,7 @@
           :occurrence-id="ocorrencia.id"
           :likes-count="ocorrencia.likes_count"
           :liked="ocorrencia.liked_by_auth_user"
+          :liking="likingId === ocorrencia.id"
           :is-owner="userId === ocorrencia.user_id"
           @like="emit('like', $event)"
           @close="emit('close', $event)"
@@ -161,6 +162,7 @@ import {
 defineProps<{
   occurrences: IOccurrence[];
   userId: number | null;
+  likingId: number | null;
 }>();
 
 const point = defineModel<{ lat: number; lng: number } | null>("point", {

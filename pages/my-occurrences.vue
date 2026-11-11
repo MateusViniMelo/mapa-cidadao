@@ -8,14 +8,14 @@
     </header>
 
     <UTable
-      :loading="loading"
+      :loading="loadingMine"
       loading-color="tertiary"
       :data="myOccurrences?.data"
       :columns="columns"
       class="mc-table"
     >
       <template #empty>
-        <p v-if="!loading" class="mc-empty">
+        <p v-if="!loadingMine" class="mc-empty">
           As ocorrências que você criar no mapa aparecem aqui.
         </p>
       </template>
@@ -24,7 +24,7 @@
     <div v-if="myOccurrences?.total" class="mc-pager">
       <UPagination
         v-model:page="currentPage"
-        :disabled="loading"
+        :disabled="loadingMine"
         :total="myOccurrences?.total"
         :items-per-page="myOccurrences?.per_page"
         color="tertiary"
@@ -43,7 +43,7 @@ definePageMeta({
 });
 
 const store = useOccurrenceStore();
-const { myOccurrences, loading } = storeToRefs(store);
+const { myOccurrences, loadingMine } = storeToRefs(store);
 const { loadMyOccurrences } = store;
 const { columns } = useMyOccurrencesColumns();
 

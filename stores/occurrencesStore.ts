@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { ref } from "vue";
+import { ref, shallowRef } from "vue";
 import type { IOccurrence } from "~/interfaces/IOccurrence";
 import type { IOccurrencePayload } from "~/interfaces/IOccurrencePayload";
 import type { InactivateOccurrenceSchema } from "~/validators/inactivateOccurrenceSchema";
@@ -7,29 +7,29 @@ import type { MyOccurrencesResponse } from "~/interfaces/responses/MyOccurrences
 
 export const useOccurrenceStore = defineStore("occurrences", () => {
   const occurrences = ref<IOccurrence[]>([]);
-  const loading = ref(false);
   const loadingOccurrences = ref(false);
-  const error = ref<any>(null);
+  const saving = shallowRef(false);
+  const likingId = shallowRef<number | null>(null);
+  const closing = shallowRef(false);
+  const loadingMine = shallowRef(false);
   const myOccurrences = ref<MyOccurrencesResponse>();
 
   const loadOccurrences = async () => {
     loadingOccurrences.value = true;
-    error.value = null;
     try {
       const { occurrences: rows } = await $fetch<{ occurrences: IOccurrence[] }>(
         "/api/occurrences",
       );
       occurrences.value = rows;
-    } catch (err: any) {
-      error.value = err?.data || err;
+    } catch {
+      return;
     } finally {
       loadingOccurrences.value = false;
     }
   };
 
   const addOccurrence = async (payload: IOccurrencePayload) => {
-    loading.value = true;
-    error.value = null;
+    saving.value = true;
     try {
       const { occurrence } = await $fetch<{ occurrence: IOccurrence }>("/api/occurrences", {
         method: "POST",
@@ -37,63 +37,38 @@ export const useOccurrenceStore = defineStore("occurrences", () => {
       });
       occurrences.value.push(occurrence);
       return occurrence;
-    } catch (err: any) {
-      error.value = err?.data || err;
-      throw err;
     } finally {
-      loading.value = false;
-    }
-  };
-
-  const removeOccurrence = async (id: number) => {
-    loading.value = true;
-    error.value = null;
-    try {
-      await $fetch(`/api/occurrences/${id}`, { method: "DELETE" });
-      occurrences.value = occurrences.value.filter((o) => o.id !== id);
-    } catch (err: any) {
-      error.value = err?.data || err;
-      throw err;
-    } finally {
-      loading.value = false;
+      saving.value = false;
     }
   };
 
   const inactive = async (inactiveOccurrence: InactivateOccurrenceSchema, id: number) => {
-    loading.value = true;
-    error.value = null;
+    closing.value = true;
     try {
       await $fetch(`/api/occurrences/inactivate/${id}`, {
         method: "POST",
         body: inactiveOccurrence,
       });
       occurrences.value = occurrences.value.filter((o) => o.id !== id);
-    } catch (err: any) {
-      error.value = err?.data || err;
-      throw err;
     } finally {
-      loading.value = false;
+      closing.value = false;
     }
   };
 
   const loadMyOccurrences = async (page = 1) => {
-    loading.value = true;
-    error.value = null;
+    loadingMine.value = true;
     try {
       myOccurrences.value = await $fetch<MyOccurrencesResponse>(
         `/api/occurrences/my-occurrences?page=${page}`,
       );
-    } catch (err: any) {
-      error.value = err?.data || err;
-      throw err;
     } finally {
-      loading.value = false;
+      loadingMine.value = false;
     }
   };
 
   const toggleLikeOccurrence = async (id: number) => {
-    loading.value = true;
-    error.value = null;
+    if (likingId.value != null) return;
+    likingId.value = id;
     try {
       const { occurrence } = await $fetch<{ occurrence: IOccurrence | null }>(
         `/api/occurrences/like/${id}`,
@@ -108,22 +83,20 @@ export const useOccurrenceStore = defineStore("occurrences", () => {
       }
 
       return occurrence;
-    } catch (err: any) {
-      error.value = err?.data || err;
-      throw err;
     } finally {
-      loading.value = false;
+      if (likingId.value === id) likingId.value = null;
     }
   };
 
   return {
     occurrences,
-    loading,
     loadingOccurrences,
-    error,
+    saving,
+    likingId,
+    closing,
+    loadingMine,
     loadOccurrences,
     addOccurrence,
-    removeOccurrence,
     inactive,
     loadMyOccurrences,
     myOccurrences,

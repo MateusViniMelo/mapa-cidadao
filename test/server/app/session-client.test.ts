@@ -57,7 +57,7 @@ test("register failure toast", () => {
 
 test("occurrences store calls same origin", () => {
   expect(occurrenceStore).toContain('"/api/occurrences"');
-  expect(occurrenceStore).toContain('await $fetch(`/api/occurrences/${id}`, { method: "DELETE" })');
+  expect(occurrenceStore).not.toContain('method: "DELETE"');
   expect(occurrenceStore).toContain("`/api/occurrences/inactivate/${id}`");
   expect(occurrenceStore).toContain("`/api/occurrences/my-occurrences?page=${page}`");
   expect(occurrenceStore).toContain("`/api/occurrences/like/${id}`");

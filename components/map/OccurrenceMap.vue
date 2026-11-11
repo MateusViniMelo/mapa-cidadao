@@ -5,6 +5,7 @@
         v-model:point="localizacaoSelecionada"
         :occurrences="occurrences"
         :user-id="authStore.user?.id ?? null"
+        :liking-id="likingId"
         @inform="openCreateModal"
         @like="onLike"
         @close="onCloseRequest"
@@ -18,7 +19,7 @@
     v-model:open="modalAberto"
     :point="localizacaoSelecionada"
     :inform-token="informToken"
-    :loading="occurrenceStore.loading"
+    :loading="saving"
     @submit="salvarOcorrencia"
     @missing-point="onMissingPoint"
     @types-error="onTypesError"
@@ -27,7 +28,7 @@
   <CloseOccurrenceModal
     v-model:open="modalFinalizarOcorrencia"
     :occurrence-id="occurrenceToClose"
-    :loading="occurrenceStore.loading"
+    :loading="closing"
     @submit="onSubmitInactivateOccurrence"
     @close="onCloseFinished"
   />
@@ -41,7 +42,8 @@ import type { InactivateOccurrenceSchema } from "~/validators/inactivateOccurren
 
 const authStore = useAuthStore();
 const occurrenceStore = useOccurrenceStore();
-const { occurrences, loadingOccurrences } = storeToRefs(occurrenceStore);
+const { occurrences, loadingOccurrences, saving, closing, likingId } =
+  storeToRefs(occurrenceStore);
 const toast = useToast();
 
 const localizacaoSelecionada = ref<{ lat: number; lng: number } | null>(null);
